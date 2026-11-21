@@ -1,0 +1,18 @@
+name: Probe online server
+on:
+  push:
+    branches: [main]
+    paths: ['tools/probe/**', '.github/workflows/probe.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: cd tools/probe && npm init -y >/dev/null && npm i firebase@11 >/dev/null && node probe.mjs | tee ../../probe.log
+      - run: |
+          git config user.name ci; git config user.email ci@example.com
+          git checkout -b ci-logs; git add -f probe.log; git commit -qm "probe $GITHUB_RUN_NUMBER"; git push -f origin ci-logs -q
