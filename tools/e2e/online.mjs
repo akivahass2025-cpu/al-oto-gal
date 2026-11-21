@@ -5,9 +5,9 @@ const URL = 'http://localhost:8080/index.html';
 const log = []; const L = (...a) => { const t = a.join(' '); log.push(t); console.log(t); };
 fs.mkdirSync('shots', { recursive: true });
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'] });
-const mk = async () => { const c = await b.newContext({ viewport: { width: 412, height: 860 }, isMobile: true, hasTouch: true }); const p = await c.newPage(); p.on('pageerror', e => L('PAGEERROR', e.message)); p.on('console', m => m.type() === 'error' && L('CONSOLE', m.text())); await p.goto(URL); await p.waitForTimeout(800); return p; };
+const mk = async () => { const c = await b.newContext({ viewport: { width: 412, height: 860 }, isMobile: true, hasTouch: true }); const p = await c.newPage(); p.on('pageerror', e => L('PAGEERROR', e.message)); p.on('console', m => ['error', 'warning'].includes(m.type()) && L('CONSOLE', m.type(), m.text())); await p.goto(URL); await p.waitForTimeout(800); return p; };
 const scr = async p => p.evaluate(() => document.querySelector('.screen.on')?.id);
-const until = async (p, id, ms = 20000) => { const t = Date.now(); while (Date.now() - t < ms) { if (await scr(p) === id) return true; await p.waitForTimeout(250); } throw new Error('timeout waiting ' + id + ' got ' + await scr(p)); };
+const until = async (p, id, ms = 20000) => { const t = Date.now(); while (Date.now() - t < ms) { if (await scr(p) === id) return true; await p.waitForTimeout(250); } L('STATE', JSON.stringify(await p.evaluate(() => Net.debug()))); throw new Error('timeout waiting ' + id + ' got ' + await scr(p)); };
 async function answer(p) {
   for (let k = 0; k < 2; k++) { // self + maybe guess
     if (await scr(p) !== 's-q') return;

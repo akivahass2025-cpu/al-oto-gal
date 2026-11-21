@@ -1128,7 +1128,7 @@ const Net = (() => {
 
   const newCode = () => String(1000 + Math.floor(Math.random() * 9000));
   return {
-    check, _joinedSnd: 0,
+    check, _joinedSnd: 0, debug: () => ({ R, code, me, cur, Gi: G && G.i, rev: G && G.revealed, round: G && G.online && G.online.round }),
     async create(name, mode, len, deckId) {
       const btn = $('#btn-start'); busy(btn, true, 'פותחים חדר… 🌐');
       try {
