@@ -1,0 +1,44 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Bundle the game for offline first start
+        run: |
+          mkdir -p android/app/src/main/assets
+          cp index.html android/app/src/main/assets/index.html
+
+      - name: Build the APK
+        working-directory: android
+        run: gradle --no-daemon assembleRelease
+
+      - name: Name the file
+        run: cp android/app/build/outputs/apk/release/app-release.apk al-oto-gal.apk
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: על אותו גל לאנדרואיד - גרסה ${{ github.run_number }}
+          body: קובץ ההתקנה לאנדרואיד. מורידים את al-oto-gal.apk בטלפון ופותחים אותו. גרסה חדשה מותקנת על הקודמת וההתקדמות נשמרת.
+          make_latest: true
+          files: al-oto-gal.apk

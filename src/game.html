@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>על אותו גל</title>
+<meta name="theme-color" content="#F6F2FF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F2FF; --bg2:#EEE7FF; --card:#FFFFFF; --line:#DCD3F5; --ink:#1C1433; --ink2:#5F5680; --ink3:#9A92B8;
+  --violet:#7C5CFF; --violet2:#A48BFF; --pink:#FF3D8B; --pink2:#FF8FBC; --mint:#16C79A; --red:#FF5A5F; --gold:#FFB703;
+  --sel:#E4DCFF; --r:22px; --shadow:0 10px 30px -12px rgba(60,30,140,.28);
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Rubik',system-ui,'Segoe UI',Arial,sans-serif;overflow:hidden;overscroll-behavior:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+input{font:inherit;color:inherit}
+#app{position:fixed;inset:0;max-width:560px;margin:0 auto;overflow:hidden}
+.bgblobs{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.bgblobs i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.45;animation:float 18s ease-in-out infinite}
+.bgblobs i:nth-child(1){width:320px;height:320px;background:#D9CCFF;top:-80px;right:-90px}
+.bgblobs i:nth-child(2){width:260px;height:260px;background:#FFD3E6;bottom:-60px;left:-80px;animation-delay:-6s}
+.bgblobs i:nth-child(3){width:200px;height:200px;background:#CFF5EA;top:45%;left:60%;animation-delay:-12s;opacity:.3}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.12)}}
+
+.screen{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;padding:calc(18px + var(--safe-t)) 20px calc(18px + var(--safe-b));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  opacity:0;pointer-events:none;transform:translateX(-30px);transition:opacity .35s ease,transform .45s cubic-bezier(.2,.9,.25,1.1)}
+.screen.on{opacity:1;pointer-events:auto;transform:none}
+.screen.off-r{transform:translateX(30px)}
+.screen::-webkit-scrollbar{display:none}
+.screen>*{flex-shrink:0}
+[hidden]{display:none!important}
+
+h1{font-size:40px;font-weight:900;letter-spacing:-.5px;line-height:1.05}
+h2{font-size:26px;font-weight:800;line-height:1.2}
+h3{font-size:20px;font-weight:800}
+.muted{color:var(--ink2)}
+.row{display:flex;align-items:center;gap:10px}
+.sp{flex:1}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:62px;border-radius:999px;background:var(--ink);color:#fff;font-size:21px;font-weight:700;
+  box-shadow:0 12px 24px -12px rgba(28,20,51,.6);transition:transform .12s ease,filter .2s,opacity .2s;position:relative;overflow:hidden}
+.btn:active{transform:scale(.96)}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.btn.grad{background:linear-gradient(135deg,var(--violet),var(--pink))}
+.btn.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.small{min-height:46px;font-size:16px;width:auto;padding:0 18px}
+.btn .shine{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{0%,60%{transform:translateX(120%)}100%{transform:translateX(-120%)}}
+.iconbtn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:var(--card);border:2px solid var(--line);flex:none;transition:transform .12s}
+.iconbtn:active{transform:scale(.9)}
+
+.field{width:100%;height:64px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);padding:0 22px;font-size:20px;outline:none;transition:border-color .2s,box-shadow .2s}
+.field:focus{border-color:var(--violet2);box-shadow:0 0 0 4px rgba(124,92,255,.15)}
+.field::placeholder{color:var(--ink3)}
+
+/* HOME */
+.logo{display:flex;flex-direction:column;align-items:center;margin-top:4vh}
+.logo svg{width:220px;height:150px;overflow:hidden;border-radius:0 0 40px 40px}
+.logo .wv{animation:wave 3.2s ease-in-out infinite}
+.logo .wv2{animation:wave 3.2s ease-in-out infinite;animation-delay:-1.6s}
+@keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-14px)}}
+.logo .ht{animation:bob 1.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+.logo .ht2{animation-delay:-.8s}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.08)}}
+.title{font-size:48px;font-weight:900;text-align:center;margin-top:6px;background:linear-gradient(135deg,var(--ink) 20%,var(--violet) 60%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{text-align:center;color:var(--ink2);font-size:18px;margin-top:6px}
+.rankpill{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:15px;margin:16px auto 0}
+.homebtns{margin-top:auto;display:flex;flex-direction:column;gap:12px;padding-top:24px}
+.toprow{display:flex;justify-content:space-between;align-items:center}
+
+/* SETUP */
+.sec{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}
+.seg{display:flex;background:var(--bg2);border-radius:999px;padding:5px;gap:4px}
+.seg button{flex:1;height:48px;border-radius:999px;font-weight:700;font-size:16px;color:var(--ink2);transition:all .25s}
+.seg button.on{background:var(--ink);color:#fff;box-shadow:0 6px 14px -8px rgba(28,20,51,.7)}
+.hint{font-size:14px;color:var(--ink2);margin-top:8px;min-height:20px}
+.chips{display:flex;gap:10px;overflow-x:auto;padding:4px 2px;margin-top:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:52px;padding:0 24px;border-radius:999px;border:2px solid var(--line);background:var(--card);font-size:18px;font-weight:600;transition:all .2s}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.surprise{height:48px;padding:0 18px;border-radius:999px;background:var(--sel);color:var(--violet);font-weight:700;font-size:16px;display:flex;align-items:center;gap:6px}
+.surprise:active{transform:scale(.95)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.deck{position:relative;min-height:96px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);padding:14px 14px 12px;display:flex;align-items:center;gap:10px;text-align:right;transition:transform .15s,border-color .2s,background .2s}
+.deck:active{transform:scale(.96)}
+.deck.on{background:var(--sel);border-color:var(--ink);box-shadow:var(--shadow)}
+.deck .em{font-size:30px;flex:none;width:40px;text-align:center}
+.deck b{display:block;font-size:17px;line-height:1.2}
+.deck small{display:block;color:var(--ink2);font-size:14px;margin-top:3px}
+.badge-new{position:absolute;top:-10px;left:14px;background:var(--pink);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px}
+.badge-done{position:absolute;top:-10px;left:14px;background:var(--mint);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px}
+.deck.spin{animation:pulse .18s ease}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.preview{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;text-align:center}
+.preview .em{font-size:20px}
+.stickybar{position:sticky;bottom:calc(-18px - var(--safe-b));margin:16px -20px calc(-18px - var(--safe-b));padding:14px 20px calc(16px + var(--safe-b));background:linear-gradient(to top,var(--bg) 70%,rgba(246,242,255,0))}
+.empty{grid-column:1/-1;text-align:center;color:var(--ink2);padding:30px 0}
+
+/* GAME */
+.gtop{display:flex;align-items:center;gap:14px;min-height:56px}
+.dashes{flex:1;display:flex;gap:5px;direction:rtl}
+.dashes i{flex:1;height:7px;border-radius:9px;background:var(--line);transition:background .3s}
+.dashes i.done{background:var(--ink)}
+.dashes i.cur{background:var(--violet)}
+.dashes i.hit{background:var(--mint)}
+.dashes i.miss{background:var(--pink2)}
+.ring{width:54px;height:54px;position:relative;flex:none;display:grid;place-items:center;font-weight:800;font-size:18px}
+.ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.who-tag{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-weight:700;font-size:16px;padding:7px 14px;border-radius:999px;background:var(--card);border:2px solid var(--line)}
+.who-tag .dot{width:12px;height:12px;border-radius:50%}
+.guess-tag{background:linear-gradient(135deg,#FFF1F7,#F1ECFF);border-color:var(--pink2)}
+.qtext{font-size:34px;font-weight:800;line-height:1.18;margin-top:14px;animation:qin .45s cubic-bezier(.2,.9,.25,1.2)}
+@keyframes qin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.qtype{font-size:14px;color:var(--ink2);margin-top:10px}
+.opts{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.opt{min-height:74px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);font-size:22px;font-weight:600;text-align:right;padding:12px 22px;display:flex;align-items:center;gap:12px;
+  transition:transform .12s,background .2s,border-color .2s;animation:optin .4s both cubic-bezier(.2,.9,.25,1.2)}
+.opt:nth-child(2){animation-delay:.05s}.opt:nth-child(3){animation-delay:.1s}.opt:nth-child(4){animation-delay:.15s}
+@keyframes optin{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.opt:active{transform:scale(.97)}
+.opt.pick{background:var(--sel);border-color:var(--ink)}
+.opt .num{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:17px;background:var(--bg2);color:var(--ink3);transition:all .2s}
+.opt.pick .num{background:var(--ink);color:#fff;animation:pop .3s}
+@keyframes pop{50%{transform:scale(1.3)}}
+.opts.ab{flex-direction:column}
+.opts.who{flex-direction:row}
+.opts.who .opt{flex:1;flex-direction:column;justify-content:center;text-align:center;min-height:150px;font-size:22px;font-weight:800;gap:6px}
+.opts.who .opt .av{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-size:28px;color:#fff;font-weight:900}
+.scalebox{margin-top:30px;text-align:center}
+.bignum{font-size:96px;font-weight:900;line-height:1;transition:transform .15s}
+.bignum.bump{transform:scale(1.15)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;margin-top:26px;direction:rtl}
+input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:99px;background:linear-gradient(to left,var(--violet2) var(--p,44%),var(--line) var(--p,44%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:54px;height:54px;border-radius:50%;background:var(--ink);border:7px solid #fff;box-shadow:0 6px 16px rgba(28,20,51,.35);margin-top:-17px}
+input[type=range]::-moz-range-track{height:20px;border-radius:99px;background:var(--line)}
+input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;background:var(--ink);border:7px solid #fff}
+.scalelbl{display:flex;justify-content:space-between;color:var(--ink2);font-size:16px;margin-top:16px;gap:16px}
+.scalelbl span:last-child{text-align:left}
+.gbottom{margin-top:auto;padding-top:20px}
+.waitline{display:flex;justify-content:space-between;color:var(--ink2);font-size:16px;margin-top:16px}
+
+/* PASS */
+.pass{align-items:center;justify-content:center;text-align:center}
+.pass .bigemoji{font-size:110px;animation:peek 1.8s ease-in-out infinite}
+@keyframes peek{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) scale(1.06)}}
+.pass .nm{font-size:44px;font-weight:900;margin-top:10px}
+.pass .avbig{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;font-size:52px;color:#fff;font-weight:900;margin:0 auto;box-shadow:var(--shadow);animation:pop .5s}
+
+/* REVEAL */
+.reveal{align-items:stretch}
+.verdict{text-align:center;margin-top:3vh}
+.verdict .vem{font-size:96px;line-height:1;display:inline-block;animation:vpop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes vpop{0%{transform:scale(0) rotate(-30deg)}100%{transform:none}}
+.verdict .vt{font-size:36px;font-weight:900;margin-top:12px}
+.verdict .vs{color:var(--ink2);font-size:18px;margin-top:6px}
+.vq{text-align:center;font-weight:700;font-size:19px;color:var(--ink2);margin-top:18px;line-height:1.3}
+.ans{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.acard{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:14px;animation:optin .45s both}
+.acard:nth-child(2){animation-delay:.12s}
+.acard .av{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px}
+.acard .an{font-size:14px;color:var(--ink2);font-weight:600}
+.acard .aa{font-size:20px;font-weight:800;margin-top:2px;line-height:1.25}
+.acard .ag{font-size:15px;margin-top:6px;color:var(--ink2)}
+.acard .mk{margin-inline-start:auto;font-size:26px}
+.scorebar{display:flex;justify-content:center;gap:12px;margin-top:16px}
+.scorebar div{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:15px}
+
+/* END */
+.end{align-items:stretch}
+.pct{font-size:110px;font-weight:900;text-align:center;line-height:1;margin-top:2vh;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.endtitle{text-align:center;font-size:32px;font-weight:900;margin-top:8px}
+.endsub{text-align:center;color:var(--ink2);font-size:18px;margin-top:6px;line-height:1.35}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.stat{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 6px;text-align:center}
+.stat b{display:block;font-size:24px;font-weight:900}
+.stat span{font-size:13px;color:var(--ink2)}
+.winner{margin-top:16px;background:linear-gradient(135deg,#FFF6D9,#FFE9F2);border:2px solid #FFD98A;border-radius:var(--r);padding:14px 18px;text-align:center;font-weight:800;font-size:18px}
+.sumlist{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.sumitem{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 16px}
+.sumitem .sq{font-weight:700;font-size:16px;display:flex;gap:8px}
+.sumitem .sa{font-size:14px;color:var(--ink2);margin-top:6px;line-height:1.5}
+.endbtns{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.btnrow{display:flex;gap:10px}
+.btnrow .btn{font-size:17px}
+
+/* HISTORY */
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.bdg{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 6px;text-align:center;min-height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.bdg .be{font-size:36px}
+.bdg b{font-size:13px;line-height:1.2}
+.bdg small{font-size:11px;color:var(--ink2);line-height:1.2}
+.bdg.locked{opacity:.45;filter:grayscale(1)}
+.bdg.locked .be{opacity:.5}
+.pairs{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.pair{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.pair .pn{font-weight:800;font-size:19px}
+.pair .pr{font-size:14px;color:var(--violet);font-weight:700;margin-top:2px}
+.pair .ps{display:flex;gap:14px;margin-top:8px;font-size:14px;color:var(--ink2);flex-wrap:wrap}
+.prog{height:8px;border-radius:9px;background:var(--line);margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--pink));border-radius:9px}
+.bigstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+/* MODAL / TOAST */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(28,20,51,.45);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal.on{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:560px;background:var(--bg);border-radius:28px 28px 0 0;padding:26px 22px calc(22px + var(--safe-b));transform:translateY(40px);transition:transform .35s cubic-bezier(.2,.9,.25,1.1)}
+.modal.on .sheet{transform:none}
+.sheet h3{font-size:24px}
+.sheet p{color:var(--ink2);margin-top:8px;font-size:17px;line-height:1.4}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 18px;font-size:18px;font-weight:600;margin-top:12px}
+.sw{width:58px;height:34px;border-radius:99px;background:var(--line);position:relative;transition:background .25s;flex:none}
+.sw::after{content:'';position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:#fff;transition:right .25s;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.sw.on{background:var(--violet)}
+.sw.on::after{right:28px}
+.toast{position:fixed;top:calc(16px + var(--safe-t));left:50%;transform:translate(-50%,-140%);z-index:60;background:var(--ink);color:#fff;border-radius:20px;padding:12px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 14px 30px -10px rgba(28,20,51,.6);transition:transform .45s cubic-bezier(.2,1.3,.4,1);max-width:92vw;width:max-content}
+.toast.on{transform:translate(-50%,0)}
+.toast .te{font-size:32px}
+.toast small{display:block;opacity:.7;font-size:13px}
+.toast b{font-size:16px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+.shareprev{width:100%;border-radius:18px;margin-top:14px;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div class="bgblobs"><i></i><i></i><i></i></div>
+<div id="app">
+
+<!-- HOME -->
+<section class="screen" id="s-home">
+  <div class="toprow">
+    <button class="iconbtn" id="btn-settings" aria-label="הגדרות">⚙️</button>
+    <button class="iconbtn" id="btn-history" aria-label="הישגים">🏆</button>
+  </div>
+  <div class="logo">
+    <svg viewBox="0 0 200 150" aria-hidden="true">
+      <defs>
+        <linearGradient id="lg1" x1="0" x2="1"><stop offset="0" stop-color="#7C5CFF"/><stop offset="1" stop-color="#FF3D8B"/></linearGradient>
+        <linearGradient id="lg2" x1="0" x2="1"><stop offset="0" stop-color="#A48BFF"/><stop offset="1" stop-color="#FF8FBC"/></linearGradient>
+      </defs>
+      <g class="wv2"><path d="M-20 112 Q 15 88 50 112 T 120 112 T 190 112 T 260 112 V160 H-20Z" fill="url(#lg2)" opacity=".55"/></g>
+      <g class="wv"><path d="M-20 100 Q 15 70 50 100 T 120 100 T 190 100 T 260 100 V160 H-20Z" fill="url(#lg1)"/></g>
+      <g class="ht"><path d="M78 58c-8-9-23-2-18 11 3 8 18 18 18 18s15-10 18-18c5-13-10-20-18-11z" fill="#FF3D8B"/></g>
+      <g class="ht ht2"><path d="M122 50c-8-9-23-2-18 11 3 8 18 18 18 18s15-10 18-18c5-13-10-20-18-11z" fill="#7C5CFF"/></g>
+    </svg>
+    <div class="title">על אותו גל</div>
+    <div class="tag">כמה אתם באמת חושבים אותו דבר? 🌊</div>
+    <div class="rankpill" id="home-rank" hidden></div>
+  </div>
+  <div class="homebtns">
+    <button class="btn grad" id="btn-new"><span class="shine"></span>משחק חדש ✨</button>
+    <button class="btn ghost" id="btn-history2">היסטוריה והישגים 🏆</button>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section class="screen" id="s-setup">
+  <div class="toprow">
+    <h1>משחק חדש</h1>
+    <button class="iconbtn" data-back aria-label="חזרה">→</button>
+  </div>
+  <input class="field mt16" id="p1" placeholder="שם שחקן/ית 1" maxlength="14" autocomplete="off">
+  <input class="field mt12" id="p2" placeholder="שם שחקן/ית 2" maxlength="14" autocomplete="off">
+
+  <div class="sec"><h3>מצב משחק</h3></div>
+  <div class="seg" id="seg-mode">
+    <button data-v="match" class="on">💞 התאמה</button>
+    <button data-v="guess">🔮 ניחוש</button>
+  </div>
+  <div class="hint" id="mode-hint"></div>
+
+  <div class="sec"><h3>אורך המשחק</h3></div>
+  <div class="seg" id="seg-len">
+    <button data-v="8">קצר · 8</button>
+    <button data-v="12" class="on">רגיל · 12</button>
+    <button data-v="20">ארוך · 20</button>
+  </div>
+
+  <div class="sec"><h2>בחרו חפיסה</h2><button class="surprise" id="btn-surprise">🎲 הפתיעו אותי</button></div>
+  <input class="field" id="search" placeholder="חיפוש חפיסות" autocomplete="off">
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="decks"></div>
+  <div class="stickybar">
+    <div class="preview muted" id="preview"></div>
+    <button class="btn grad mt8" id="btn-start"><span class="shine"></span>יאללה, מתחילים</button>
+  </div>
+</section>
+
+<!-- PASS -->
+<section class="screen pass" id="s-pass">
+  <div class="bigemoji" id="pass-emoji">🙈</div>
+  <div class="muted mt16" id="pass-sub" style="font-size:19px">תעבירו את הטלפון ל…</div>
+  <div class="nm" id="pass-name"></div>
+  <div class="muted mt8" id="pass-note" style="font-size:16px"></div>
+  <button class="btn grad mt24" id="btn-ready" style="max-width:360px"><span class="shine"></span>אני מוכן/ה 👀</button>
+</section>
+
+<!-- QUESTION -->
+<section class="screen" id="s-q">
+  <div class="gtop">
+    <button class="iconbtn" id="btn-quit" aria-label="יציאה">✕</button>
+    <div class="dashes" id="dashes"></div>
+    <div class="ring" id="ring"></div>
+  </div>
+  <div><span class="who-tag" id="q-who"></span></div>
+  <div class="qtext" id="q-text"></div>
+  <div class="qtype" id="q-type"></div>
+  <div id="q-input"></div>
+  <div class="gbottom" id="q-bottom"></div>
+</section>
+
+<!-- REVEAL -->
+<section class="screen reveal" id="s-reveal">
+  <div class="verdict" id="rv-verdict"></div>
+  <div class="vq" id="rv-q"></div>
+  <div class="ans" id="rv-ans"></div>
+  <div class="scorebar" id="rv-score"></div>
+  <div class="gbottom"><button class="btn grad" id="btn-next"><span class="shine"></span>לשאלה הבאה</button></div>
+</section>
+
+<!-- END -->
+<section class="screen end" id="s-end">
+  <div class="toprow"><span></span><button class="iconbtn" data-home aria-label="בית">🏠</button></div>
+  <div class="pct" id="end-pct">0%</div>
+  <div class="endtitle" id="end-title"></div>
+  <div class="endsub" id="end-sub"></div>
+  <div id="end-winner"></div>
+  <div class="statrow" id="end-stats"></div>
+  <div class="endbtns">
+    <button class="btn grad" id="btn-share"><span class="shine"></span>שתפו את התוצאה 📸</button>
+    <div class="btnrow">
+      <button class="btn ghost" id="btn-again">עוד סיבוב 🔁</button>
+      <button class="btn ghost" id="btn-other">חפיסה אחרת 🃏</button>
+    </div>
+  </div>
+  <div class="sec"><h3>סיכום השאלות</h3></div>
+  <div class="sumlist" id="end-list"></div>
+  <div style="height:20px"></div>
+</section>
+
+<!-- HISTORY -->
+<section class="screen" id="s-hist">
+  <div class="toprow">
+    <h1>הישגים</h1>
+    <button class="iconbtn" data-back aria-label="חזרה">→</button>
+  </div>
+  <div class="bigstats" id="h-stats"></div>
+  <div class="sec"><h3>תגים</h3><span class="muted" id="h-bcount"></span></div>
+  <div class="badges" id="h-badges"></div>
+  <div class="sec"><h3>הזוגות שלכם</h3></div>
+  <div class="pairs" id="h-pairs"></div>
+  <div style="height:24px"></div>
+</section>
+</div>
+
+<canvas id="fx"></canvas>
+<div class="toast" id="toast"><span class="te"></span><div><small>תג חדש נפתח!</small><b></b></div></div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script>
+/*__DECKS__*/
+</script>
+<script>
+'use strict';
+/* ============ helpers ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const COLORS = ['#7C5CFF', '#FF3D8B'];
+const initial = n => (n || '?').trim().charAt(0);
+
+const DECKS = (window.DECKS || []).map(d => ({ ...d, questions: d.questions.map((q, i) => ({ ...q, id: d.id + ':' + i })) }));
+const GROUPS = [['all', 'הכול'], ['couples', 'זוגות'], ['fun', 'כיף'], ['life', 'חיים']];
+const TYPE_LBL = { ab: 'זה או זה', scale: 'דרגו מ-1 עד 10', mc: 'בחרו תשובה אחת', rank: 'לחצו לפי הסדר: הראשון = הכי', who: 'מי מכם?' };
+
+/* ============ storage ============ */
+const KEY = 'al-oto-gal-v1';
+let DB = { last: { p1: '', p2: '', mode: 'match', len: 12 }, games: 0, badges: {}, pairs: {}, settings: { sound: true, music: true } };
+try { const raw = localStorage.getItem(KEY); if (raw) DB = Object.assign(DB, JSON.parse(raw)); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} };
+const pairKey = (a, b) => [a.trim(), b.trim()].map(s => s.toLowerCase()).sort().join('|');
+
+/* ============ ranks & badges ============ */
+const RANKS = [
+  [0, 'מכירים', '🤝'], [3, 'חברים טובים', '😊'], [7, 'אחים לנשק', '💪'], [15, 'צוות מנצח', '🏆'], [30, 'נשמות תאומות', '👑']
+];
+const rankOf = games => { let r = RANKS[0]; for (const x of RANKS) if (games >= x[0]) r = x; return r; };
+const nextRank = games => RANKS.find(x => x[0] > games);
+
+const BADGES = [
+  ['first', '🌊', 'הגל הראשון', 'שיחקתם משחק ראשון'],
+  ['p100', '💯', 'טלפתיה מלאה', '100% במשחק אחד'],
+  ['p90', '💞', 'נשמות תאומות', '90% ומעלה'],
+  ['p0', '🪐', 'הפכים נמשכים', 'פחות מ-25% (וזה בסדר!)'],
+  ['streak5', '🔥', 'רצף חם', '5 התאמות ברצף'],
+  ['streak10', '⚡', 'בלתי ניתנים לעצירה', '10 התאמות ברצף'],
+  ['g10', '🎮', 'מכורים קלות', '10 משחקים'],
+  ['g25', '🕹️', 'מכורים רשמית', '25 משחקים'],
+  ['g50', '🏅', 'אגדות הגל', '50 משחקים'],
+  ['d5', '🃏', 'טועמים מכל דבר', '5 חפיסות שונות'],
+  ['d10', '🎴', 'אספנים', '10 חפיסות שונות'],
+  ['dall', '👑', 'ראיתם הכול', 'כל החפיסות'],
+  ['wyrdone', '🤔', 'מלכי הדילמות', 'סיימתם את "מה הייתם מעדיפים"'],
+  ['decdone', '✅', 'חפיסה שלמה', 'סיימתם חפיסה עד הסוף'],
+  ['long', '🏃', 'מרתון', 'משחק ארוך של 20 שאלות'],
+  ['guesswin', '🔮', 'קוראי מחשבות', 'ניחוש 80% ומעלה'],
+  ['scale3', '🎯', 'בול על המספר', '3 סקאלות זהות במשחק'],
+  ['night', '🦉', 'ינשופי לילה', 'משחק אחרי חצות'],
+  ['couple', '💑', 'זוג משחק', 'שיחקתם חפיסת זוגות'],
+  ['pairs3', '👥', 'מלך החבר\'ה', '3 זוגות שחקנים שונים'],
+];
+
+/* ============ audio ============ */
+const Snd = (() => {
+  let ctx = null, master = null, musicGain = null, musicTimer = null, step = 0, nextT = 0;
+  const init = () => {
+    if (ctx) return;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain(); master.gain.value = .9; master.connect(ctx.destination);
+      musicGain = ctx.createGain(); musicGain.gain.value = 0; musicGain.connect(master);
+    } catch (e) { ctx = null; }
+  };
+  const tone = (f, t0, dur, type = 'sine', vol = .2, dest) => {
+    if (!ctx) return;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0);
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol, t0 + .012); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(g); g.connect(dest || master); o.start(t0); o.stop(t0 + dur + .05);
+  };
+  const sfx = name => {
+    if (!DB.settings.sound) return;
+    init(); if (!ctx) return; if (ctx.state === 'suspended') ctx.resume();
+    const t = ctx.currentTime;
+    switch (name) {
+      case 'tap': tone(660, t, .08, 'triangle', .12); break;
+      case 'pick': tone(523, t, .1, 'triangle', .14); tone(784, t + .05, .14, 'triangle', .12); break;
+      case 'pass': { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(900, t + .25); g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + .3); o.connect(g); g.connect(master); o.start(t); o.stop(t + .32); break; }
+      case 'match': [523, 659, 784, 1047].forEach((f, i) => { tone(f, t + i * .08, .5, 'triangle', .16); tone(f * 2, t + i * .08, .3, 'sine', .05); }); break;
+      case 'close': [523, 659, 784].forEach((f, i) => tone(f, t + i * .09, .4, 'triangle', .13)); break;
+      case 'miss': tone(330, t, .22, 'sawtooth', .06); tone(247, t + .14, .35, 'triangle', .14); break;
+      case 'win': [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, t + i * .09, .7, 'triangle', .14)); [1047, 1319, 1568].forEach(f => tone(f, t + .6, 1.1, 'sine', .06)); break;
+      case 'badge': [880, 1175, 1568].forEach((f, i) => tone(f, t + i * .07, .45, 'sine', .14)); break;
+      case 'tick': tone(1200, t, .03, 'square', .04); break;
+    }
+  };
+  // gentle generative lo-fi loop
+  const CH = [[261.6, 329.6, 392, 493.9], [220, 261.6, 329.6, 392], [174.6, 220, 261.6, 329.6], [196, 246.9, 293.7, 392]];
+  const PENTA = [523.3, 587.3, 659.3, 784, 880, 1046.5];
+  const sched = () => {
+    while (nextT < ctx.currentTime + .25) {
+      const beat = step % 8, bar = Math.floor(step / 8) % 4, ch = CH[bar];
+      if (beat === 0) ch.forEach(f => tone(f, nextT, 3.4, 'sine', .045, musicGain));
+      if (beat === 0 || beat === 4) tone(ch[0] / 2, nextT, .9, 'triangle', .09, musicGain);
+      if (Math.random() < .42) tone(pick(PENTA), nextT, .5, 'triangle', .035, musicGain);
+      if (beat % 2 === 1) tone(5000, nextT, .03, 'square', .004, musicGain);
+      nextT += .43; step++;
+    }
+  };
+  const music = on => {
+    init(); if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    if (on && !musicTimer) { nextT = ctx.currentTime + .1; musicTimer = setInterval(sched, 90); musicGain.gain.setTargetAtTime(.55, ctx.currentTime, .8); }
+    if (!on && musicTimer) { musicGain.gain.setTargetAtTime(0, ctx.currentTime, .3); clearInterval(musicTimer); musicTimer = null; }
+  };
+  document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else ctx.resume(); });
+  return { sfx, music, init };
+})();
+const vib = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+let audioStarted = false;
+document.addEventListener('pointerdown', () => { if (audioStarted) return; audioStarted = true; Snd.init(); if (DB.settings.music) Snd.music(true); }, { once: false, capture: true });
+
+/* ============ confetti ============ */
+const FX = (() => {
+  const cv = $('#fx'), cx = cv.getContext('2d'); let parts = [], raf = 0;
+  const fit = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; };
+  addEventListener('resize', fit); fit();
+  const loop = () => {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter(p => p.life > 0);
+    for (const p of parts) {
+      p.vy += .25 * devicePixelRatio; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.globalAlpha = Math.min(1, p.life / 30);
+      cx.fillStyle = p.c;
+      if (p.s === 'h') { cx.font = `${p.w * 2}px serif`; cx.fillText(p.e, -p.w, p.w); } else cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      cx.restore();
+    }
+    raf = parts.length ? requestAnimationFrame(loop) : 0;
+  };
+  const burst = (n = 120, emojis) => {
+    const d = devicePixelRatio, cols = ['#7C5CFF', '#FF3D8B', '#FFB703', '#16C79A', '#A48BFF', '#FF8FBC'];
+    for (let i = 0; i < n; i++) {
+      const fromLeft = i % 2 === 0;
+      const p = { x: fromLeft ? 0 : cv.width, y: cv.height * .55, vx: (fromLeft ? 1 : -1) * (6 + Math.random() * 12) * d, vy: -(10 + Math.random() * 14) * d,
+        r: Math.random() * 6, vr: (Math.random() - .5) * .3, w: (6 + Math.random() * 6) * d, h: (10 + Math.random() * 8) * d, c: pick(cols), life: 110 + Math.random() * 60, s: 'r' };
+      if (emojis && Math.random() < .25) { p.s = 'h'; p.e = pick(emojis); p.w = 12 * d; }
+      parts.push(p);
+    }
+    if (!raf) raf = requestAnimationFrame(loop);
+  };
+  return { burst };
+})();
+
+/* ============ navigation ============ */
+let cur = 'home';
+const show = (id, dir) => {
+  const prev = $('#s-' + cur), next = $('#s-' + id);
+  if (prev && prev !== next) { prev.classList.remove('on'); }
+  next.classList.toggle('off-r', dir === 'back');
+  next.scrollTop = 0;
+  requestAnimationFrame(() => { next.classList.remove('off-r'); next.classList.add('on'); });
+  cur = id;
+};
+history.replaceState({ s: 'root' }, '');
+history.pushState({ s: 'app' }, '');
+addEventListener('popstate', () => { history.pushState({ s: 'app' }, ''); handleBack(); });
+function handleBack() {
+  if ($('#modal').classList.contains('on')) return closeModal();
+  if (['q', 'pass', 'reveal'].includes(cur)) return confirmQuit();
+  if (cur === 'home') return;
+  if (cur === 'end') return goHome();
+  goHome();
+}
+const goHome = () => { renderHome(); show('home', 'back'); };
+$$('[data-back]').forEach(b => b.onclick = () => { Snd.sfx('tap'); goHome(); });
+$$('[data-home]').forEach(b => b.onclick = () => { Snd.sfx('tap'); goHome(); });
+
+/* ============ modal & toast ============ */
+const openModal = html => { $('#sheet').innerHTML = html; $('#modal').classList.add('on'); };
+const closeModal = () => $('#modal').classList.remove('on');
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+let toastQ = [], toasting = false;
+const toast = (emoji, text) => { toastQ.push([emoji, text]); if (!toasting) nextToast(); };
+const nextToast = () => {
+  const t = toastQ.shift(); if (!t) { toasting = false; return; } toasting = true;
+  const box = $('#toast'); box.querySelector('.te').textContent = t[0]; box.querySelector('b').textContent = t[1];
+  Snd.sfx('badge'); vib(40); box.classList.add('on');
+  setTimeout(() => { box.classList.remove('on'); setTimeout(nextToast, 450); }, 2600);
+};
+
+/* ============ HOME ============ */
+function renderHome() {
+  const rp = $('#home-rank');
+  if (DB.games > 0) { rp.hidden = false; rp.innerHTML = `🎮 ${DB.games} משחקים · 🏅 ${Object.keys(DB.badges).length}/${BADGES.length} תגים`; } else rp.hidden = true;
+}
+$('#btn-new').onclick = () => { Snd.sfx('pick'); openSetup(); };
+$('#btn-history').onclick = $('#btn-history2').onclick = () => { Snd.sfx('tap'); renderHistory(); show('hist'); };
+$('#btn-settings').onclick = () => { Snd.sfx('tap'); renderSettings(); };
+function renderSettings() {
+  openModal(`<h3>הגדרות</h3>
+    <div class="toggle">🔊 צלילים<button class="sw ${DB.settings.sound ? 'on' : ''}" data-k="sound"></button></div>
+    <div class="toggle">🎵 מוזיקה<button class="sw ${DB.settings.music ? 'on' : ''}" data-k="music"></button></div>
+    <p>ההתקדמות נשמרת בטלפון הזה בלבד.</p>
+    <button class="btn mt16" id="m-close">סגירה</button>`);
+  $$('#sheet .sw').forEach(b => b.onclick = () => {
+    const k = b.dataset.k; DB.settings[k] = !DB.settings[k]; b.classList.toggle('on', DB.settings[k]); save();
+    if (k === 'music') Snd.music(DB.settings.music); Snd.sfx('tap');
+  });
+  $('#m-close').onclick = closeModal;
+}
+
+/* ============ SETUP ============ */
+const setup = { mode: DB.last.mode || 'match', len: DB.last.len || 12, group: 'all', deck: null, q: '' };
+const MODE_HINT = {
+  match: 'כל אחד עונה על עצמו. תשובות זהות = נקודה להתאמה 💞',
+  guess: 'כל אחד עונה על עצמו ואז מנחש מה השני ענה. מי מכיר את מי יותר טוב? 🔮'
+};
+function segInit(id, key) {
+  $$(`#${id} button`).forEach(b => {
+    b.classList.toggle('on', String(setup[key]) === b.dataset.v);
+    b.onclick = () => { Snd.sfx('tap'); setup[key] = key === 'len' ? +b.dataset.v : b.dataset.v; $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); if (key === 'mode') $('#mode-hint').textContent = MODE_HINT[setup.mode]; };
+  });
+}
+function openSetup() {
+  $('#p1').value = DB.last.p1 || ''; $('#p2').value = DB.last.p2 || '';
+  segInit('seg-mode', 'mode'); segInit('seg-len', 'len'); $('#mode-hint').textContent = MODE_HINT[setup.mode];
+  if (!setup.deck) setup.deck = DECKS[0] && DECKS[0].id;
+  renderChips(); renderDecks(); renderPreview(); checkStart();
+  show('setup');
+}
+function renderChips() {
+  const c = $('#chips'); c.innerHTML = '';
+  GROUPS.forEach(([v, n]) => { const b = el('button', 'chip' + (setup.group === v ? ' on' : ''), n); b.onclick = () => { Snd.sfx('tap'); setup.group = v; renderChips(); renderDecks(); }; c.appendChild(b); });
+}
+const pairOf = () => { const a = $('#p1').value.trim(), b = $('#p2').value.trim(); return a && b ? DB.pairs[pairKey(a, b)] : null; };
+function visibleDecks() {
+  const q = setup.q.trim();
+  return DECKS.filter(d => (setup.group === 'all' || d.group === setup.group) && (!q || d.name.includes(q) || (d.desc || '').includes(q)));
+}
+function renderDecks() {
+  const g = $('#decks'); g.innerHTML = '';
+  const pr = pairOf(), list = visibleDecks();
+  if (!list.length) { g.innerHTML = '<div class="empty">לא מצאנו חפיסה כזאת 🤷</div>'; return; }
+  list.forEach(d => {
+    const seen = pr && pr.seen && pr.seen[d.id] ? pr.seen[d.id].length : 0;
+    const done = seen >= d.questions.length;
+    const b = el('button', 'deck' + (setup.deck === d.id ? ' on' : ''));
+    b.dataset.id = d.id;
+    b.innerHTML = `${done ? '<span class="badge-done">הושלם ✓</span>' : d.isNew ? '<span class="badge-new">חדש</span>' : ''}
+      <span class="em">${d.emoji}</span><span><b>${esc(d.name)}</b><small>${d.questions.length} שאלות${d.audience === 'couples' ? ' · 💑' : d.audience === 'friends' ? ' · 👯' : ''}</small></span>`;
+    b.onclick = () => { Snd.sfx('pick'); setup.deck = d.id; $$('.deck').forEach(x => x.classList.toggle('on', x === b)); renderPreview(); };
+    g.appendChild(b);
+  });
+}
+function renderPreview() {
+  const d = DECKS.find(x => x.id === setup.deck); const p = $('#preview');
+  if (!d) { p.innerHTML = '<span class="muted">בחרו חפיסה</span>'; return; }
+  p.innerHTML = `<span class="em">${d.emoji}</span><span><b style="color:var(--ink)">${esc(d.name)}</b> · ${esc(d.desc || '')}</span>`;
+}
+const checkStart = () => { $('#btn-start').disabled = !($('#p1').value.trim() && $('#p2').value.trim() && setup.deck); };
+['#p1', '#p2'].forEach(s => $(s).addEventListener('input', () => { checkStart(); renderDecks(); }));
+$('#search').addEventListener('input', e => { setup.q = e.target.value; renderDecks(); });
+$('#btn-surprise').onclick = () => {
+  const list = visibleDecks().length ? visibleDecks() : DECKS; let n = 0; const total = 12 + Math.floor(Math.random() * 6);
+  const spin = () => {
+    const d = pick(list); setup.deck = d.id; Snd.sfx('tick');
+    $$('.deck').forEach(x => { x.classList.toggle('on', x.dataset.id === d.id); if (x.dataset.id === d.id) { x.classList.remove('spin'); void x.offsetWidth; x.classList.add('spin'); } });
+    renderPreview();
+    if (++n < total) setTimeout(spin, 60 + n * 14); else { Snd.sfx('pick'); vib(30); const on = $('.deck.on'); on && on.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  };
+  spin();
+};
+$('#btn-start').onclick = () => {
+  const p1 = $('#p1').value.trim(), p2 = $('#p2').value.trim();
+  if (p1.toLowerCase() === p2.toLowerCase()) { openModal(`<h3>רגע, אותו שם פעמיים? 🤔</h3><p>תנו לכל שחקן שם אחר, כדי שנדע מי ענה מה.</p><button class="btn mt16" id="m-close">הבנתי</button>`); $('#m-close').onclick = closeModal; return; }
+  DB.last = { p1, p2, mode: setup.mode, len: setup.len }; save();
+  startGame(p1, p2, setup.mode, setup.len, setup.deck);
+};
+
+/* ============ GAME ============ */
+let G = null;
+function chooseQuestions(deck, pk, n) {
+  const pr = DB.pairs[pk]; const seen = new Set(pr && pr.seen && pr.seen[deck.id] || []);
+  const fresh = shuffle(deck.questions.filter(q => !seen.has(q.id))), old = shuffle(deck.questions.filter(q => seen.has(q.id)));
+  let qs = fresh.concat(old).slice(0, Math.min(n, deck.questions.length));
+  // spread the question types nicely
+  return shuffle(qs);
+}
+function startGame(p1, p2, mode, len, deckId) {
+  const deck = DECKS.find(d => d.id === deckId);
+  const pk = pairKey(p1, p2);
+  G = { p: [p1, p2], mode, deck, pk, qs: chooseQuestions(deck, pk, len), i: 0, res: [], streak: 0, bestStreak: 0, order: [0, 1], turn: 0, phase: 'self', cur: null };
+  Snd.sfx('pick');
+  beginQuestion();
+}
+function beginQuestion() {
+  G.order = G.i % 2 === 0 ? [0, 1] : [1, 0];
+  G.turn = 0; G.cur = { self: [null, null], guess: [null, null] };
+  showPass();
+}
+function showPass() {
+  const who = G.order[G.turn];
+  const first = G.i === 0 && G.turn === 0;
+  $('#pass-emoji').textContent = first ? '🌊' : G.turn === 0 ? '👉' : '🙈';
+  $('#pass-sub').textContent = first ? 'מתחילים! הטלפון אצל' : G.turn === 0 ? 'השאלה הבאה מתחילה אצל' : 'אל תציצו! 🤫 תעבירו את הטלפון ל';
+  $('#pass-name').innerHTML = `<div class="avbig" style="background:${COLORS[who]}">${esc(initial(G.p[who]))}</div><div class="mt12">${esc(G.p[who])}</div>`;
+  $('#pass-note').textContent = `שאלה ${G.i + 1} מתוך ${G.qs.length}` + (G.mode === 'guess' ? ' · עונים ואז מנחשים' : '');
+  $('#btn-ready').innerHTML = `<span class="shine"></span>אני ${esc(G.p[who])}, יאללה 👀`;
+  if (!first) { Snd.sfx('pass'); vib(25); }
+  show('pass');
+}
+$('#btn-ready').onclick = () => { Snd.sfx('tap'); G.phase = 'self'; renderQuestion(); show('q'); };
+
+function renderDashes() {
+  const d = $('#dashes'); d.innerHTML = '';
+  G.qs.forEach((q, i) => { const r = G.res[i]; d.appendChild(el('i', i < G.i ? (r && r.match ? 'hit' : 'miss') : i === G.i ? 'cur' : '')); });
+  const pct = (G.i) / G.qs.length, R = 23, C = 2 * Math.PI * R;
+  $('#ring').innerHTML = `<svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="${R}" fill="none" stroke="#DCD3F5" stroke-width="6"/><circle cx="27" cy="27" r="${R}" fill="none" stroke="#1C1433" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" style="transition:stroke-dashoffset .5s"/></svg><span>${G.i + 1}</span>`;
+}
+function renderQuestion() {
+  const q = G.qs[G.i], who = G.order[G.turn], other = 1 - who, guessing = G.phase === 'guess';
+  renderDashes();
+  const tag = $('#q-who');
+  tag.className = 'who-tag' + (guessing ? ' guess-tag' : '');
+  tag.innerHTML = guessing ? `🔮 ${esc(G.p[who])}, מה לדעתך ${esc(G.p[other])} ענה/תה?` : `<span class="dot" style="background:${COLORS[who]}"></span>התשובה של ${esc(G.p[who])}`;
+  const qt = $('#q-text'); qt.style.animation = 'none'; void qt.offsetWidth; qt.style.animation = '';
+  qt.textContent = q.q;
+  $('#q-type').textContent = q.t === 'rank' ? 'לחצו לפי הסדר: 1 = הכי, 4 = הכי פחות' : TYPE_LBL[q.t];
+  const box = $('#q-input'), bottom = $('#q-bottom'); box.innerHTML = ''; bottom.innerHTML = '';
+  const done = v => {
+    vib(15);
+    if (guessing) G.cur.guess[who] = v; else G.cur.self[who] = v;
+    if (G.mode === 'guess' && !guessing) { G.phase = 'guess'; Snd.sfx('pick'); return setTimeout(renderQuestion, 180); }
+    G.phase = 'self';
+    if (G.turn === 0) { G.turn = 1; return setTimeout(showPass, 220); }
+    setTimeout(reveal, 220);
+  };
+  const waitLine = () => { const w = el('div', 'waitline'); w.innerHTML = `<span>${guessing ? 'הניחוש שלך' : 'הבחירה שלך'}</span><span>${G.turn === 0 ? `אחר כך ${esc(G.p[other])}…` : 'ואז חושפים! ✨'}</span>`; bottom.appendChild(w); };
+
+  if (q.t === 'ab' || q.t === 'mc') {
+    const wrap = el('div', 'opts ' + q.t);
+    q.o.forEach((o, i) => {
+      const b = el('button', 'opt', `<span class="num">${q.t === 'mc' ? 'אבגד'[i] : i === 0 ? '←' : '→'}</span><span>${esc(o)}</span>`);
+      b.onclick = () => { if (wrap.dataset.lock) return; wrap.dataset.lock = 1; b.classList.add('pick'); Snd.sfx('pick'); done(i); };
+      wrap.appendChild(b);
+    });
+    if (q.t === 'ab') wrap.querySelectorAll('.num').forEach((n, i) => n.textContent = i === 0 ? 'א' : 'ב');
+    box.appendChild(wrap); waitLine();
+  } else if (q.t === 'who') {
+    const wrap = el('div', 'opts who');
+    [0, 1].forEach(i => {
+      const b = el('button', 'opt', `<span class="av" style="background:${COLORS[i]}">${esc(initial(G.p[i]))}</span>${esc(G.p[i])}`);
+      b.onclick = () => { if (wrap.dataset.lock) return; wrap.dataset.lock = 1; b.classList.add('pick'); Snd.sfx('pick'); done(i); };
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap); waitLine();
+  } else if (q.t === 'scale') {
+    let v = 5;
+    const sb = el('div', 'scalebox');
+    sb.innerHTML = `<div class="bignum">5</div><input type="range" min="1" max="10" step="1" value="5"><div class="scalelbl"><span>1 · ${esc(q.min || 'הכי פחות')}</span><span>${esc(q.max || 'הכי')} · 10</span></div>`;
+    const r = sb.querySelector('input'), num = sb.querySelector('.bignum');
+    const conf = el('button', 'btn mt24', 'אישור 5');
+    const upd = () => { v = +r.value; num.textContent = v; conf.textContent = 'אישור ' + v; r.style.setProperty('--p', ((v - 1) / 9 * 100) + '%'); num.classList.add('bump'); setTimeout(() => num.classList.remove('bump'), 120); Snd.sfx('tick'); };
+    r.addEventListener('input', upd); r.style.setProperty('--p', '44.4%');
+    conf.onclick = () => { if (conf.dataset.lock) return; conf.dataset.lock = 1; Snd.sfx('pick'); done(v); };
+    box.appendChild(sb); bottom.appendChild(conf); waitLine();
+  } else if (q.t === 'rank') {
+    let order = [];
+    const wrap = el('div', 'opts');
+    const conf = el('button', 'btn mt16', 'אישור הדירוג'); conf.disabled = true;
+    const reset = el('button', 'btn ghost small mt8', 'איפוס ↺'); reset.style.margin = '10px auto 0';
+    const paint = () => {
+      [...wrap.children].forEach((b, i) => { const p = order.indexOf(i); b.classList.toggle('pick', p >= 0); b.querySelector('.num').textContent = p >= 0 ? p + 1 : ''; });
+      conf.disabled = order.length < q.o.length;
+      if (order.length === q.o.length - 1) { const last = q.o.findIndex((_, i) => !order.includes(i)); order.push(last); paint(); }
+    };
+    q.o.forEach((o, i) => {
+      const b = el('button', 'opt', `<span class="num"></span><span>${esc(o)}</span>`);
+      b.onclick = () => { const p = order.indexOf(i); if (p >= 0) order = order.slice(0, p); else order.push(i); Snd.sfx('tap'); paint(); };
+      wrap.appendChild(b);
+    });
+    reset.onclick = () => { order = []; Snd.sfx('tap'); paint(); };
+    conf.onclick = () => { if (conf.dataset.lock) return; conf.dataset.lock = 1; Snd.sfx('pick'); done(order.slice()); };
+    box.appendChild(wrap); box.appendChild(reset); bottom.appendChild(conf); waitLine();
+  }
+}
+
+/* similarity 0..1 */
+function sim(q, a, b) {
+  if (a == null || b == null) return 0;
+  if (q.t === 'scale') return Math.max(0, 1 - Math.abs(a - b) / 4);
+  if (q.t === 'rank') { let s = 0; for (let k = 0; k < q.o.length; k++) s += Math.abs(a.indexOf(k) - b.indexOf(k)); return 1 - s / 8; }
+  return a === b ? 1 : 0;
+}
+function fmt(q, v) {
+  if (v == null) return '—';
+  if (q.t === 'scale') return String(v);
+  if (q.t === 'who') return G.p[v];
+  if (q.t === 'rank') return v.map(i => q.o[i]).join(' › ');
+  return q.o[v];
+}
+function reveal() {
+  const q = G.qs[G.i], c = G.cur;
+  let s, match, guessS = null;
+  if (G.mode === 'match') { s = sim(q, c.self[0], c.self[1]); }
+  else { guessS = [sim(q, c.guess[0], c.self[1]), sim(q, c.guess[1], c.self[0])]; s = (guessS[0] + guessS[1]) / 2; }
+  match = s >= .75;
+  G.res[G.i] = { q, self: c.self.slice(), guess: c.guess.slice(), s, match, guessS };
+  G.streak = match ? G.streak + 1 : 0; G.bestStreak = Math.max(G.bestStreak, G.streak);
+
+  const perfect = s === 1;
+  const V = $('#rv-verdict');
+  if (G.mode === 'match') {
+    const t = perfect ? pick(['על אותו גל! 🌊', 'בול אותו דבר!', 'טלפתיה!', 'מוח אחד!']) : match ? pick(['כמעט זהה!', 'ממש קרוב!', 'אותו כיוון!']) : pick(['גלים שונים', 'אופס, לא הפעם', 'כל אחד והגל שלו', 'הפכים נמשכים?']);
+    V.innerHTML = `<div class="vem">${perfect ? '💞' : match ? '✨' : '🙃'}</div><div class="vt">${t}</div>${G.streak >= 3 ? `<div class="vs">🔥 ${G.streak} התאמות ברצף!</div>` : ''}`;
+  } else {
+    const both = guessS[0] >= .75 && guessS[1] >= .75, none = guessS[0] < .75 && guessS[1] < .75;
+    V.innerHTML = `<div class="vem">${both ? '🔮' : none ? '🙈' : '🎯'}</div><div class="vt">${both ? 'שניכם קראתם מחשבות!' : none ? 'אף אחד לא ניחש…' : 'ניחוש אחד בול!'}</div>`;
+  }
+  $('#rv-q').textContent = q.q;
+  const A = $('#rv-ans'); A.innerHTML = '';
+  [0, 1].forEach(p => {
+    const card = el('div', 'acard');
+    let extra = '', mk = '';
+    if (G.mode === 'guess') {
+      const ok = guessS[p] >= .75;
+      extra = `<div class="ag">🔮 ניחש/ה על ${esc(G.p[1 - p])}: <b>${esc(fmt(q, c.guess[p]))}</b></div>`;
+      mk = ok ? '✅' : '❌';
+    }
+    card.innerHTML = `<div class="av" style="background:${COLORS[p]}">${esc(initial(G.p[p]))}</div><div><div class="an">${esc(G.p[p])}</div><div class="aa">${esc(fmt(q, c.self[p]))}</div>${extra}</div>${mk ? `<span class="mk">${mk}</span>` : ''}`;
+    A.appendChild(card);
+  });
+  const done = G.res.filter(Boolean);
+  const sb = $('#rv-score');
+  if (G.mode === 'match') sb.innerHTML = `<div>💞 ${done.filter(r => r.match).length} התאמות</div><div>📊 ${Math.round(done.reduce((a, r) => a + r.s, 0) / done.length * 100)}% עד עכשיו</div>`;
+  else { const sc = [0, 1].map(p => done.reduce((a, r) => a + (r.guessS[p] >= .75 ? 1 : 0), 0)); sb.innerHTML = `<div style="border-color:${COLORS[0]}">${esc(G.p[0])}: ${sc[0]}</div><div style="border-color:${COLORS[1]}">${esc(G.p[1])}: ${sc[1]}</div>`; }
+  $('#btn-next').innerHTML = `<span class="shine"></span>${G.i + 1 >= G.qs.length ? 'לתוצאות! 🏁' : 'לשאלה הבאה ←'}`;
+  show('reveal');
+  setTimeout(() => {
+    if (perfect) { Snd.sfx('match'); FX.burst(90, ['💞', '🌊', '✨']); vib([30, 50, 30]); }
+    else if (match) { Snd.sfx('close'); FX.burst(40); vib(30); }
+    else { Snd.sfx('miss'); vib(60); }
+  }, 250);
+}
+$('#btn-next').onclick = () => { Snd.sfx('tap'); G.i++; if (G.i >= G.qs.length) return endGame(); beginQuestion(); };
+
+$('#btn-quit').onclick = () => { Snd.sfx('tap'); confirmQuit(); };
+function confirmQuit() {
+  openModal(`<h3>לצאת מהמשחק? 🚪</h3><p>ההתקדמות של הסיבוב הזה לא תישמר.</p><div class="btnrow mt16"><button class="btn ghost" id="m-stay">להמשיך לשחק</button><button class="btn" id="m-quit">יציאה</button></div>`);
+  $('#m-stay').onclick = closeModal;
+  $('#m-quit').onclick = () => { closeModal(); G = null; goHome(); };
+}
+
+/* ============ END ============ */
+const TIERS = [
+  [95, 'נשמות תאומות 💞', 'אתם בעצם אדם אחד בשני גופים. מפחיד קצת.'],
+  [80, 'על אותו גל 🌊', 'גולשים יחד על כל גל. כמעט טלפתיה.'],
+  [65, 'כמעט טלפתיה 🔮', 'עוד כמה סיבובים ואתם מסיימים משפטים אחד לשני.'],
+  [50, 'משלימים זה את זה 🧩', 'מסכימים על העיקר ומתווכחים על השאר. בדיוק כמו שצריך.'],
+  [35, 'הפכים נמשכים 😅', 'לפחות אף פעם לא משעמם ביחד.'],
+  [0, 'מכוכבים שונים 🪐', 'אבל היי, ככה לומדים משהו חדש בכל סיבוב!']
+];
+const GUESS_TIERS = [
+  [90, 'קוראי מחשבות 🔮', 'אתם מכירים אחד את השני יותר טוב מעצמכם.'],
+  [70, 'מכירים מצוין 🧠', 'עוד קצת ואתם יכולים להזמין אחד בשביל השני במסעדה.'],
+  [50, 'מכירים יפה 👍', 'יש בסיס, יש עוד מה לגלות.'],
+  [0, 'יש עוד מה לגלות 🕵️', 'מזל שיש עוד סיבוב!']
+];
+function endGame() {
+  const res = G.res, n = res.length;
+  const pct = Math.round(res.reduce((a, r) => a + r.s, 0) / n * 100);
+  const matches = res.filter(r => r.match).length;
+  const tiers = G.mode === 'guess' ? GUESS_TIERS : TIERS; const tier = tiers.find(t => pct >= t[0]);
+  // record
+  const pk = G.pk; const pr = DB.pairs[pk] || (DB.pairs[pk] = { names: G.p.slice(), games: 0, best: 0, sum: 0, seen: {}, decks: {} });
+  pr.names = G.p.slice(); pr.games++; pr.best = Math.max(pr.best, pct); pr.sum += pct; pr.last = Date.now();
+  pr.decks[G.deck.id] = (pr.decks[G.deck.id] || 0) + 1;
+  const seen = new Set(pr.seen[G.deck.id] || []); res.forEach(r => seen.add(r.q.id)); pr.seen[G.deck.id] = [...seen];
+  DB.games++;
+  const allDecks = new Set(); Object.values(DB.pairs).forEach(p => Object.keys(p.decks).forEach(d => allDecks.add(d)));
+  const scaleExact = res.filter(r => r.q.t === 'scale' && G.mode === 'match' && r.s === 1).length;
+  const deckDone = seen.size >= G.deck.questions.length;
+  const h = new Date().getHours();
+  const earned = [];
+  const give = id => { if (!DB.badges[id]) { DB.badges[id] = Date.now(); earned.push(id); } };
+  give('first');
+  if (G.mode === 'match') { if (pct === 100) give('p100'); if (pct >= 90) give('p90'); if (pct < 25) give('p0'); }
+  if (G.mode === 'guess' && pct >= 80) give('guesswin');
+  if (G.bestStreak >= 5) give('streak5'); if (G.bestStreak >= 10) give('streak10');
+  if (DB.games >= 10) give('g10'); if (DB.games >= 25) give('g25'); if (DB.games >= 50) give('g50');
+  if (allDecks.size >= 5) give('d5'); if (allDecks.size >= 10) give('d10'); if (allDecks.size >= DECKS.length) give('dall');
+  if (deckDone) give('decdone'); if (deckDone && G.deck.id === 'wyr') give('wyrdone');
+  if (n >= 20) give('long'); if (scaleExact >= 3) give('scale3'); if (h >= 0 && h < 5) give('night');
+  if (G.deck.audience === 'couples') give('couple'); if (Object.keys(DB.pairs).length >= 3) give('pairs3');
+  const prevRank = rankOf(pr.games - 1), newRank = rankOf(pr.games);
+  save();
+  G.pct = pct; G.tier = tier;
+
+  // UI
+  $('#end-title').textContent = tier[1]; $('#end-sub').textContent = tier[2];
+  const W = $('#end-winner'); W.innerHTML = '';
+  if (G.mode === 'guess') {
+    const sc = [0, 1].map(p => res.reduce((a, r) => a + r.guessS[p], 0) / n * 100 | 0);
+    W.innerHTML = `<div class="winner">${sc[0] === sc[1] ? `🤝 תיקו! שניכם ${sc[0]}%` : `🏆 ${esc(G.p[sc[0] > sc[1] ? 0 : 1])} מכיר/ה את ${esc(G.p[sc[0] > sc[1] ? 1 : 0])} יותר טוב (${Math.max(...sc)}% מול ${Math.min(...sc)}%)`}</div>`;
+  }
+  $('#end-stats').innerHTML = `<div class="stat"><b>${matches}/${n}</b><span>${G.mode === 'guess' ? 'שאלות מוצלחות' : 'התאמות'}</span></div><div class="stat"><b>🔥${G.bestStreak}</b><span>רצף הכי ארוך</span></div><div class="stat"><b>${newRank[2]}</b><span>${newRank[1]}</span></div>`;
+  const L = $('#end-list'); L.innerHTML = '';
+  res.forEach((r, i) => {
+    const it = el('div', 'sumitem');
+    let a = `${esc(G.p[0])}: <b>${esc(fmt(r.q, r.self[0]))}</b><br>${esc(G.p[1])}: <b>${esc(fmt(r.q, r.self[1]))}</b>`;
+    if (G.mode === 'guess') a += `<br>🔮 ניחושים: ${esc(fmt(r.q, r.guess[0]))} / ${esc(fmt(r.q, r.guess[1]))}`;
+    it.innerHTML = `<div class="sq"><span>${r.match ? '✅' : '❌'}</span><span>${esc(r.q.q)}</span></div><div class="sa">${a}</div>`;
+    L.appendChild(it);
+  });
+  show('end');
+  const elp = $('#end-pct'); let k = 0; const t0 = performance.now();
+  const step = now => { const p = Math.min(1, (now - t0) / 1400); k = Math.round(pct * (1 - Math.pow(1 - p, 3))); elp.textContent = k + '%'; if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+  setTimeout(() => { Snd.sfx('win'); FX.burst(pct >= 65 ? 220 : 110, ['💞', '🌊', '⭐', '🎉']); vib([40, 60, 40, 60, 80]); }, 1300);
+  setTimeout(() => {
+    if (newRank !== prevRank) toast(newRank[2], `דרגה חדשה: ${newRank[1]}!`);
+    earned.forEach(id => { const b = BADGES.find(x => x[0] === id); b && toast(b[1], b[2]); });
+  }, 2100);
+}
+$('#btn-again').onclick = () => { Snd.sfx('pick'); startGame(G.p[0], G.p[1], G.mode, G.qs.length, G.deck.id); };
+$('#btn-other').onclick = () => { Snd.sfx('tap'); openSetup(); };
+
+/* ============ SHARE IMAGE ============ */
+function drawShare() {
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#F6F2FF'); g.addColorStop(1, '#FFE6F1'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const blob = (cx, cy, r, col) => { const rg = x.createRadialGradient(cx, cy, 0, cx, cy, r); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = rg; x.fillRect(0, 0, W, H); };
+  blob(900, 160, 420, 'rgba(164,139,255,.45)'); blob(120, 1200, 460, 'rgba(255,143,188,.4)');
+  // waves
+  const wave = (y, amp, col) => { x.beginPath(); x.moveTo(0, y); for (let i = 0; i <= W; i += 10) x.lineTo(i, y + Math.sin(i / 90) * amp); x.lineTo(W, H); x.lineTo(0, H); x.closePath(); x.fillStyle = col; x.fill(); };
+  const wg = x.createLinearGradient(0, 0, W, 0); wg.addColorStop(0, '#7C5CFF'); wg.addColorStop(1, '#FF3D8B');
+  wave(1150, 22, 'rgba(164,139,255,.5)'); wave(1185, 26, wg);
+  x.direction = 'rtl'; x.textAlign = 'center'; x.fillStyle = '#1C1433';
+  const F = (w, s) => `${w} ${s}px Rubik, system-ui, Arial, sans-serif`;
+  x.font = F(900, 64); x.fillText('🌊 על אותו גל', W / 2, 150);
+  x.font = F(600, 44); x.fillStyle = '#5F5680'; x.fillText(`${G.p[0]}  💞  ${G.p[1]}`, W / 2, 250);
+  const pg = x.createLinearGradient(300, 0, 780, 0); pg.addColorStop(0, '#7C5CFF'); pg.addColorStop(1, '#FF3D8B');
+  x.font = F(900, 300); x.fillStyle = pg; x.fillText(G.pct + '%', W / 2, 600);
+  x.fillStyle = '#1C1433'; x.font = F(900, 76); x.fillText(G.tier[1], W / 2, 740);
+  x.font = F(500, 38); x.fillStyle = '#5F5680';
+  const words = G.tier[2].split(' '); let line = '', y = 820; for (const w of words) { const t = line ? line + ' ' + w : w; if (x.measureText(t).width > 880) { x.fillText(line, W / 2, y); line = w; y += 52; } else line = t; } x.fillText(line, W / 2, y);
+  // pill
+  const pill = `${G.deck.emoji} ${G.deck.name} · ${G.mode === 'guess' ? 'מצב ניחוש' : 'מצב התאמה'}`;
+  x.font = F(700, 38); const pw = x.measureText(pill).width + 80;
+  x.fillStyle = '#fff'; x.strokeStyle = '#DCD3F5'; x.lineWidth = 4;
+  const rr = (X, Y, w, h, r) => { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); };
+  rr(W / 2 - pw / 2, 930, pw, 84, 42); x.fill(); x.stroke();
+  x.fillStyle = '#1C1433'; x.fillText(pill, W / 2, 985);
+  x.font = F(700, 36); x.fillStyle = '#fff'; x.fillText('וכמה אתם על אותו גל? 😉', W / 2, 1290);
+  return c;
+}
+$('#btn-share').onclick = async () => {
+  Snd.sfx('tap');
+  const c = drawShare(); const url = c.toDataURL('image/png');
+  const text = `קיבלנו ${G.pct}% ב"על אותו גל" 🌊 ${G.tier[1]}`;
+  openModal(`<h3>התמונה שלכם מוכנה 📸</h3><img class="shareprev" src="${url}" alt=""><div class="btnrow mt16"><button class="btn grad" id="m-share">שיתוף</button><button class="btn ghost" id="m-close">סגירה</button></div>`);
+  $('#m-close').onclick = closeModal;
+  $('#m-share').onclick = async () => {
+    try {
+      if (window.Android && Android.shareImage) { Android.shareImage(url.split(',')[1], text); return; }
+      const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+      const file = new File([blob], 'al-oto-gal.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return; }
+      const a = document.createElement('a'); a.href = url; a.download = 'al-oto-gal.png'; document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) {}
+  };
+};
+
+/* ============ HISTORY ============ */
+function renderHistory() {
+  const pairs = Object.values(DB.pairs).sort((a, b) => (b.last || 0) - (a.last || 0));
+  const allDecks = new Set(); pairs.forEach(p => Object.keys(p.decks).forEach(d => allDecks.add(d)));
+  const best = pairs.reduce((m, p) => Math.max(m, p.best), 0);
+  $('#h-stats').innerHTML = `<div class="stat"><b>${DB.games}</b><span>משחקים</span></div><div class="stat"><b>${best}%</b><span>שיא התאמה</span></div><div class="stat"><b>${allDecks.size}/${DECKS.length}</b><span>חפיסות שנוסו</span></div><div class="stat"><b>${pairs.length}</b><span>זוגות שחקנים</span></div>`;
+  const B = $('#h-badges'); B.innerHTML = '';
+  $('#h-bcount').textContent = `${Object.keys(DB.badges).length}/${BADGES.length}`;
+  BADGES.forEach(([id, e, n, d]) => B.appendChild(el('div', 'bdg' + (DB.badges[id] ? '' : ' locked'), `<span class="be">${DB.badges[id] ? e : '🔒'}</span><b>${esc(n)}</b><small>${esc(d)}</small>`)));
+  const P = $('#h-pairs'); P.innerHTML = '';
+  if (!pairs.length) P.innerHTML = '<div class="empty">עוד לא שיחקתם. יאללה, משחק ראשון! 🌊</div>';
+  pairs.forEach(p => {
+    const r = rankOf(p.games), nx = nextRank(p.games);
+    const prog = nx ? (p.games - r[0]) / (nx[0] - r[0]) * 100 : 100;
+    const doneDecks = DECKS.filter(d => (p.seen[d.id] || []).length >= d.questions.length).length;
+    P.appendChild(el('div', 'pair', `<div class="pn">${esc(p.names[0])} 💞 ${esc(p.names[1])}</div><div class="pr">${r[2]} ${r[1]}</div>
+      <div class="ps"><span>🎮 ${p.games} משחקים</span><span>🏆 שיא ${p.best}%</span><span>📊 ממוצע ${Math.round(p.sum / p.games)}%</span><span>✅ ${doneDecks} חפיסות הושלמו</span></div>
+      <div class="prog"><i style="width:${prog}%"></i></div><div class="muted" style="font-size:13px;margin-top:6px">${nx ? `עוד ${nx[0] - p.games} משחקים לדרגת ${nx[1]} ${nx[2]}` : 'הגעתם לדרגה הכי גבוהה! 👑'}</div>`));
+  });
+}
+
+/* ============ boot ============ */
+renderHome();
+requestAnimationFrame(() => $('#s-home').classList.add('on'));
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
