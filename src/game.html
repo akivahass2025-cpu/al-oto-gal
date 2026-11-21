@@ -584,7 +584,7 @@ const show = (id, dir) => {
   if (prev && prev !== next) { prev.classList.remove('on'); }
   next.classList.toggle('off-r', dir === 'back');
   next.scrollTop = 0;
-  requestAnimationFrame(() => { next.classList.remove('off-r'); next.classList.add('on'); });
+  requestAnimationFrame(() => { if (cur !== id) return; $$('.screen.on').forEach(x => x !== next && x.classList.remove('on')); next.classList.remove('off-r'); next.classList.add('on'); });
   cur = id;
 };
 history.replaceState({ s: 'root' }, '');
