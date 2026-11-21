@@ -13,6 +13,7 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -89,6 +90,14 @@ public class MainActivity extends Activity {
                 } catch (Exception ignored) {
                 }
                 return true;
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse response) {
+                // website not published yet (or down): play the copy that ships inside the app
+                if (request.isForMainFrame() && response.getStatusCode() >= 400 && !request.getUrl().toString().startsWith("file:")) {
+                    view.loadUrl(BUNDLED);
+                }
             }
 
             @Override
