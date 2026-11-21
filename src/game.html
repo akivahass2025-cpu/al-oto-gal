@@ -231,6 +231,29 @@ input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;bac
 .toast small{display:block;opacity:.7;font-size:13px}
 .toast b{font-size:16px}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+.code{display:flex;justify-content:center;gap:10px;margin-top:18px;direction:ltr}
+.code span{width:64px;height:84px;border-radius:20px;background:var(--card);border:2px solid var(--line);display:grid;place-items:center;font-size:48px;font-weight:900;box-shadow:var(--shadow);animation:pop .5s both}
+.code span:nth-child(2){animation-delay:.08s}.code span:nth-child(3){animation-delay:.16s}.code span:nth-child(4){animation-delay:.24s}
+.wa{background:#25D366!important;color:#fff!important;border:0!important}
+.players{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.pl{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:12px 16px;font-size:19px;font-weight:700;animation:optin .4s both}
+.pl .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px;flex:none}
+.pl.empty{border-style:dashed;color:var(--ink3);font-weight:500}
+.pl.empty .av{background:var(--bg2)!important;color:var(--ink3)}
+.dots::after{content:'';animation:dots 1.4s steps(4) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.codein{width:100%;height:96px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);text-align:center;font-size:56px;font-weight:900;letter-spacing:18px;direction:ltr;outline:none;padding-left:18px}
+.codein:focus{border-color:var(--violet2);box-shadow:0 0 0 4px rgba(124,92,255,.15)}
+.err{color:var(--red);font-weight:600;margin-top:12px;min-height:22px;text-align:center}
+.netbar{position:fixed;bottom:calc(14px + var(--safe-b));left:50%;transform:translate(-50%,160%);z-index:45;background:#FFF3D6;color:#7A5200;border:2px solid #FFD98A;border-radius:999px;padding:10px 18px;font-weight:700;font-size:15px;transition:transform .35s;white-space:nowrap}
+.netbar.on{transform:translate(-50%,0)}
+.wait .orb{width:150px;height:150px;border-radius:50%;margin:0 auto;background:conic-gradient(from 0deg,var(--violet),var(--pink),var(--violet2),var(--violet));animation:spin 2.4s linear infinite;display:grid;place-items:center;box-shadow:0 20px 40px -18px rgba(124,92,255,.7)}
+.wait .orb div{width:122px;height:122px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:56px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wait .orb div span{display:inline-block;animation:spin 2.4s linear infinite reverse}
+.onlinepill{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:var(--mint)}
+.onlinepill i{width:9px;height:9px;border-radius:50%;background:var(--mint);animation:pulse 1.4s infinite}
+.minigrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;max-height:55vh;overflow-y:auto;padding:4px 2px}
 .shareprev{width:100%;border-radius:18px;margin-top:14px;box-shadow:var(--shadow)}
 </style>
 </head>
@@ -261,6 +284,7 @@ input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;bac
   </div>
   <div class="homebtns">
     <button class="btn grad" id="btn-new"><span class="shine"></span>משחק חדש ✨</button>
+    <button class="btn" id="btn-join">הצטרפות לחדר 🔑</button>
     <button class="btn ghost" id="btn-history2">היסטוריה והישגים 🏆</button>
   </div>
 </section>
@@ -271,7 +295,11 @@ input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;bac
     <h1>משחק חדש</h1>
     <button class="iconbtn" data-back aria-label="חזרה">→</button>
   </div>
-  <input class="field mt16" id="p1" placeholder="שם שחקן/ית 1" maxlength="14" autocomplete="off">
+  <div class="seg mt16" id="seg-where">
+    <button data-v="online">🌐 כל אחד מהטלפון שלו</button>
+    <button data-v="local">📱 טלפון אחד</button>
+  </div>
+  <input class="field mt12" id="p1" placeholder="שם שחקן/ית 1" maxlength="14" autocomplete="off">
   <input class="field mt12" id="p2" placeholder="שם שחקן/ית 2" maxlength="14" autocomplete="off">
 
   <div class="sec"><h3>מצב משחק</h3></div>
@@ -305,6 +333,34 @@ input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;bac
   <div class="nm" id="pass-name"></div>
   <div class="muted mt8" id="pass-note" style="font-size:16px"></div>
   <button class="btn grad mt24" id="btn-ready" style="max-width:360px"><span class="shine"></span>אני מוכן/ה 👀</button>
+</section>
+
+<!-- LOBBY -->
+<section class="screen" id="s-lobby">
+  <div class="toprow"><h1>החדר שלכם</h1><button class="iconbtn" id="btn-lobby-x" aria-label="יציאה">✕</button></div>
+  <div class="muted mt16" style="text-align:center;font-size:18px">קוד החדר</div>
+  <div class="code" id="lobby-code"></div>
+  <button class="btn wa mt24" id="btn-wa">שליחת הקוד בווצאפ 💬</button>
+  <div class="players" id="lobby-players"></div>
+  <div class="hint" id="lobby-info" style="text-align:center"></div>
+  <div class="gbottom"><button class="btn grad" id="btn-lobby-start" disabled><span class="shine"></span>מתחילים! 🚀</button></div>
+</section>
+
+<!-- JOIN -->
+<section class="screen" id="s-join">
+  <div class="toprow"><h1>הצטרפות לחדר</h1><button class="iconbtn" data-back aria-label="חזרה">→</button></div>
+  <div class="muted mt16" style="font-size:18px">הקוד שקיבלתם מהחבר/ה 🔑</div>
+  <input class="codein mt12" id="join-code" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" autocomplete="off">
+  <input class="field mt16" id="join-name" placeholder="השם שלך" maxlength="14" autocomplete="off">
+  <div class="err" id="join-err"></div>
+  <div class="gbottom"><button class="btn grad" id="btn-join-go" disabled><span class="shine"></span>נכנסים לחדר 🚪</button></div>
+</section>
+
+<!-- WAIT -->
+<section class="screen pass wait" id="s-wait">
+  <div class="orb"><div><span id="wait-emoji">⏳</span></div></div>
+  <div class="nm dots" id="wait-title" style="font-size:30px;margin-top:26px"></div>
+  <div class="muted mt12" id="wait-sub" style="font-size:18px"></div>
 </section>
 
 <!-- QUESTION -->
@@ -368,10 +424,14 @@ input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;bac
 <canvas id="fx"></canvas>
 <div class="toast" id="toast"><span class="te"></span><div><small>תג חדש נפתח!</small><b></b></div></div>
 
+<div class="netbar" id="netbar"></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 
 <script>
 /*__DECKS__*/
+</script>
+<script>
+/*__FIREBASE__*/
 </script>
 <script>
 'use strict';
@@ -532,7 +592,7 @@ history.pushState({ s: 'app' }, '');
 addEventListener('popstate', () => { history.pushState({ s: 'app' }, ''); handleBack(); });
 function handleBack() {
   if ($('#modal').classList.contains('on')) return closeModal();
-  if (['q', 'pass', 'reveal'].includes(cur)) return confirmQuit();
+  if (['q', 'pass', 'reveal', 'wait', 'lobby'].includes(cur)) return confirmQuit();
   if (cur === 'home') return;
   if (cur === 'end') return goHome();
   goHome();
@@ -576,7 +636,13 @@ function renderSettings() {
 }
 
 /* ============ SETUP ============ */
-const setup = { mode: DB.last.mode || 'match', len: DB.last.len || 12, group: 'all', deck: null, q: '' };
+const setup = { where: DB.last.where || 'online', mode: DB.last.mode || 'match', len: DB.last.len || 12, group: 'all', deck: null, q: '' };
+const applyWhere = () => {
+  const on = setup.where === 'online';
+  $('#p2').hidden = on; $('#p1').placeholder = on ? 'השם שלך' : 'שם שחקן/ית 1';
+  $('#btn-start').innerHTML = `<span class="shine"></span>${on ? 'פותחים חדר 🌐' : 'יאללה, מתחילים'}`;
+  checkStart();
+};
 const MODE_HINT = {
   match: 'כל אחד עונה על עצמו. תשובות זהות = נקודה להתאמה 💞',
   guess: 'כל אחד עונה על עצמו ואז מנחש מה השני ענה. מי מכיר את מי יותר טוב? 🔮'
@@ -584,14 +650,14 @@ const MODE_HINT = {
 function segInit(id, key) {
   $$(`#${id} button`).forEach(b => {
     b.classList.toggle('on', String(setup[key]) === b.dataset.v);
-    b.onclick = () => { Snd.sfx('tap'); setup[key] = key === 'len' ? +b.dataset.v : b.dataset.v; $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); if (key === 'mode') $('#mode-hint').textContent = MODE_HINT[setup.mode]; };
+    b.onclick = () => { Snd.sfx('tap'); setup[key] = key === 'len' ? +b.dataset.v : b.dataset.v; $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); if (key === 'mode') $('#mode-hint').textContent = MODE_HINT[setup.mode]; if (key === 'where') applyWhere(); };
   });
 }
 function openSetup() {
   $('#p1').value = DB.last.p1 || ''; $('#p2').value = DB.last.p2 || '';
-  segInit('seg-mode', 'mode'); segInit('seg-len', 'len'); $('#mode-hint').textContent = MODE_HINT[setup.mode];
+  segInit('seg-where', 'where'); segInit('seg-mode', 'mode'); segInit('seg-len', 'len'); $('#mode-hint').textContent = MODE_HINT[setup.mode];
   if (!setup.deck) setup.deck = DECKS[0] && DECKS[0].id;
-  renderChips(); renderDecks(); renderPreview(); checkStart();
+  renderChips(); renderDecks(); renderPreview(); applyWhere();
   show('setup');
 }
 function renderChips() {
@@ -623,7 +689,7 @@ function renderPreview() {
   if (!d) { p.innerHTML = '<span class="muted">בחרו חפיסה</span>'; return; }
   p.innerHTML = `<span class="em">${d.emoji}</span><span><b style="color:var(--ink)">${esc(d.name)}</b> · ${esc(d.desc || '')}</span>`;
 }
-const checkStart = () => { $('#btn-start').disabled = !($('#p1').value.trim() && $('#p2').value.trim() && setup.deck); };
+const checkStart = () => { $('#btn-start').disabled = !($('#p1').value.trim() && (setup.where === 'online' || $('#p2').value.trim()) && setup.deck); };
 ['#p1', '#p2'].forEach(s => $(s).addEventListener('input', () => { checkStart(); renderDecks(); }));
 $('#search').addEventListener('input', e => { setup.q = e.target.value; renderDecks(); });
 $('#btn-surprise').onclick = () => {
@@ -638,8 +704,9 @@ $('#btn-surprise').onclick = () => {
 };
 $('#btn-start').onclick = () => {
   const p1 = $('#p1').value.trim(), p2 = $('#p2').value.trim();
+  if (setup.where === 'online') { DB.last = { ...DB.last, p1, where: 'online', mode: setup.mode, len: setup.len }; save(); return Net.create(p1, setup.mode, setup.len, setup.deck); }
   if (p1.toLowerCase() === p2.toLowerCase()) { openModal(`<h3>רגע, אותו שם פעמיים? 🤔</h3><p>תנו לכל שחקן שם אחר, כדי שנדע מי ענה מה.</p><button class="btn mt16" id="m-close">הבנתי</button>`); $('#m-close').onclick = closeModal; return; }
-  DB.last = { p1, p2, mode: setup.mode, len: setup.len }; save();
+  DB.last = { ...DB.last, p1, p2, where: 'local', mode: setup.mode, len: setup.len }; save();
   startGame(p1, p2, setup.mode, setup.len, setup.deck);
 };
 
@@ -652,17 +719,28 @@ function chooseQuestions(deck, pk, n) {
   // spread the question types nicely
   return shuffle(qs);
 }
-function startGame(p1, p2, mode, len, deckId) {
-  const deck = DECKS.find(d => d.id === deckId);
+const QBYID = {}; DECKS.forEach(d => d.questions.forEach(q => QBYID[q.id] = q));
+function startGame(p1, p2, mode, len, deckId, online) {
+  const deck = DECKS.find(d => d.id === deckId) || DECKS[0];
   const pk = pairKey(p1, p2);
-  G = { p: [p1, p2], mode, deck, pk, qs: chooseQuestions(deck, pk, len), i: 0, res: [], streak: 0, bestStreak: 0, order: [0, 1], turn: 0, phase: 'self', cur: null };
+  const qs = online ? online.qids.map(id => QBYID[id]).filter(Boolean) : chooseQuestions(deck, pk, len);
+  G = { p: [p1, p2], mode, deck, pk, qs, i: 0, res: [], streak: 0, bestStreak: 0, order: [0, 1], turn: 0, phase: 'self', cur: null,
+        online: online ? { me: online.me, round: online.round } : null, revealed: -1, ended: false };
   Snd.sfx('pick');
   beginQuestion();
 }
 function beginQuestion() {
   G.order = G.i % 2 === 0 ? [0, 1] : [1, 0];
-  G.turn = 0; G.cur = { self: [null, null], guess: [null, null] };
+  G.turn = 0; G.cur = { self: [null, null], guess: [null, null] }; G.phase = 'self';
+  if (G.online) { renderQuestion(); show('q'); Net.check(); return; }
   showPass();
+}
+function showWait() {
+  const other = 1 - G.online.me;
+  $('#wait-emoji').textContent = pick(['⏳', '🤔', '👀', '🌊']);
+  $('#wait-title').textContent = `ממתינים ל${G.p[other]}`;
+  $('#wait-sub').textContent = pick(['ברגע שיענה/תענה – חושפים! ✨', 'אל תגלו מה עניתם 🤫', 'מעניין אם תהיה התאמה… 💞']);
+  show('wait');
 }
 function showPass() {
   const who = G.order[G.turn];
@@ -684,7 +762,7 @@ function renderDashes() {
   $('#ring').innerHTML = `<svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="${R}" fill="none" stroke="#DCD3F5" stroke-width="6"/><circle cx="27" cy="27" r="${R}" fill="none" stroke="#1C1433" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" style="transition:stroke-dashoffset .5s"/></svg><span>${G.i + 1}</span>`;
 }
 function renderQuestion() {
-  const q = G.qs[G.i], who = G.order[G.turn], other = 1 - who, guessing = G.phase === 'guess';
+  const q = G.qs[G.i], who = G.online ? G.online.me : G.order[G.turn], other = 1 - who, guessing = G.phase === 'guess';
   renderDashes();
   const tag = $('#q-who');
   tag.className = 'who-tag' + (guessing ? ' guess-tag' : '');
@@ -698,10 +776,11 @@ function renderQuestion() {
     if (guessing) G.cur.guess[who] = v; else G.cur.self[who] = v;
     if (G.mode === 'guess' && !guessing) { G.phase = 'guess'; Snd.sfx('pick'); return setTimeout(renderQuestion, 180); }
     G.phase = 'self';
+    if (G.online) { Net.answer(G.i, { s: G.cur.self[who], g: G.mode === 'guess' ? G.cur.guess[who] : null }); return setTimeout(() => { if (G && G.revealed < G.i) showWait(); Net.check(); }, 200); }
     if (G.turn === 0) { G.turn = 1; return setTimeout(showPass, 220); }
     setTimeout(reveal, 220);
   };
-  const waitLine = () => { const w = el('div', 'waitline'); w.innerHTML = `<span>${guessing ? 'הניחוש שלך' : 'הבחירה שלך'}</span><span>${G.turn === 0 ? `אחר כך ${esc(G.p[other])}…` : 'ואז חושפים! ✨'}</span>`; bottom.appendChild(w); };
+  const waitLine = () => { const w = el('div', 'waitline'); w.innerHTML = `<span>${guessing ? 'הניחוש שלך' : 'הבחירה שלך'}</span><span>${G.online ? '<span class="onlinepill"><i></i>אונליין</span>' : G.turn === 0 ? `אחר כך ${esc(G.p[other])}…` : 'ואז חושפים! ✨'}</span>`; bottom.appendChild(w); };
 
   if (q.t === 'ab' || q.t === 'mc') {
     const wrap = el('div', 'opts ' + q.t);
@@ -766,6 +845,7 @@ function fmt(q, v) {
   return q.o[v];
 }
 function reveal() {
+  if (G.revealed === G.i) return; G.revealed = G.i;
   const q = G.qs[G.i], c = G.cur;
   let s, match, guessS = null;
   if (G.mode === 'match') { s = sim(q, c.self[0], c.self[1]); }
@@ -808,13 +888,22 @@ function reveal() {
     else { Snd.sfx('miss'); vib(60); }
   }, 250);
 }
-$('#btn-next').onclick = () => { Snd.sfx('tap'); G.i++; if (G.i >= G.qs.length) return endGame(); beginQuestion(); };
+$('#btn-next').onclick = () => {
+  Snd.sfx('tap');
+  if (G.online) { $('#btn-next').disabled = true; setTimeout(() => $('#btn-next').disabled = false, 1500); return Net.advance(G.i + 1); }
+  G.i++; if (G.i >= G.qs.length) return endGame(); beginQuestion();
+};
+function gotoQuestion(i) {
+  if (!G || i <= G.i) return;
+  G.i = i; if (G.i >= G.qs.length) { if (!G.ended) endGame(); return; }
+  beginQuestion();
+}
 
 $('#btn-quit').onclick = () => { Snd.sfx('tap'); confirmQuit(); };
 function confirmQuit() {
   openModal(`<h3>לצאת מהמשחק? 🚪</h3><p>ההתקדמות של הסיבוב הזה לא תישמר.</p><div class="btnrow mt16"><button class="btn ghost" id="m-stay">להמשיך לשחק</button><button class="btn" id="m-quit">יציאה</button></div>`);
   $('#m-stay').onclick = closeModal;
-  $('#m-quit').onclick = () => { closeModal(); G = null; goHome(); };
+  $('#m-quit').onclick = () => { closeModal(); G = null; Net.leave(); goHome(); };
 }
 
 /* ============ END ============ */
@@ -833,7 +922,8 @@ const GUESS_TIERS = [
   [0, 'יש עוד מה לגלות 🕵️', 'מזל שיש עוד סיבוב!']
 ];
 function endGame() {
-  const res = G.res, n = res.length;
+  G.ended = true;
+  const res = G.res.filter(Boolean), n = res.length || 1;
   const pct = Math.round(res.reduce((a, r) => a + r.s, 0) / n * 100);
   const matches = res.filter(r => r.match).length;
   const tiers = G.mode === 'guess' ? GUESS_TIERS : TIERS; const tier = tiers.find(t => pct >= t[0]);
@@ -888,8 +978,14 @@ function endGame() {
     earned.forEach(id => { const b = BADGES.find(x => x[0] === id); b && toast(b[1], b[2]); });
   }, 2100);
 }
-$('#btn-again').onclick = () => { Snd.sfx('pick'); startGame(G.p[0], G.p[1], G.mode, G.qs.length, G.deck.id); };
-$('#btn-other').onclick = () => { Snd.sfx('tap'); openSetup(); };
+$('#btn-again').onclick = () => { Snd.sfx('pick'); if (G.online) return Net.newRound(G.deck.id); startGame(G.p[0], G.p[1], G.mode, G.qs.length, G.deck.id); };
+$('#btn-other').onclick = () => {
+  Snd.sfx('tap');
+  if (!G || !G.online) return openSetup();
+  openModal(`<h3>איזו חפיסה עכשיו? 🃏</h3><div class="minigrid" id="m-decks"></div><button class="btn ghost mt12" id="m-close">ביטול</button>`);
+  $('#m-close').onclick = closeModal;
+  DECKS.forEach(d => { const b = el('button', 'deck', `<span class="em">${d.emoji}</span><span><b>${esc(d.name)}</b><small>${d.questions.length} שאלות</small></span>`); b.onclick = () => { closeModal(); Net.newRound(d.id); }; $('#m-decks').appendChild(b); });
+};
 
 /* ============ SHARE IMAGE ============ */
 function drawShare() {
@@ -958,10 +1054,150 @@ function renderHistory() {
   });
 }
 
+/* ============ ONLINE ROOMS ============ */
+const Net = (() => {
+  const ROOT = 'rooms', PFX = 'gal';  // shared database with the zeh-o-zeh app; own prefix so codes never clash
+  const CFG = { apiKey: "AIzaSyAcZnezXR5OQ1bi1FFPKPU_jUqkV-B5i_Y", authDomain: "zeh-o-zeh.firebaseapp.com",
+    databaseURL: "https://zeh-o-zeh-default-rtdb.europe-west1.firebasedatabase.app", projectId: "zeh-o-zeh", appId: "1:563159959757:web:feeddf9876cb76a92f0184" };
+  let db = null, F = window.FBK, code = null, me = 0, R = null, unsub = null, ready = null, connOk = true;
+  const path = s => ROOT + '/' + PFX + code + (s ? '/' + s : '');
+  const init = () => ready || (ready = (async () => {
+    if (!F) throw new Error('no-sdk');
+    const app = F.initializeApp(CFG); db = F.getDatabase(app);
+    await Promise.race([F.signInAnonymously(F.getAuth(app)), new Promise((_, rj) => setTimeout(() => rj(new Error('timeout')), 12000))]);
+    F.onValue(F.ref(db, '.info/connected'), s => { connOk = !!s.val(); bar(); });
+    return db;
+  })().catch(e => { ready = null; throw e; }));
+  const netErr = e => { console.warn(e); openModal(`<h3>אין חיבור לשרת 📡</h3><p>בדקו שיש אינטרנט ונסו שוב. אפשר גם לשחק בינתיים על טלפון אחד.</p><button class="btn mt16" id="m-close">הבנתי</button>`); $('#m-close').onclick = closeModal; };
+  const busy = (btn, on, txt) => { if (!btn) return; btn.disabled = on; if (on) { btn.dataset.t = btn.innerHTML; btn.innerHTML = txt || 'רגע…'; } else if (btn.dataset.t) btn.innerHTML = btn.dataset.t; };
+  const keyOf = i => 'r' + (R ? R.round : 0) + '_' + i;
+
+  function listen() {
+    unsub && unsub();
+    unsub = F.onValue(F.ref(db, path()), snap => { R = snap.val(); onRoom(); });
+    try { F.onDisconnect(F.ref(db, path('p/' + me + '/on'))).set(false); F.set(F.ref(db, path('p/' + me + '/on')), true); } catch (e) {}
+    DB.lastRoom = { code, me, t: Date.now() }; save();
+  }
+  function bar() {
+    const b = $('#netbar'); let msg = '';
+    const inGame = ['lobby', 'q', 'wait', 'reveal', 'end'].includes(cur) && code;
+    if (inGame && !connOk) msg = '📡 החיבור נפל… מנסים להתחבר מחדש';
+    else if (inGame && R && R.p && R.p[1 - me] && R.p[1 - me].on === false) msg = `😴 ${R.p[1 - me].name} התנתק/ה… מחכים שיחזור/תחזור`;
+    if (msg) b.textContent = msg; b.classList.toggle('on', !!msg);
+  }
+  function renderLobby() {
+    if (!R) return;
+    $('#lobby-code').innerHTML = code.split('').map(c => `<span>${c}</span>`).join('');
+    const P = $('#lobby-players'); P.innerHTML = '';
+    [0, 1].forEach(i => {
+      const p = R.p && R.p[i];
+      P.appendChild(el('div', 'pl' + (p ? '' : ' empty'), p ? `<span class="av" style="background:${COLORS[i]}">${esc(initial(p.name))}</span>${esc(p.name)}${i === me ? ' (את/ה)' : ''}<span class="sp"></span>${i === 0 ? '👑' : '✅'}`
+        : `<span class="av">?</span><span class="dots">מחכים לשחקן/ית השני/ה</span>`));
+    });
+    const d = DECKS.find(x => x.id === R.deckId);
+    const both = R.p && R.p[0] && R.p[1];
+    $('#lobby-info').innerHTML = `${d ? d.emoji + ' ' + esc(d.name) : ''} · ${R.mode === 'guess' ? '🔮 ניחוש' : '💞 התאמה'} · ${R.len} שאלות` + (me === 1 ? `<br><span class="dots">מחכים ש${esc(R.p[0].name)} יתחיל/תתחיל</span>` : '');
+    const st = $('#btn-lobby-start'); st.hidden = me !== 0; st.disabled = !both;
+    $('#btn-wa').hidden = !!both;
+  }
+  function onRoom() {
+    bar();
+    if (!R) { if (code) { Net.leave(); goHome(); openModal(`<h3>החדר נסגר 🚪</h3><p>אפשר לפתוח חדר חדש בכל רגע.</p><button class="btn mt16" id="m-close">סגירה</button>`); $('#m-close').onclick = closeModal; } return; }
+    if (R.status === 'lobby') { if (cur !== 'lobby') show('lobby'); renderLobby(); if (R.p && R.p[1] && me === 0 && !Net._joinedSnd) { Net._joinedSnd = 1; Snd.sfx('match'); vib([30, 40, 30]); FX.burst(50); } return; }
+    if (R.status !== 'play' || !R.p || !R.p[1]) return;
+    // new round → start
+    if (!G || !G.online || G.online.round !== R.round) {
+      closeModal();
+      startGame(R.p[0].name, R.p[1].name, R.mode, R.len, R.deckId, { me, round: R.round, qids: R.qids || [] });
+      return;
+    }
+    check();
+  }
+  function check() {
+    if (!R || !G || !G.online || G.online.round !== R.round) return;
+    const roomI = R.i || 0;
+    if (roomI > G.i) { if (G.revealed < G.i && G.i < G.qs.length) { const a = R.ans && R.ans[keyOf(G.i)]; if (a && a[0] && a[1]) fill(a), reveal(); } return gotoQuestion(roomI); }
+    const a = R.ans && R.ans[keyOf(G.i)];
+    if (a && a[0] && a[1] && G.revealed < G.i) {
+      // only reveal on my phone after I answered too
+      if (cur === 'q') return;
+      fill(a); reveal();
+    }
+  }
+  const fill = a => { [0, 1].forEach(p => { G.cur.self[p] = a[p].s ?? null; G.cur.guess[p] = a[p].g ?? null; }); };
+
+  const newCode = () => String(1000 + Math.floor(Math.random() * 9000));
+  return {
+    check, _joinedSnd: 0,
+    async create(name, mode, len, deckId) {
+      const btn = $('#btn-start'); busy(btn, true, 'פותחים חדר… 🌐');
+      try {
+        await init();
+        let c, tries = 0;
+        do { c = newCode(); const ex = await F.get(F.ref(db, ROOT + '/' + PFX + c + '/t')); if (!ex.exists() || Date.now() - ex.val() > 6 * 3600e3) break; } while (++tries < 12);
+        code = c; me = 0; Net._joinedSnd = 0;
+        await F.set(F.ref(db, path()), { t: Date.now(), status: 'lobby', mode, len, deckId, round: 0, i: 0, p: { 0: { name, on: true } } });
+        G = null; listen(); Snd.sfx('pick');
+      } catch (e) { netErr(e); } finally { busy(btn, false); }
+    },
+    async join(c, name) {
+      const btn = $('#btn-join-go'); busy(btn, true, 'מתחברים… 🔌'); $('#join-err').textContent = '';
+      try {
+        await init();
+        const snap = await F.get(F.ref(db, ROOT + '/' + PFX + c)); const v = snap.val();
+        if (!v) { $('#join-err').textContent = 'לא מצאנו חדר עם הקוד הזה 🤔'; return; }
+        const same = i => v.p && v.p[i] && v.p[i].name.trim().toLowerCase() === name.trim().toLowerCase();
+        if (same(0) || same(1)) { me = same(0) ? 0 : 1; }
+        else if (v.p && v.p[1]) { $('#join-err').textContent = 'החדר כבר מלא 🙈'; return; }
+        else { me = 1; await F.set(F.ref(db, ROOT + '/' + PFX + c + '/p/1'), { name, on: true }); }
+        code = c; G = null; listen(); Snd.sfx('match'); vib(40);
+        DB.last = { ...DB.last, p1: name }; save();
+      } catch (e) { netErr(e); } finally { busy(btn, false); }
+    },
+    async start() {
+      if (!R || me !== 0) return;
+      const deck = DECKS.find(d => d.id === R.deckId) || DECKS[0];
+      const qids = chooseQuestions(deck, pairKey(R.p[0].name, R.p[1].name), R.len).map(q => q.id);
+      try { await F.update(F.ref(db, path()), { status: 'play', round: (R.round || 0) + 1, i: 0, qids, ans: null }); } catch (e) { netErr(e); }
+    },
+    async newRound(deckId) {
+      if (!R) return;
+      const deck = DECKS.find(d => d.id === deckId) || DECKS[0];
+      const qids = chooseQuestions(deck, pairKey(R.p[0].name, R.p[1].name), R.len).map(q => q.id);
+      try { await F.update(F.ref(db, path()), { status: 'play', deckId, round: (R.round || 0) + 1, i: 0, qids, ans: null }); } catch (e) { netErr(e); }
+    },
+    answer(i, val) { if (!code) return; F.set(F.ref(db, path('ans/' + keyOf(i) + '/' + me)), val).catch(netErr); },
+    advance(i) { if (!code || !R) return; if ((R.i || 0) < i) F.update(F.ref(db, path()), { i }).catch(netErr); },
+    leave() {
+      if (!code) return;
+      try { F.set(F.ref(db, path('p/' + me + '/on')), false); if (me === 0 && R && R.status === 'lobby') F.set(F.ref(db, path()), null); } catch (e) {}
+      unsub && unsub(); unsub = null; code = null; R = null; $('#netbar').classList.remove('on');
+    },
+    share() {
+      const txt = `בוא/י נבדוק כמה אנחנו על אותו גל 🌊💞\nקוד החדר: *${code}*\nפותחים את האפליקציה "על אותו גל" ← הצטרפות לחדר 🔑`;
+      const url = 'https://wa.me/?text=' + encodeURIComponent(txt);
+      if (window.Android) location.href = url; else window.open(url, '_blank');
+    },
+    get code() { return code; }
+  };
+})();
+$('#btn-wa').onclick = () => { Snd.sfx('tap'); Net.share(); };
+$('#btn-lobby-start').onclick = () => { Snd.sfx('pick'); Net.start(); };
+$('#btn-lobby-x').onclick = () => { Snd.sfx('tap'); confirmQuit(); };
+$('#btn-join').onclick = () => {
+  Snd.sfx('pick');
+  $('#join-name').value = DB.last.p1 || ''; $('#join-code').value = ''; $('#join-err').textContent = ''; joinCheck();
+  show('join'); setTimeout(() => $('#join-code').focus(), 400);
+};
+const joinCheck = () => { $('#btn-join-go').disabled = !(/^\d{4}$/.test($('#join-code').value) && $('#join-name').value.trim()); };
+$('#join-code').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); joinCheck(); if (e.target.value.length === 4) { Snd.sfx('pick'); if (!$('#join-name').value.trim()) $('#join-name').focus(); } });
+$('#join-name').addEventListener('input', joinCheck);
+$('#btn-join-go').onclick = () => Net.join($('#join-code').value, $('#join-name').value.trim());
+
 /* ============ boot ============ */
 renderHome();
 requestAnimationFrame(() => $('#s-home').classList.add('on'));
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !window.Android && location.hostname !== 'localhost') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>

@@ -26,7 +26,8 @@ jobs:
       - name: Bundle the game for offline first start
         run: |
           mkdir -p android/app/src/main/assets
-          cp index.html android/app/src/main/assets/index.html
+          cp index.html manifest.webmanifest android/app/src/main/assets/
+          cp -r icons android/app/src/main/assets/
 
       - name: Build the APK
         working-directory: android

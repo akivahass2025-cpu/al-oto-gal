@@ -1,0 +1,26 @@
+name: Online room test
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Two phones play a full online game
+        run: |
+          python3 -m http.server 8080 >/dev/null 2>&1 &
+          cd tools/e2e && npm init -y >/dev/null && npm i playwright-core@1 >/dev/null
+          cp ../../index.html . 2>/dev/null || true
+          node online.mjs || true
+      - name: Save the results to the ci-logs branch
+        run: |
+          mkdir -p /tmp/out && cp -r tools/e2e/shots tools/e2e/e2e.log /tmp/out/ 2>/dev/null || true
+          git config user.name ci; git config user.email ci@example.com
+          git checkout --orphan ci-logs; git rm -rfq . ; cp -r /tmp/out/* . ; git add -A; git commit -qm "online test $GITHUB_RUN_NUMBER"; git push -f origin ci-logs -q
+          grep -q "ALL OK" e2e.log

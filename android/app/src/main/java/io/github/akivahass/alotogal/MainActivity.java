@@ -11,24 +11,26 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 /**
- * Shows the game from its website, so new questions arrive without a new APK.
- * The site's service worker keeps it playable offline; if the site was never
- * reached (first start without internet), the copy bundled in the APK opens instead.
+ * Plays the copy of the game that ships inside the APK.
+ * It is served from https://localhost/ so the online rooms (Firebase) accept it
+ * and the saved progress keeps the same address across updates.
  */
 public class MainActivity extends Activity {
 
-    private static final String HOME = "https://akivahass2025-cpu.github.io/al-oto-gal/";
-    private static final String BUNDLED = "file:///android_asset/index.html";
+    private static final String HOST = "localhost";
+    private static final String HOME = "https://localhost/index.html";
 
     private WebView web;
 
@@ -82,29 +84,28 @@ public class MainActivity extends Activity {
 
         web.setWebViewClient(new WebViewClient() {
             @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                Uri u = request.getUrl();
+                if (!HOST.equals(u.getHost())) return null;
+                String p = u.getPath();
+                if (p == null || p.equals("/") || p.isEmpty()) p = "/index.html";
+                try {
+                    InputStream in = getAssets().open(p.substring(1));
+                    String mime = p.endsWith(".html") ? "text/html" : p.endsWith(".png") ? "image/png" : p.endsWith(".js") ? "application/javascript" : p.endsWith(".webmanifest") ? "application/manifest+json" : "application/octet-stream";
+                    return new WebResourceResponse(mime, "utf-8", in);
+                } catch (Exception e) {
+                    return new WebResourceResponse("text/plain", "utf-8", 404, "Not Found", new HashMap<>(), new ByteArrayInputStream(new byte[0]));
+                }
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                if (url.startsWith(HOME) || url.startsWith("file:///android_asset/")) return false;
+                if (HOST.equals(request.getUrl().getHost())) return false;
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW, request.getUrl()));
                 } catch (Exception ignored) {
                 }
                 return true;
-            }
-
-            @Override
-            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse response) {
-                // website not published yet (or down): play the copy that ships inside the app
-                if (request.isForMainFrame() && response.getStatusCode() >= 400 && !request.getUrl().toString().startsWith("file:")) {
-                    view.loadUrl(BUNDLED);
-                }
-            }
-
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                if (request.isForMainFrame() && !request.getUrl().toString().startsWith("file:")) {
-                    view.loadUrl(BUNDLED);
-                }
             }
         });
 

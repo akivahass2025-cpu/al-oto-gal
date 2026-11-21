@@ -20,7 +20,8 @@ const decks = files.map(id => {
   total += d.questions.length; return d;
 });
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-const html = fs.readFileSync(path.join(root, 'src/game.html'), 'utf8').replace('/*__DECKS__*/', 'window.DECKS=' + JSON.stringify(decks) + ';');
+const fbk = fs.readFileSync(path.join(root, 'src/fbk.js'), 'utf8');
+const html = fs.readFileSync(path.join(root, 'src/game.html'), 'utf8').replace('/*__DECKS__*/', () => 'window.DECKS=' + JSON.stringify(decks) + ';').replace('/*__FIREBASE__*/', () => fbk);
 fs.writeFileSync(path.join(root, 'index.html'), html);
 const sw = fs.readFileSync(path.join(root, 'src/sw.js'), 'utf8').replace('__VERSION__', Date.now());
 fs.writeFileSync(path.join(root, 'sw.js'), sw);
