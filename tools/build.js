@@ -23,6 +23,10 @@ if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 const fbk = fs.readFileSync(path.join(root, 'src/fbk.js'), 'utf8');
 const html = fs.readFileSync(path.join(root, 'src/game.html'), 'utf8').replace('/*__DECKS__*/', () => 'window.DECKS=' + JSON.stringify(decks) + ';').replace('/*__FIREBASE__*/', () => fbk);
 fs.writeFileSync(path.join(root, 'index.html'), html);
+// claude.ai artifact version: no Firebase (blocked there), online rooms run on the artifact's live room
+fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
+const art = html.replace(fbk, () => '').replace(/<link rel="(manifest|icon|apple-touch-icon)"[^>]*>\n/g, '');
+fs.writeFileSync(path.join(root, 'dist/artifact.html'), art);
 const sw = fs.readFileSync(path.join(root, 'src/sw.js'), 'utf8').replace('__VERSION__', Date.now());
 fs.writeFileSync(path.join(root, 'sw.js'), sw);
 console.log(`built: ${decks.length} decks, ${total} questions`);

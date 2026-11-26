@@ -443,6 +443,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const COLORS = ['#7C5CFF', '#FF3D8B'];
+const IN_ARTIFACT_EARLY = !!(window.claude && typeof window.claude.use === 'function');
 const initial = n => (n || '?').trim().charAt(0);
 
 const DECKS = (window.DECKS || []).map(d => ({ ...d, questions: d.questions.map((q, i) => ({ ...q, id: d.id + ':' + i })) }));
@@ -587,9 +588,8 @@ const show = (id, dir) => {
   requestAnimationFrame(() => { if (cur !== id) return; $$('.screen.on').forEach(x => x !== next && x.classList.remove('on')); next.classList.remove('off-r'); next.classList.add('on'); });
   cur = id;
 };
-history.replaceState({ s: 'root' }, '');
-history.pushState({ s: 'app' }, '');
-addEventListener('popstate', () => { history.pushState({ s: 'app' }, ''); handleBack(); });
+try { if (!IN_ARTIFACT_EARLY) { history.replaceState({ s: 'root' }, ''); history.pushState({ s: 'app' }, ''); } } catch (e) {}
+addEventListener('popstate', () => { try { history.pushState({ s: 'app' }, ''); } catch (e) {} handleBack(); });
 function handleBack() {
   if ($('#modal').classList.contains('on')) return closeModal();
   if (['q', 'pass', 'reveal', 'wait', 'lobby'].includes(cur)) return confirmQuit();
@@ -1055,29 +1055,133 @@ function renderHistory() {
 }
 
 /* ============ ONLINE ROOMS ============ */
-const Net = (() => {
+/* Two interchangeable connections with the same room shape R:
+   { status, mode, len, deckId, round, qids, i, p:{0:{name,on},1:{name,on}}, ans:{ r<round>_<i>: {0:{s,g},1:{s,g}} } }
+   - Fire: the Firebase database (the APK and normal browsers)
+   - Live: the claude.ai artifact's live room (Firebase is blocked inside an artifact) */
+const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
+
+const FireT = (() => {
   const ROOT = 'rooms', PFX = 'gal';  // shared database with the zeh-o-zeh app; own prefix so codes never clash
   const CFG = { apiKey: "AIzaSyAcZnezXR5OQ1bi1FFPKPU_jUqkV-B5i_Y", authDomain: "zeh-o-zeh.firebaseapp.com",
     databaseURL: "https://zeh-o-zeh-default-rtdb.europe-west1.firebasedatabase.app", projectId: "zeh-o-zeh", appId: "1:563159959757:web:feeddf9876cb76a92f0184" };
-  let db = null, F = window.FBK, code = null, me = 0, R = null, unsub = null, ready = null, connOk = true;
+  let db = null, F = window.FBK, code = null, me = 0, unsub = null, ready = null, T;
   const path = s => ROOT + '/' + PFX + code + (s ? '/' + s : '');
   const init = () => ready || (ready = (async () => {
     if (!F) throw new Error('no-sdk');
     const app = F.initializeApp(CFG); db = F.getDatabase(app);
     await Promise.race([F.signInAnonymously(F.getAuth(app)), new Promise((_, rj) => setTimeout(() => rj(new Error('timeout')), 12000))]);
-    F.onValue(F.ref(db, '.info/connected'), s => { connOk = !!s.val(); bar(); });
+    F.onValue(F.ref(db, '.info/connected'), s => T.onConn(!!s.val()));
     return db;
   })().catch(e => { ready = null; throw e; }));
-  const netErr = e => { console.warn(e); openModal(`<h3>אין חיבור לשרת 📡</h3><p>בדקו שיש אינטרנט ונסו שוב. אפשר גם לשחק בינתיים על טלפון אחד.</p><button class="btn mt16" id="m-close">הבנתי</button>`); $('#m-close').onclick = closeModal; };
+  const listen = () => {
+    unsub && unsub();
+    unsub = F.onValue(F.ref(db, path()), snap => T.onRoom(snap.val()));
+    try { F.onDisconnect(F.ref(db, path('p/' + me + '/on'))).set(false); F.set(F.ref(db, path('p/' + me + '/on')), true); } catch (e) {}
+  };
+  return T = {
+    onRoom: () => {}, onConn: () => {},
+    async create(name, meta) {
+      await init(); let c, tries = 0;
+      do { c = String(1000 + Math.floor(Math.random() * 9000)); const ex = await F.get(F.ref(db, ROOT + '/' + PFX + c + '/t')); if (!ex.exists() || Date.now() - ex.val() > 6 * 3600e3) break; } while (++tries < 12);
+      code = c; me = 0;
+      await F.set(F.ref(db, path()), { t: Date.now(), status: 'lobby', round: 0, i: 0, ...meta, p: { 0: { name, on: true } } });
+      listen(); return { code, me };
+    },
+    async join(c, name) {
+      await init();
+      const v = (await F.get(F.ref(db, ROOT + '/' + PFX + c))).val();
+      if (!v) return { err: 'לא מצאנו חדר עם הקוד הזה 🤔' };
+      const same = i => v.p && v.p[i] && v.p[i].name.trim().toLowerCase() === name.trim().toLowerCase();
+      code = c;
+      if (same(0) || same(1)) me = same(0) ? 0 : 1;
+      else if (v.p && v.p[1]) { code = null; return { err: 'החדר כבר מלא 🙈' }; }
+      else { me = 1; await F.set(F.ref(db, path('p/1')), { name, on: true }); }
+      listen(); return { code, me };
+    },
+    update(patch) { return F.update(F.ref(db, path()), patch); },
+    answer(key, val) { return F.set(F.ref(db, path('ans/' + key + '/' + me)), val); },
+    leave(R) {
+      try { F.set(F.ref(db, path('p/' + me + '/on')), false); if (me === 0 && R && R.status === 'lobby') F.set(F.ref(db, path()), null); } catch (e) {}
+      unsub && unsub(); unsub = null; code = null;
+    }
+  };
+})();
+
+const LiveT = (() => {
+  // Each phone keeps the whole game it knows in its own presence; the room is the merge of both.
+  let room = null, sub = null, T, mine = null, last = { 0: null, 1: null }, conn = true;
+  const api = () => claude.use('room').then(r => { if (!r) throw new Error('no-room'); return r; });
+  const push = () => room && room.presence({ gal: mine }).catch(e => console.warn(e));
+  const peersOf = () => (room ? room.peers() : []).map(p => ({ me: p.sameTab, v: p.presence && p.presence.gal })).filter(x => x.v && x.v.name);
+  function merge() {
+    const ps = peersOf();
+    const host = ps.find(x => x.v.role === 'h'), guest = ps.find(x => x.v.role === 'g');
+    if (host) last[0] = host.v.name; if (guest) last[1] = guest.v.name;
+    // adopt the newest round anyone started
+    const top = ps.reduce((a, x) => (!a || (x.v.meta.round || 0) > (a.v.meta.round || 0) ? x : a), null);
+    if (top && !top.me && (top.v.meta.round || 0) > (mine.meta.round || 0)) { mine.meta = { ...top.v.meta }; mine.ans = {}; push(); }
+    const meta = mine.meta, same = ps.filter(x => (x.v.meta.round || 0) === (meta.round || 0));
+    const R = { ...meta, i: Math.max(meta.i || 0, ...same.map(x => x.v.meta.i || 0)), p: {}, ans: {} };
+    [0, 1].forEach(k => { if (last[k]) R.p[k] = { name: last[k], on: !!(k === 0 ? host : guest) }; });
+    same.forEach(x => { const k = x.v.role === 'h' ? 0 : 1; Object.entries(x.v.ans || {}).forEach(([key, val]) => { (R.ans[key] = R.ans[key] || {})[k] = val; }); });
+    T.onRoom(R);
+  }
+  async function enter(code) {
+    const r = await api(); room = await r.join('gal' + code);
+    room.onConnection(ok => { conn = ok; T.onConn(ok); });
+    return room;
+  }
+  const waitPeers = ms => new Promise(res => setTimeout(res, ms));
+  return T = {
+    onRoom: () => {}, onConn: () => {},
+    async create(name, meta) {
+      const code = String(1000 + Math.floor(Math.random() * 9000));
+      await enter(code);
+      mine = { role: 'h', name, meta: { status: 'lobby', round: 0, i: 0, ...meta }, ans: {} }; last = { 0: name, 1: null };
+      sub = room.onPeers(merge); await push(); merge();
+      return { code, me: 0 };
+    },
+    async join(code, name) {
+      await enter(code); await waitPeers(2500);
+      const ps = peersOf(), low = s => s.trim().toLowerCase();
+      const host = ps.find(x => x.v.role === 'h'), guest = ps.find(x => x.v.role === 'g');
+      if (!host && !guest) { await room.leave(); room = null; return { err: 'לא מצאנו חדר עם הקוד הזה 🤔 (החדר פתוח רק כשמי שפתח אותו נמצא בו)' }; }
+      let role;
+      if (host && low(host.v.name) === low(name)) role = 'h';
+      else if (guest && low(guest.v.name) === low(name)) role = 'g';
+      else if (!guest) role = 'g';
+      else if (!host) role = 'h';
+      else { await room.leave(); room = null; return { err: 'החדר כבר מלא 🙈' }; }
+      const src = host || guest;
+      mine = { role, name, meta: { ...src.v.meta }, ans: role === (src === host ? 'h' : 'g') ? { ...(src.v.ans || {}) } : {} };
+      last = { 0: host ? host.v.name : role === 'h' ? name : null, 1: guest ? guest.v.name : role === 'g' ? name : null };
+      sub = room.onPeers(merge); await push(); merge();
+      return { code, me: role === 'h' ? 0 : 1 };
+    },
+    async update(patch) {
+      if (patch.ans === null) { mine.ans = {}; delete patch.ans; }
+      mine.meta = { ...mine.meta, ...patch };
+      await push(); merge();
+    },
+    async answer(key, val) { mine.ans = { ...mine.ans, [key]: val }; await push(); merge(); },
+    leave() { sub && sub(); sub = null; room && room.leave().catch(() => {}); room = null; mine = null; }
+  };
+})();
+
+const Net = (() => {
+  const T = IN_ARTIFACT ? LiveT : FireT;
+  let code = null, me = 0, R = null, connOk = true;
+  const netErr = e => {
+    console.warn(e);
+    const msg = IN_ARTIFACT ? 'כדי לשחק אונליין כאן, שני השחקנים צריכים להיות מחוברים ל-Claude ולפתוח את אותו קישור. אפשר גם לשחק בינתיים על טלפון אחד.' : 'בדקו שיש אינטרנט ונסו שוב. אפשר גם לשחק בינתיים על טלפון אחד.';
+    openModal(`<h3>אין חיבור לחדר 📡</h3><p>${msg}</p><button class="btn mt16" id="m-close">הבנתי</button>`); $('#m-close').onclick = closeModal;
+  };
   const busy = (btn, on, txt) => { if (!btn) return; btn.disabled = on; if (on) { btn.dataset.t = btn.innerHTML; btn.innerHTML = txt || 'רגע…'; } else if (btn.dataset.t) btn.innerHTML = btn.dataset.t; };
   const keyOf = i => 'r' + (R ? R.round : 0) + '_' + i;
+  T.onConn = ok => { connOk = ok; bar(); };
+  T.onRoom = v => { R = v; onRoom(); };
 
-  function listen() {
-    unsub && unsub();
-    unsub = F.onValue(F.ref(db, path()), snap => { R = snap.val(); onRoom(); });
-    try { F.onDisconnect(F.ref(db, path('p/' + me + '/on'))).set(false); F.set(F.ref(db, path('p/' + me + '/on')), true); } catch (e) {}
-    DB.lastRoom = { code, me, t: Date.now() }; save();
-  }
   function bar() {
     const b = $('#netbar'); let msg = '';
     const inGame = ['lobby', 'q', 'wait', 'reveal', 'end'].includes(cur) && code;
@@ -1096,7 +1200,7 @@ const Net = (() => {
     });
     const d = DECKS.find(x => x.id === R.deckId);
     const both = R.p && R.p[0] && R.p[1];
-    $('#lobby-info').innerHTML = `${d ? d.emoji + ' ' + esc(d.name) : ''} · ${R.mode === 'guess' ? '🔮 ניחוש' : '💞 התאמה'} · ${R.len} שאלות` + (me === 1 ? `<br><span class="dots">מחכים ש${esc(R.p[0].name)} יתחיל/תתחיל</span>` : '');
+    $('#lobby-info').innerHTML = `${d ? d.emoji + ' ' + esc(d.name) : ''} · ${R.mode === 'guess' ? '🔮 ניחוש' : '💞 התאמה'} · ${R.len} שאלות` + (me === 1 && R.p[0] ? `<br><span class="dots">מחכים ש${esc(R.p[0].name)} יתחיל/תתחיל</span>` : '');
     const st = $('#btn-lobby-start'); st.hidden = me !== 0; st.disabled = !both;
     $('#btn-wa').hidden = !!both;
   }
@@ -1104,8 +1208,7 @@ const Net = (() => {
     bar();
     if (!R) { if (code) { Net.leave(); goHome(); openModal(`<h3>החדר נסגר 🚪</h3><p>אפשר לפתוח חדר חדש בכל רגע.</p><button class="btn mt16" id="m-close">סגירה</button>`); $('#m-close').onclick = closeModal; } return; }
     if (R.status === 'lobby') { if (cur !== 'lobby') show('lobby'); renderLobby(); if (R.p && R.p[1] && me === 0 && !Net._joinedSnd) { Net._joinedSnd = 1; Snd.sfx('match'); vib([30, 40, 30]); FX.burst(50); } return; }
-    if (R.status !== 'play' || !R.p || !R.p[1]) return;
-    // new round → start
+    if (R.status !== 'play' || !R.p || !R.p[0] || !R.p[1]) return;
     if (!G || !G.online || G.online.round !== R.round) {
       closeModal();
       startGame(R.p[0].name, R.p[1].name, R.mode, R.len, R.deckId, { me, round: R.round, qids: R.qids || [] });
@@ -1118,65 +1221,43 @@ const Net = (() => {
     const roomI = R.i || 0;
     if (roomI > G.i) { if (G.revealed < G.i && G.i < G.qs.length) { const a = R.ans && R.ans[keyOf(G.i)]; if (a && a[0] && a[1]) fill(a), reveal(); } return gotoQuestion(roomI); }
     const a = R.ans && R.ans[keyOf(G.i)];
-    if (a && a[0] && a[1] && G.revealed < G.i) {
-      // only reveal on my phone after I answered too
-      if (cur === 'q') return;
-      fill(a); reveal();
-    }
+    if (a && a[0] && a[1] && G.revealed < G.i) { if (cur === 'q') return; fill(a); reveal(); }
   }
   const fill = a => { [0, 1].forEach(p => { G.cur.self[p] = a[p].s ?? null; G.cur.guess[p] = a[p].g ?? null; }); };
-
-  const newCode = () => String(1000 + Math.floor(Math.random() * 9000));
+  const roundPatch = deckId => {
+    const deck = DECKS.find(d => d.id === deckId) || DECKS[0];
+    const qids = chooseQuestions(deck, pairKey(R.p[0].name, R.p[1].name), R.len).map(q => q.id);
+    return { status: 'play', deckId: deck.id, round: (R.round || 0) + 1, i: 0, qids, ans: null };
+  };
   return {
-    check, _joinedSnd: 0, debug: () => ({ R, code, me, cur, Gi: G && G.i, rev: G && G.revealed, round: G && G.online && G.online.round }),
+    check, _joinedSnd: 0,
+    debug: () => ({ R, code, me, cur, Gi: G && G.i, rev: G && G.revealed, round: G && G.online && G.online.round, live: IN_ARTIFACT }),
     async create(name, mode, len, deckId) {
       const btn = $('#btn-start'); busy(btn, true, 'פותחים חדר… 🌐');
-      try {
-        await init();
-        let c, tries = 0;
-        do { c = newCode(); const ex = await F.get(F.ref(db, ROOT + '/' + PFX + c + '/t')); if (!ex.exists() || Date.now() - ex.val() > 6 * 3600e3) break; } while (++tries < 12);
-        code = c; me = 0; Net._joinedSnd = 0;
-        await F.set(F.ref(db, path()), { t: Date.now(), status: 'lobby', mode, len, deckId, round: 0, i: 0, p: { 0: { name, on: true } } });
-        G = null; listen(); Snd.sfx('pick');
-      } catch (e) { netErr(e); } finally { busy(btn, false); }
+      try { const r = await T.create(name, { mode, len, deckId }); code = r.code; me = r.me; Net._joinedSnd = 0; G = null; DB.lastRoom = { code, me, t: Date.now() }; save(); Snd.sfx('pick'); if (R) onRoom(); }
+      catch (e) { netErr(e); } finally { busy(btn, false); }
     },
     async join(c, name) {
       const btn = $('#btn-join-go'); busy(btn, true, 'מתחברים… 🔌'); $('#join-err').textContent = '';
       try {
-        await init();
-        const snap = await F.get(F.ref(db, ROOT + '/' + PFX + c)); const v = snap.val();
-        if (!v) { $('#join-err').textContent = 'לא מצאנו חדר עם הקוד הזה 🤔'; return; }
-        const same = i => v.p && v.p[i] && v.p[i].name.trim().toLowerCase() === name.trim().toLowerCase();
-        if (same(0) || same(1)) { me = same(0) ? 0 : 1; }
-        else if (v.p && v.p[1]) { $('#join-err').textContent = 'החדר כבר מלא 🙈'; return; }
-        else { me = 1; await F.set(F.ref(db, ROOT + '/' + PFX + c + '/p/1'), { name, on: true }); }
-        code = c; G = null; listen(); Snd.sfx('match'); vib(40);
-        DB.last = { ...DB.last, p1: name }; save();
+        const r = await T.join(c, name);
+        if (r.err) { $('#join-err').textContent = r.err; return; }
+        code = r.code; me = r.me; G = null; Snd.sfx('match'); vib(40);
+        DB.last = { ...DB.last, p1: name }; DB.lastRoom = { code, me, t: Date.now() }; save(); if (R) onRoom();
       } catch (e) { netErr(e); } finally { busy(btn, false); }
     },
-    async start() {
-      if (!R || me !== 0) return;
-      const deck = DECKS.find(d => d.id === R.deckId) || DECKS[0];
-      const qids = chooseQuestions(deck, pairKey(R.p[0].name, R.p[1].name), R.len).map(q => q.id);
-      try { await F.update(F.ref(db, path()), { status: 'play', round: (R.round || 0) + 1, i: 0, qids, ans: null }); } catch (e) { netErr(e); }
-    },
-    async newRound(deckId) {
-      if (!R) return;
-      const deck = DECKS.find(d => d.id === deckId) || DECKS[0];
-      const qids = chooseQuestions(deck, pairKey(R.p[0].name, R.p[1].name), R.len).map(q => q.id);
-      try { await F.update(F.ref(db, path()), { status: 'play', deckId, round: (R.round || 0) + 1, i: 0, qids, ans: null }); } catch (e) { netErr(e); }
-    },
-    answer(i, val) { if (!code) return; F.set(F.ref(db, path('ans/' + keyOf(i) + '/' + me)), val).catch(netErr); },
-    advance(i) { if (!code || !R) return; if ((R.i || 0) < i) F.update(F.ref(db, path()), { i }).catch(netErr); },
-    leave() {
-      if (!code) return;
-      try { F.set(F.ref(db, path('p/' + me + '/on')), false); if (me === 0 && R && R.status === 'lobby') F.set(F.ref(db, path()), null); } catch (e) {}
-      unsub && unsub(); unsub = null; code = null; R = null; $('#netbar').classList.remove('on');
-    },
+    async start() { if (!R || me !== 0) return; try { await T.update(roundPatch(R.deckId)); } catch (e) { netErr(e); } },
+    async newRound(deckId) { if (!R) return; try { await T.update(roundPatch(deckId)); } catch (e) { netErr(e); } },
+    answer(i, val) { if (!code) return; Promise.resolve(T.answer(keyOf(i), val)).catch(netErr); },
+    advance(i) { if (!code || !R) return; if ((R.i || 0) < i) Promise.resolve(T.update({ i })).catch(netErr); },
+    leave() { if (!code) return; T.leave(R); code = null; R = null; $('#netbar').classList.remove('on'); },
     share() {
-      const txt = `בוא/י נבדוק כמה אנחנו על אותו גל 🌊💞\nקוד החדר: *${code}*\nפותחים את האפליקציה "על אותו גל" ← הצטרפות לחדר 🔑`;
+      const txt = IN_ARTIFACT
+        ? `בוא/י נבדוק כמה אנחנו על אותו גל 🌊💞\nקוד החדר: *${code}*\nפותחים את הקישור של המשחק ב-Claude ← הצטרפות לחדר 🔑`
+        : `בוא/י נבדוק כמה אנחנו על אותו גל 🌊💞\nקוד החדר: *${code}*\nפותחים את האפליקציה "על אותו גל" ← הצטרפות לחדר 🔑`;
       const url = 'https://wa.me/?text=' + encodeURIComponent(txt);
-      if (window.Android) location.href = url; else window.open(url, '_blank');
+      if (window.Android) { location.href = url; return; }
+      const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
     },
     get code() { return code; }
   };
@@ -1197,7 +1278,7 @@ $('#btn-join-go').onclick = () => Net.join($('#join-code').value, $('#join-name'
 /* ============ boot ============ */
 renderHome();
 requestAnimationFrame(() => $('#s-home').classList.add('on'));
-if ('serviceWorker' in navigator && location.protocol === 'https:' && !window.Android && location.hostname !== 'localhost') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !window.Android && !IN_ARTIFACT && location.hostname !== 'localhost') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>

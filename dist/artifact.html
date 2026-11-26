@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>על אותו גל</title>
+<meta name="theme-color" content="#F6F2FF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F2FF; --bg2:#EEE7FF; --card:#FFFFFF; --line:#DCD3F5; --ink:#1C1433; --ink2:#5F5680; --ink3:#9A92B8;
+  --violet:#7C5CFF; --violet2:#A48BFF; --pink:#FF3D8B; --pink2:#FF8FBC; --mint:#16C79A; --red:#FF5A5F; --gold:#FFB703;
+  --sel:#E4DCFF; --r:22px; --shadow:0 10px 30px -12px rgba(60,30,140,.28);
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Rubik',system-ui,'Segoe UI',Arial,sans-serif;overflow:hidden;overscroll-behavior:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+input{font:inherit;color:inherit}
+#app{position:fixed;inset:0;max-width:560px;margin:0 auto;overflow:hidden}
+.bgblobs{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.bgblobs i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.45;animation:float 18s ease-in-out infinite}
+.bgblobs i:nth-child(1){width:320px;height:320px;background:#D9CCFF;top:-80px;right:-90px}
+.bgblobs i:nth-child(2){width:260px;height:260px;background:#FFD3E6;bottom:-60px;left:-80px;animation-delay:-6s}
+.bgblobs i:nth-child(3){width:200px;height:200px;background:#CFF5EA;top:45%;left:60%;animation-delay:-12s;opacity:.3}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.12)}}
+
+.screen{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;padding:calc(18px + var(--safe-t)) 20px calc(18px + var(--safe-b));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  opacity:0;pointer-events:none;transform:translateX(-30px);transition:opacity .35s ease,transform .45s cubic-bezier(.2,.9,.25,1.1)}
+.screen.on{opacity:1;pointer-events:auto;transform:none}
+.screen.off-r{transform:translateX(30px)}
+.screen::-webkit-scrollbar{display:none}
+.screen>*{flex-shrink:0}
+[hidden]{display:none!important}
+
+h1{font-size:40px;font-weight:900;letter-spacing:-.5px;line-height:1.05}
+h2{font-size:26px;font-weight:800;line-height:1.2}
+h3{font-size:20px;font-weight:800}
+.muted{color:var(--ink2)}
+.row{display:flex;align-items:center;gap:10px}
+.sp{flex:1}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:62px;border-radius:999px;background:var(--ink);color:#fff;font-size:21px;font-weight:700;
+  box-shadow:0 12px 24px -12px rgba(28,20,51,.6);transition:transform .12s ease,filter .2s,opacity .2s;position:relative;overflow:hidden}
+.btn:active{transform:scale(.96)}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.btn.grad{background:linear-gradient(135deg,var(--violet),var(--pink))}
+.btn.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.small{min-height:46px;font-size:16px;width:auto;padding:0 18px}
+.btn .shine{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{0%,60%{transform:translateX(120%)}100%{transform:translateX(-120%)}}
+.iconbtn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:var(--card);border:2px solid var(--line);flex:none;transition:transform .12s}
+.iconbtn:active{transform:scale(.9)}
+
+.field{width:100%;height:64px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);padding:0 22px;font-size:20px;outline:none;transition:border-color .2s,box-shadow .2s}
+.field:focus{border-color:var(--violet2);box-shadow:0 0 0 4px rgba(124,92,255,.15)}
+.field::placeholder{color:var(--ink3)}
+
+/* HOME */
+.logo{display:flex;flex-direction:column;align-items:center;margin-top:4vh}
+.logo svg{width:220px;height:150px;overflow:hidden;border-radius:0 0 40px 40px}
+.logo .wv{animation:wave 3.2s ease-in-out infinite}
+.logo .wv2{animation:wave 3.2s ease-in-out infinite;animation-delay:-1.6s}
+@keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-14px)}}
+.logo .ht{animation:bob 1.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+.logo .ht2{animation-delay:-.8s}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.08)}}
+.title{font-size:48px;font-weight:900;text-align:center;margin-top:6px;background:linear-gradient(135deg,var(--ink) 20%,var(--violet) 60%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{text-align:center;color:var(--ink2);font-size:18px;margin-top:6px}
+.rankpill{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:15px;margin:16px auto 0}
+.homebtns{margin-top:auto;display:flex;flex-direction:column;gap:12px;padding-top:24px}
+.toprow{display:flex;justify-content:space-between;align-items:center}
+
+/* SETUP */
+.sec{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}
+.seg{display:flex;background:var(--bg2);border-radius:999px;padding:5px;gap:4px}
+.seg button{flex:1;height:48px;border-radius:999px;font-weight:700;font-size:16px;color:var(--ink2);transition:all .25s}
+.seg button.on{background:var(--ink);color:#fff;box-shadow:0 6px 14px -8px rgba(28,20,51,.7)}
+.hint{font-size:14px;color:var(--ink2);margin-top:8px;min-height:20px}
+.chips{display:flex;gap:10px;overflow-x:auto;padding:4px 2px;margin-top:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:52px;padding:0 24px;border-radius:999px;border:2px solid var(--line);background:var(--card);font-size:18px;font-weight:600;transition:all .2s}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.surprise{height:48px;padding:0 18px;border-radius:999px;background:var(--sel);color:var(--violet);font-weight:700;font-size:16px;display:flex;align-items:center;gap:6px}
+.surprise:active{transform:scale(.95)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.deck{position:relative;min-height:96px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);padding:14px 14px 12px;display:flex;align-items:center;gap:10px;text-align:right;transition:transform .15s,border-color .2s,background .2s}
+.deck:active{transform:scale(.96)}
+.deck.on{background:var(--sel);border-color:var(--ink);box-shadow:var(--shadow)}
+.deck .em{font-size:30px;flex:none;width:40px;text-align:center}
+.deck b{display:block;font-size:17px;line-height:1.2}
+.deck small{display:block;color:var(--ink2);font-size:14px;margin-top:3px}
+.badge-new{position:absolute;top:-10px;left:14px;background:var(--pink);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px}
+.badge-done{position:absolute;top:-10px;left:14px;background:var(--mint);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px}
+.deck.spin{animation:pulse .18s ease}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.preview{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;text-align:center}
+.preview .em{font-size:20px}
+.stickybar{position:sticky;bottom:calc(-18px - var(--safe-b));margin:16px -20px calc(-18px - var(--safe-b));padding:14px 20px calc(16px + var(--safe-b));background:linear-gradient(to top,var(--bg) 70%,rgba(246,242,255,0))}
+.empty{grid-column:1/-1;text-align:center;color:var(--ink2);padding:30px 0}
+
+/* GAME */
+.gtop{display:flex;align-items:center;gap:14px;min-height:56px}
+.dashes{flex:1;display:flex;gap:5px;direction:rtl}
+.dashes i{flex:1;height:7px;border-radius:9px;background:var(--line);transition:background .3s}
+.dashes i.done{background:var(--ink)}
+.dashes i.cur{background:var(--violet)}
+.dashes i.hit{background:var(--mint)}
+.dashes i.miss{background:var(--pink2)}
+.ring{width:54px;height:54px;position:relative;flex:none;display:grid;place-items:center;font-weight:800;font-size:18px}
+.ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.who-tag{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-weight:700;font-size:16px;padding:7px 14px;border-radius:999px;background:var(--card);border:2px solid var(--line)}
+.who-tag .dot{width:12px;height:12px;border-radius:50%}
+.guess-tag{background:linear-gradient(135deg,#FFF1F7,#F1ECFF);border-color:var(--pink2)}
+.qtext{font-size:34px;font-weight:800;line-height:1.18;margin-top:14px;animation:qin .45s cubic-bezier(.2,.9,.25,1.2)}
+@keyframes qin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.qtype{font-size:14px;color:var(--ink2);margin-top:10px}
+.opts{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.opt{min-height:74px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);font-size:22px;font-weight:600;text-align:right;padding:12px 22px;display:flex;align-items:center;gap:12px;
+  transition:transform .12s,background .2s,border-color .2s;animation:optin .4s both cubic-bezier(.2,.9,.25,1.2)}
+.opt:nth-child(2){animation-delay:.05s}.opt:nth-child(3){animation-delay:.1s}.opt:nth-child(4){animation-delay:.15s}
+@keyframes optin{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.opt:active{transform:scale(.97)}
+.opt.pick{background:var(--sel);border-color:var(--ink)}
+.opt .num{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:17px;background:var(--bg2);color:var(--ink3);transition:all .2s}
+.opt.pick .num{background:var(--ink);color:#fff;animation:pop .3s}
+@keyframes pop{50%{transform:scale(1.3)}}
+.opts.ab{flex-direction:column}
+.opts.who{flex-direction:row}
+.opts.who .opt{flex:1;flex-direction:column;justify-content:center;text-align:center;min-height:150px;font-size:22px;font-weight:800;gap:6px}
+.opts.who .opt .av{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-size:28px;color:#fff;font-weight:900}
+.scalebox{margin-top:30px;text-align:center}
+.bignum{font-size:96px;font-weight:900;line-height:1;transition:transform .15s}
+.bignum.bump{transform:scale(1.15)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;margin-top:26px;direction:rtl}
+input[type=range]::-webkit-slider-runnable-track{height:20px;border-radius:99px;background:linear-gradient(to left,var(--violet2) var(--p,44%),var(--line) var(--p,44%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:54px;height:54px;border-radius:50%;background:var(--ink);border:7px solid #fff;box-shadow:0 6px 16px rgba(28,20,51,.35);margin-top:-17px}
+input[type=range]::-moz-range-track{height:20px;border-radius:99px;background:var(--line)}
+input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;background:var(--ink);border:7px solid #fff}
+.scalelbl{display:flex;justify-content:space-between;color:var(--ink2);font-size:16px;margin-top:16px;gap:16px}
+.scalelbl span:last-child{text-align:left}
+.gbottom{margin-top:auto;padding-top:20px}
+.waitline{display:flex;justify-content:space-between;color:var(--ink2);font-size:16px;margin-top:16px}
+
+/* PASS */
+.pass{align-items:center;justify-content:center;text-align:center}
+.pass .bigemoji{font-size:110px;animation:peek 1.8s ease-in-out infinite}
+@keyframes peek{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) scale(1.06)}}
+.pass .nm{font-size:44px;font-weight:900;margin-top:10px}
+.pass .avbig{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;font-size:52px;color:#fff;font-weight:900;margin:0 auto;box-shadow:var(--shadow);animation:pop .5s}
+
+/* REVEAL */
+.reveal{align-items:stretch}
+.verdict{text-align:center;margin-top:3vh}
+.verdict .vem{font-size:96px;line-height:1;display:inline-block;animation:vpop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes vpop{0%{transform:scale(0) rotate(-30deg)}100%{transform:none}}
+.verdict .vt{font-size:36px;font-weight:900;margin-top:12px}
+.verdict .vs{color:var(--ink2);font-size:18px;margin-top:6px}
+.vq{text-align:center;font-weight:700;font-size:19px;color:var(--ink2);margin-top:18px;line-height:1.3}
+.ans{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.acard{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:14px;animation:optin .45s both}
+.acard:nth-child(2){animation-delay:.12s}
+.acard .av{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px}
+.acard .an{font-size:14px;color:var(--ink2);font-weight:600}
+.acard .aa{font-size:20px;font-weight:800;margin-top:2px;line-height:1.25}
+.acard .ag{font-size:15px;margin-top:6px;color:var(--ink2)}
+.acard .mk{margin-inline-start:auto;font-size:26px}
+.scorebar{display:flex;justify-content:center;gap:12px;margin-top:16px}
+.scorebar div{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:15px}
+
+/* END */
+.end{align-items:stretch}
+.pct{font-size:110px;font-weight:900;text-align:center;line-height:1;margin-top:2vh;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.endtitle{text-align:center;font-size:32px;font-weight:900;margin-top:8px}
+.endsub{text-align:center;color:var(--ink2);font-size:18px;margin-top:6px;line-height:1.35}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.stat{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 6px;text-align:center}
+.stat b{display:block;font-size:24px;font-weight:900}
+.stat span{font-size:13px;color:var(--ink2)}
+.winner{margin-top:16px;background:linear-gradient(135deg,#FFF6D9,#FFE9F2);border:2px solid #FFD98A;border-radius:var(--r);padding:14px 18px;text-align:center;font-weight:800;font-size:18px}
+.sumlist{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.sumitem{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 16px}
+.sumitem .sq{font-weight:700;font-size:16px;display:flex;gap:8px}
+.sumitem .sa{font-size:14px;color:var(--ink2);margin-top:6px;line-height:1.5}
+.endbtns{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.btnrow{display:flex;gap:10px}
+.btnrow .btn{font-size:17px}
+
+/* HISTORY */
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.bdg{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 6px;text-align:center;min-height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.bdg .be{font-size:36px}
+.bdg b{font-size:13px;line-height:1.2}
+.bdg small{font-size:11px;color:var(--ink2);line-height:1.2}
+.bdg.locked{opacity:.45;filter:grayscale(1)}
+.bdg.locked .be{opacity:.5}
+.pairs{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.pair{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.pair .pn{font-weight:800;font-size:19px}
+.pair .pr{font-size:14px;color:var(--violet);font-weight:700;margin-top:2px}
+.pair .ps{display:flex;gap:14px;margin-top:8px;font-size:14px;color:var(--ink2);flex-wrap:wrap}
+.prog{height:8px;border-radius:9px;background:var(--line);margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--pink));border-radius:9px}
+.bigstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+/* MODAL / TOAST */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(28,20,51,.45);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal.on{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:560px;background:var(--bg);border-radius:28px 28px 0 0;padding:26px 22px calc(22px + var(--safe-b));transform:translateY(40px);transition:transform .35s cubic-bezier(.2,.9,.25,1.1)}
+.modal.on .sheet{transform:none}
+.sheet h3{font-size:24px}
+.sheet p{color:var(--ink2);margin-top:8px;font-size:17px;line-height:1.4}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 18px;font-size:18px;font-weight:600;margin-top:12px}
+.sw{width:58px;height:34px;border-radius:99px;background:var(--line);position:relative;transition:background .25s;flex:none}
+.sw::after{content:'';position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:#fff;transition:right .25s;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.sw.on{background:var(--violet)}
+.sw.on::after{right:28px}
+.toast{position:fixed;top:calc(16px + var(--safe-t));left:50%;transform:translate(-50%,-140%);z-index:60;background:var(--ink);color:#fff;border-radius:20px;padding:12px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 14px 30px -10px rgba(28,20,51,.6);transition:transform .45s cubic-bezier(.2,1.3,.4,1);max-width:92vw;width:max-content}
+.toast.on{transform:translate(-50%,0)}
+.toast .te{font-size:32px}
+.toast small{display:block;opacity:.7;font-size:13px}
+.toast b{font-size:16px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+.code{display:flex;justify-content:center;gap:10px;margin-top:18px;direction:ltr}
+.code span{width:64px;height:84px;border-radius:20px;background:var(--card);border:2px solid var(--line);display:grid;place-items:center;font-size:48px;font-weight:900;box-shadow:var(--shadow);animation:pop .5s both}
+.code span:nth-child(2){animation-delay:.08s}.code span:nth-child(3){animation-delay:.16s}.code span:nth-child(4){animation-delay:.24s}
+.wa{background:#25D366!important;color:#fff!important;border:0!important}
+.players{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.pl{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:12px 16px;font-size:19px;font-weight:700;animation:optin .4s both}
+.pl .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px;flex:none}
+.pl.empty{border-style:dashed;color:var(--ink3);font-weight:500}
+.pl.empty .av{background:var(--bg2)!important;color:var(--ink3)}
+.dots::after{content:'';animation:dots 1.4s steps(4) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.codein{width:100%;height:96px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);text-align:center;font-size:56px;font-weight:900;letter-spacing:18px;direction:ltr;outline:none;padding-left:18px}
+.codein:focus{border-color:var(--violet2);box-shadow:0 0 0 4px rgba(124,92,255,.15)}
+.err{color:var(--red);font-weight:600;margin-top:12px;min-height:22px;text-align:center}
+.netbar{position:fixed;bottom:calc(14px + var(--safe-b));left:50%;transform:translate(-50%,160%);z-index:45;background:#FFF3D6;color:#7A5200;border:2px solid #FFD98A;border-radius:999px;padding:10px 18px;font-weight:700;font-size:15px;transition:transform .35s;white-space:nowrap}
+.netbar.on{transform:translate(-50%,0)}
+.wait .orb{width:150px;height:150px;border-radius:50%;margin:0 auto;background:conic-gradient(from 0deg,var(--violet),var(--pink),var(--violet2),var(--violet));animation:spin 2.4s linear infinite;display:grid;place-items:center;box-shadow:0 20px 40px -18px rgba(124,92,255,.7)}
+.wait .orb div{width:122px;height:122px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:56px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wait .orb div span{display:inline-block;animation:spin 2.4s linear infinite reverse}
+.onlinepill{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:var(--mint)}
+.onlinepill i{width:9px;height:9px;border-radius:50%;background:var(--mint);animation:pulse 1.4s infinite}
+.minigrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;max-height:55vh;overflow-y:auto;padding:4px 2px}
+.shareprev{width:100%;border-radius:18px;margin-top:14px;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div class="bgblobs"><i></i><i></i><i></i></div>
+<div id="app">
+
+<!-- HOME -->
+<section class="screen" id="s-home">
+  <div class="toprow">
+    <button class="iconbtn" id="btn-settings" aria-label="הגדרות">⚙️</button>
+    <button class="iconbtn" id="btn-history" aria-label="הישגים">🏆</button>
+  </div>
+  <div class="logo">
+    <svg viewBox="0 0 200 150" aria-hidden="true">
+      <defs>
+        <linearGradient id="lg1" x1="0" x2="1"><stop offset="0" stop-color="#7C5CFF"/><stop offset="1" stop-color="#FF3D8B"/></linearGradient>
+        <linearGradient id="lg2" x1="0" x2="1"><stop offset="0" stop-color="#A48BFF"/><stop offset="1" stop-color="#FF8FBC"/></linearGradient>
+      </defs>
+      <g class="wv2"><path d="M-20 112 Q 15 88 50 112 T 120 112 T 190 112 T 260 112 V160 H-20Z" fill="url(#lg2)" opacity=".55"/></g>
+      <g class="wv"><path d="M-20 100 Q 15 70 50 100 T 120 100 T 190 100 T 260 100 V160 H-20Z" fill="url(#lg1)"/></g>
+      <g class="ht"><path d="M78 58c-8-9-23-2-18 11 3 8 18 18 18 18s15-10 18-18c5-13-10-20-18-11z" fill="#FF3D8B"/></g>
+      <g class="ht ht2"><path d="M122 50c-8-9-23-2-18 11 3 8 18 18 18 18s15-10 18-18c5-13-10-20-18-11z" fill="#7C5CFF"/></g>
+    </svg>
+    <div class="title">על אותו גל</div>
+    <div class="tag">כמה אתם באמת חושבים אותו דבר? 🌊</div>
+    <div class="rankpill" id="home-rank" hidden></div>
+  </div>
+  <div class="homebtns">
+    <button class="btn grad" id="btn-new"><span class="shine"></span>משחק חדש ✨</button>
+    <button class="btn" id="btn-join">הצטרפות לחדר 🔑</button>
+    <button class="btn ghost" id="btn-history2">היסטוריה והישגים 🏆</button>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section class="screen" id="s-setup">
+  <div class="toprow">
+    <h1>משחק חדש</h1>
+    <button class="iconbtn" data-back aria-label="חזרה">→</button>
+  </div>
+  <div class="seg mt16" id="seg-where">
+    <button data-v="online">🌐 כל אחד מהטלפון שלו</button>
+    <button data-v="local">📱 טלפון אחד</button>
+  </div>
+  <input class="field mt12" id="p1" placeholder="שם שחקן/ית 1" maxlength="14" autocomplete="off">
+  <input class="field mt12" id="p2" placeholder="שם שחקן/ית 2" maxlength="14" autocomplete="off">
+
+  <div class="sec"><h3>מצב משחק</h3></div>
+  <div class="seg" id="seg-mode">
+    <button data-v="match" class="on">💞 התאמה</button>
+    <button data-v="guess">🔮 ניחוש</button>
+  </div>
+  <div class="hint" id="mode-hint"></div>
+
+  <div class="sec"><h3>אורך המשחק</h3></div>
+  <div class="seg" id="seg-len">
+    <button data-v="8">קצר · 8</button>
+    <button data-v="12" class="on">רגיל · 12</button>
+    <button data-v="20">ארוך · 20</button>
+  </div>
+
+  <div class="sec"><h2>בחרו חפיסה</h2><button class="surprise" id="btn-surprise">🎲 הפתיעו אותי</button></div>
+  <input class="field" id="search" placeholder="חיפוש חפיסות" autocomplete="off">
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="decks"></div>
+  <div class="stickybar">
+    <div class="preview muted" id="preview"></div>
+    <button class="btn grad mt8" id="btn-start"><span class="shine"></span>יאללה, מתחילים</button>
+  </div>
+</section>
+
+<!-- PASS -->
+<section class="screen pass" id="s-pass">
+  <div class="bigemoji" id="pass-emoji">🙈</div>
+  <div class="muted mt16" id="pass-sub" style="font-size:19px">תעבירו את הטלפון ל…</div>
+  <div class="nm" id="pass-name"></div>
+  <div class="muted mt8" id="pass-note" style="font-size:16px"></div>
+  <button class="btn grad mt24" id="btn-ready" style="max-width:360px"><span class="shine"></span>אני מוכן/ה 👀</button>
+</section>
+
+<!-- LOBBY -->
+<section class="screen" id="s-lobby">
+  <div class="toprow"><h1>החדר שלכם</h1><button class="iconbtn" id="btn-lobby-x" aria-label="יציאה">✕</button></div>
+  <div class="muted mt16" style="text-align:center;font-size:18px">קוד החדר</div>
+  <div class="code" id="lobby-code"></div>
+  <button class="btn wa mt24" id="btn-wa">שליחת הקוד בווצאפ 💬</button>
+  <div class="players" id="lobby-players"></div>
+  <div class="hint" id="lobby-info" style="text-align:center"></div>
+  <div class="gbottom"><button class="btn grad" id="btn-lobby-start" disabled><span class="shine"></span>מתחילים! 🚀</button></div>
+</section>
+
+<!-- JOIN -->
+<section class="screen" id="s-join">
+  <div class="toprow"><h1>הצטרפות לחדר</h1><button class="iconbtn" data-back aria-label="חזרה">→</button></div>
+  <div class="muted mt16" style="font-size:18px">הקוד שקיבלתם מהחבר/ה 🔑</div>
+  <input class="codein mt12" id="join-code" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" autocomplete="off">
+  <input class="field mt16" id="join-name" placeholder="השם שלך" maxlength="14" autocomplete="off">
+  <div class="err" id="join-err"></div>
+  <div class="gbottom"><button class="btn grad" id="btn-join-go" disabled><span class="shine"></span>נכנסים לחדר 🚪</button></div>
+</section>
+
+<!-- WAIT -->
+<section class="screen pass wait" id="s-wait">
+  <div class="orb"><div><span id="wait-emoji">⏳</span></div></div>
+  <div class="nm dots" id="wait-title" style="font-size:30px;margin-top:26px"></div>
+  <div class="muted mt12" id="wait-sub" style="font-size:18px"></div>
+</section>
+
+<!-- QUESTION -->
+<section class="screen" id="s-q">
+  <div class="gtop">
+    <button class="iconbtn" id="btn-quit" aria-label="יציאה">✕</button>
+    <div class="dashes" id="dashes"></div>
+    <div class="ring" id="ring"></div>
+  </div>
+  <div><span class="who-tag" id="q-who"></span></div>
+  <div class="qtext" id="q-text"></div>
+  <div class="qtype" id="q-type"></div>
+  <div id="q-input"></div>
+  <div class="gbottom" id="q-bottom"></div>
+</section>
+
+<!-- REVEAL -->
+<section class="screen reveal" id="s-reveal">
+  <div class="verdict" id="rv-verdict"></div>
+  <div class="vq" id="rv-q"></div>
+  <div class="ans" id="rv-ans"></div>
+  <div class="scorebar" id="rv-score"></div>
+  <div class="gbottom"><button class="btn grad" id="btn-next"><span class="shine"></span>לשאלה הבאה</button></div>
+</section>
+
+<!-- END -->
+<section class="screen end" id="s-end">
+  <div class="toprow"><span></span><button class="iconbtn" data-home aria-label="בית">🏠</button></div>
+  <div class="pct" id="end-pct">0%</div>
+  <div class="endtitle" id="end-title"></div>
+  <div class="endsub" id="end-sub"></div>
+  <div id="end-winner"></div>
+  <div class="statrow" id="end-stats"></div>
+  <div class="endbtns">
+    <button class="btn grad" id="btn-share"><span class="shine"></span>שתפו את התוצאה 📸</button>
+    <div class="btnrow">
+      <button class="btn ghost" id="btn-again">עוד סיבוב 🔁</button>
+      <button class="btn ghost" id="btn-other">חפיסה אחרת 🃏</button>
+    </div>
+  </div>
+  <div class="sec"><h3>סיכום השאלות</h3></div>
+  <div class="sumlist" id="end-list"></div>
+  <div style="height:20px"></div>
+</section>
+
+<!-- HISTORY -->
+<section class="screen" id="s-hist">
+  <div class="toprow">
+    <h1>הישגים</h1>
+    <button class="iconbtn" data-back aria-label="חזרה">→</button>
+  </div>
+  <div class="bigstats" id="h-stats"></div>
+  <div class="sec"><h3>תגים</h3><span class="muted" id="h-bcount"></span></div>
+  <div class="badges" id="h-badges"></div>
+  <div class="sec"><h3>הזוגות שלכם</h3></div>
+  <div class="pairs" id="h-pairs"></div>
+  <div style="height:24px"></div>
+</section>
+</div>
+
+<canvas id="fx"></canvas>
+<div class="toast" id="toast"><span class="te"></span><div><small>תג חדש נפתח!</small><b></b></div></div>
+
+<div class="netbar" id="netbar"></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script>
+window.DECKS=[{"id":"food","name":"אוכל","emoji":"🍕","group":"life","audience":"all","desc":"חשקים, דעות ועקרונות שלא זזים מהם","questions":[{"t":"ab","q":"לבשל או להזמין הערב?","o":["לבשל","להזמין"]},{"t":"ab","q":"מתוק או מלוח?","o":["מתוק","מלוח"]},{"t":"ab","q":"קפה או תה בבוקר?","o":["קפה","תה"]},{"t":"ab","q":"ארוחת צהריים חמה או כריך מהיר?","o":["חמה","כריך"]},{"t":"ab","q":"שוקולד חלב או שוקולד מריר?","o":["חלב","מריר"]},{"t":"ab","q":"תוספת לצד העיקרית: אורז או פסטה?","o":["אורז","פסטה"]},{"t":"ab","q":"אוכל של אתמול או אוכל טרי?","o":["של אתמול","טרי"]},{"t":"ab","q":"פיצה עם אננס: בעד או נגד?","o":["בעד","נגד"]},{"t":"ab","q":"לאכול בעמידה ליד המקרר או לשבת ליד שולחן?","o":["ליד המקרר","ליד שולחן"]},{"t":"ab","q":"מסעדה שקטה או מקום רועש עם אווירה?","o":["שקטה","רועש ואווירה"]},{"t":"scale","q":"כמה חריף זה יותר מדי?","min":"בלי פלפל בכלל","max":"כמה שיותר"},{"t":"scale","q":"כמה חשוב שהאוכל על הצלחת לא יתערבב?","min":"לא משנה","max":"חייבת הפרדה"},{"t":"scale","q":"כמה סבלנות יש לך לחכות לשולחן במסעדה?","min":"אפס","max":"אחכה שעה"},{"t":"scale","q":"כמה מתחשק לנסות מאכל שמעולם לא טעמת?","min":"נשאר בקלאסיקות","max":"מנסה הכול"},{"t":"scale","q":"כמה חשוב שהצלחת תיראה יפה?","min":"העיקר שימלא","max":"כמו במגזין"},{"t":"scale","q":"כמה קל לוותר על קינוח?","min":"בלתי אפשרי","max":"קל מאוד"},{"t":"mc","q":"ארוחת הבוקר המושלמת?","o":["שקשוקה","פנקייקים","בורקס","קפה וזהו"]},{"t":"mc","q":"מה מציל ערב חורפי?","o":["מרק חם","שוקו חם","פיצה","תה ועוגיות"]},{"t":"mc","q":"על מה הכי מחכים בסעודת שבת?","o":["חמין","קוגל","דג","סלטים"]},{"t":"mc","q":"הנשנוש האולטימטיבי לסרט?","o":["פופקורן","במבה","שוקולד","פירות"]},{"t":"mc","q":"טעם הגלידה האהוב?","o":["וניל","שוקולד","פיסטוק","לימון"]},{"t":"mc","q":"אוכל ילדות שהכי מחזיר אחורה?","o":["שניצל ופירה","מרק עוף","פתיתים","קציצות"]},{"t":"rank","q":"סדרו מהכי אהוב להכי פחות","o":["פיצה","סושי","המבורגר","פלאפל"]},{"t":"rank","q":"סדרו את הארוחות לפי כמה אתם אוהבים אותן","o":["ארוחת בוקר","ארוחת צהריים","ארוחת ערב","נשנוש באמצע"]},{"t":"rank","q":"סדרו קינוחים מהמנצח לשמיני","o":["עוגת שוקולד","גלידה","סופגנייה","מלבי"]},{"t":"rank","q":"סדרו תוספות מהכי חובה להכי פחות","o":["צ'יפס","אורז","פירה","סלט"]},{"t":"who","q":"מי מאיתנו יותר אוכל באמצע הלילה?"},{"t":"who","q":"מי מאיתנו מבשל טוב יותר?"},{"t":"who","q":"מי מאיתנו יותר גונב מהצלחת של השני?"},{"t":"who","q":"מי מאיתנו יותר נוטה לשרוף את האוכל?"},{"t":"ab","q":"סלט קצוץ דק או גס?","o":["דק","גס"]},{"t":"ab","q":"לחם לבן או לחם מלא?","o":["לבן","מלא"]},{"t":"ab","q":"עוף או בשר?","o":["עוף","בשר"]},{"t":"ab","q":"מרק לפני העיקרית או לדלג עליו?","o":["מרק","לדלג"]},{"t":"ab","q":"לאכול קודם את הכי טעים או לשמור אותו לסוף?","o":["קודם","לסוף"]},{"t":"ab","q":"גלידה בגביע או בכוסית?","o":["גביע","כוסית"]},{"t":"ab","q":"פיתה או לחמניה?","o":["פיתה","לחמניה"]},{"t":"ab","q":"פירות לנשנוש או עוגיות?","o":["פירות","עוגיות"]},{"t":"ab","q":"לאכול ביחד או כל אחד כשמתחשק לו?","o":["ביחד","כל אחד לבד"]},{"t":"ab","q":"אוכל חם מאוד או פושר?","o":["חם מאוד","פושר"]},{"t":"scale","q":"כמה אפשר לאכול ירקות בלי להתלונן?","min":"בקושי","max":"בכיף"},{"t":"scale","q":"כמה חשוב מלח באוכל?","min":"בלי מלח","max":"הרבה מלח"},{"t":"scale","q":"כמה קשה לעמוד בפני לחם חם?","min":"קל","max":"בלתי אפשרי"},{"t":"scale","q":"כמה מתחשק לנסות מסעדה חדשה במקום הקבועה?","min":"נשארים בקבועה","max":"רק חדש"},{"t":"scale","q":"כמה מתחשק לבשל ארוחה גדולה לאורחים?","min":"בשום אופן","max":"מחכים לזה"},{"t":"scale","q":"כמה אכפת לך מתאריך התפוגה?","min":"סתם מספר","max":"בודקים כל פעם"},{"t":"mc","q":"מה מזמינים כשלא יודעים מה לאכול?","o":["פיצה","פסטה","המבורגר","שניצל בפיתה"]},{"t":"mc","q":"ארוחת ערב קלה מושלמת?","o":["סלט וביצה","טוסט","גבינות ולחם","מרק"]},{"t":"mc","q":"מה הכי טעים בחגים?","o":["סופגניות","לביבות","אוזני המן","עוגת דבש"]},{"t":"mc","q":"מה שותים לצד הארוחה?","o":["מים","מיץ תפוזים","קולה","סודה"]},{"t":"mc","q":"מה הכי חשוב במסעדה?","o":["טעם","שירות","מחיר","אווירה"]},{"t":"mc","q":"איזה ריח מהמטבח הכי מושך?","o":["לחם בתנור","בצל מטוגן","עוגה אפויה","קפה טרי"]},{"t":"rank","q":"סדרו מהכי חובה על השולחן להכי פחות","o":["חומוס","טחינה","סלט ירקות","חציל"]},{"t":"rank","q":"סדרו מאפים מהכי אהוב להכי פחות","o":["בורקס","רוגלך","קרואסון","חלה"]},{"t":"rank","q":"סדרו מרקים מהמנצח לאחרון","o":["מרק עוף","מרק עגבניות","מרק בצל","מרק ירקות"]},{"t":"rank","q":"סדרו משקאות חמים מהכי אהוב","o":["קפה","תה","שוקו","תה נענע"]},{"t":"who","q":"מי מאיתנו יותר מתלונן שהאוכל התקרר?"},{"t":"who","q":"מי מאיתנו מוסיף יותר מלח בלי לטעום?"},{"t":"who","q":"מי מאיתנו משאיר יותר כלים בכיור?"},{"t":"who","q":"מי מאיתנו יותר מתרגש מאוכל חדש?"}]},{"id":"travel","name":"טיולים","emoji":"✈️","group":"life","audience":"all","desc":"מזוודות, יעדים וויכוחים על ניווט","questions":[{"t":"ab","q":"חופשה בחו״ל או טיול בארץ?","o":["חו״ל","בארץ"]},{"t":"ab","q":"מלון או צימר?","o":["מלון","צימר"]},{"t":"ab","q":"לתכנן הכול מראש או לזרום?","o":["לתכנן","לזרום"]},{"t":"ab","q":"הים או ההרים?","o":["הים","ההרים"]},{"t":"ab","q":"עיר גדולה ושוקקת או כפר שקט?","o":["עיר שוקקת","כפר שקט"]},{"t":"ab","q":"טיסה מוקדם בבוקר או מאוחר בערב?","o":["מוקדם בבוקר","מאוחר בערב"]},{"t":"ab","q":"מזוודה גדולה או תיק גב?","o":["מזוודה","תיק גב"]},{"t":"ab","q":"במטוס: ליד החלון או במעבר?","o":["ליד החלון","במעבר"]},{"t":"ab","q":"רכב שכור או תחבורה ציבורית?","o":["רכב שכור","תחבורה ציבורית"]},{"t":"ab","q":"טיול קצר ואינטנסיבי או ארוך ורגוע?","o":["קצר ואינטנסיבי","ארוך ורגוע"]},{"t":"scale","q":"כמה מוקדם מתחילים לארוז לפני טיול?","min":"בבוקר הטיסה","max":"שבוע מראש"},{"t":"scale","q":"כמה הליכה ברגל זה בסדר ביום טיול?","min":"מינימום","max":"עד הערב"},{"t":"scale","q":"כמה חשוב מלון עם ארוחת בוקר?","min":"לא קריטי","max":"תנאי בסיסי"},{"t":"scale","q":"כמה מוקדם מגיעים לשדה התעופה?","min":"רגע לפני הסגירה","max":"שלוש שעות מראש"},{"t":"scale","q":"כמה מתחשק לחזור לאותו יעד שוב ושוב?","min":"תמיד מקום חדש","max":"אותו מקום כל שנה"},{"t":"scale","q":"כמה כבדה המזוודה שלך בדרך כלל?","min":"קלה כנוצה","max":"עמוסה עד הסוף"},{"t":"mc","q":"החופשה המושלמת?","o":["עיר ואטרקציות","טבע וטיולים","בריכה ושקט","צימר וקצת שלווה"]},{"t":"mc","q":"מה הכי חשוב ביעד?","o":["אוכל טוב","נוף מרהיב","מחיר נוח","קרוב לבית"]},{"t":"mc","q":"יעד החלומות?","o":["שווייץ","איטליה","יוון","יפן"]},{"t":"mc","q":"מה אסור לשכוח לארוז?","o":["מטען לטלפון","תרופות","כובע ומשקפי שמש","נשנושים"]},{"t":"mc","q":"איפה הכי כיף לישון בטיול?","o":["מלון","דירת אירוח","צימר","אוהל"]},{"t":"mc","q":"מה עושים ראשון כשמגיעים ליעד?","o":["פורקים ונחים","יוצאים לאכול","מסתובבים בסביבה","מתכננים את המחר"]},{"t":"rank","q":"סדרו מהיעד הכי מושך להכי פחות","o":["ים","הרים","עיר","מדבר"]},{"t":"rank","q":"סדרו אמצעי תחבורה לפי נוחות","o":["רכבת","מטוס","רכב","אוטובוס"]},{"t":"rank","q":"מה הכי חשוב בחופשה? סדרו","o":["שינה","אוכל","טיולים","תמונות"]},{"t":"rank","q":"סדרו עונות לטיול מהאהובה ביותר","o":["אביב","קיץ","סתיו","חורף"]},{"t":"who","q":"מי מאיתנו יותר מאבד דברים בטיול?"},{"t":"who","q":"מי מאיתנו אורז יותר מדי?"},{"t":"who","q":"מי מאיתנו יתעורר ראשון בחופשה?"},{"t":"who","q":"מי מאיתנו מנווט טוב יותר?"},{"t":"ab","q":"לצלם הרבה או לזכור בעיניים?","o":["לצלם","לזכור בעיניים"]},{"t":"ab","q":"טיול מאורגן או עצמאי?","o":["מאורגן","עצמאי"]},{"t":"ab","q":"מוזיאון או פארק?","o":["מוזיאון","פארק"]},{"t":"ab","q":"שוק מקומי או קניון?","o":["שוק","קניון"]},{"t":"ab","q":"נסיעה ארוכה ברכב או טיסה קצרה?","o":["נסיעה ברכב","טיסה"]},{"t":"ab","q":"מזכרות לכולם או בלי מזכרות?","o":["מזכרות","בלי"]},{"t":"ab","q":"ללכת לאיבוד בכוונה או לפי מפה?","o":["ללכת לאיבוד","לפי מפה"]},{"t":"ab","q":"לטייל בחבורה או בשניים?","o":["בחבורה","בשניים"]},{"t":"ab","q":"להחליף מקום כל יום או להישאר באותו מקום?","o":["להחליף","להישאר"]},{"t":"ab","q":"נוף מהחלון או מיקום מרכזי?","o":["נוף","מיקום מרכזי"]},{"t":"scale","q":"כמה נסיעה זה בסדר בשביל טיול של יום?","min":"שעה","max":"חמש שעות"},{"t":"scale","q":"כמה חשוב דירוג גבוה לפני שמזמינים מקום?","min":"לא משנה","max":"חובה"},{"t":"scale","q":"כמה לחץ בשדה התעופה?","min":"רגוע לגמרי","max":"מתח עד הדלת"},{"t":"scale","q":"כמה חשוב לראות כל אתר מהמדריך?","min":"לא חובה","max":"הכול ברשימה"},{"t":"scale","q":"כמה מתחשק לטיול בשלג?","min":"בלי קור","max":"מיד"},{"t":"scale","q":"כמה קל להסתדר בשפה שלא מכירים?","min":"אובד עצות","max":"מסתדר עם הידיים"},{"t":"mc","q":"איך מעבירים טיסה ארוכה?","o":["ישנים","סרטים","קוראים","אוכלים"]},{"t":"mc","q":"מה הכי מעצבן בטיול?","o":["פקקים","תורים","מזג אוויר","איחורים"]},{"t":"mc","q":"טיול בארץ: לאן נוסעים?","o":["הצפון","ירושלים","הנגב","אילת"]},{"t":"mc","q":"מה מביאים כמזכרת?","o":["מגנט","אוכל מקומי","בגד","רק תמונות"]},{"t":"mc","q":"איפה הכי נרגעים בחופשה?","o":["חוף הים","בריכה","שביל בהרים","מרפסת עם נוף"]},{"t":"mc","q":"איך מחליטים לאן ללכת?","o":["גוגל מפות","המלצות חברים","מדריך","סתם הולכים"]},{"t":"rank","q":"סדרו מזג אוויר לטיול מהכי טוב","o":["שמש","ענן קל","גשם קל","שלג"]},{"t":"rank","q":"סדרו אטרקציות מהכי מושכת","o":["פארק שעשועים","מוזיאון","שוק","תצפית"]},{"t":"rank","q":"סדרו ארוחות בטיול מהכי אהובה","o":["בוקר במלון","אוכל רחוב","מסעדה מקומית","פיקניק"]},{"t":"rank","q":"סדרו אורך נסיעה מהכי נוח","o":["שעה","שלוש שעות","חצי יום","טיסה"]},{"t":"who","q":"מי מאיתנו מתלונן יותר על החום בטיול?"},{"t":"who","q":"מי מאיתנו מצלם יותר?"},{"t":"who","q":"מי מאיתנו מקפיד יותר על לוח זמנים?"},{"t":"who","q":"מי מאיתנו מתרגש יותר ערב טיול?"}]},{"id":"lifestyle","name":"סגנון חיים","emoji":"🛋️","group":"life","audience":"all","desc":"בוקר, סדר, בלגן וסופי שבוע","questions":[{"t":"ab","q":"ציפור בוקר או ינשוף לילה?","o":["ציפור בוקר","ינשוף לילה"]},{"t":"ab","q":"מקלחת בבוקר או בערב?","o":["בבוקר","בערב"]},{"t":"ab","q":"להציע את המיטה כל בוקר או להשאיר?","o":["להציע","להשאיר"]},{"t":"ab","q":"בבית: שקט מוחלט או רקע של מוזיקה?","o":["שקט","מוזיקה ברקע"]},{"t":"ab","q":"קניות בחנות או אונליין?","o":["בחנות","אונליין"]},{"t":"ab","q":"סוף שבוע בבית או בחוץ?","o":["בבית","בחוץ"]},{"t":"ab","q":"לקום מהשעון הראשון או נודניק?","o":["מיד","נודניק"]},{"t":"ab","q":"חורף או קיץ?","o":["חורף","קיץ"]},{"t":"ab","q":"רשימות כתובות או לזכור בראש?","o":["רשימות","בראש"]},{"t":"ab","q":"לשטוף כלים מיד או להשאיר לבוקר?","o":["מיד","לבוקר"]},{"t":"scale","q":"כמה סדר יש בבית?","min":"בלגן יצירתי","max":"הכול במקום"},{"t":"scale","q":"כמה קשה לקום בבוקר?","min":"קופץ מהמיטה","max":"בלתי אפשרי"},{"t":"scale","q":"כמה אתה מתכנן את היום מראש?","min":"זורם לגמרי","max":"לפי לוח זמנים"},{"t":"scale","q":"כמה נוטים לאחר?","min":"תמיד מוקדם","max":"תמיד ברגע האחרון"},{"t":"scale","q":"כמה חשוב לישון שמונה שעות?","min":"מסתדר עם מעט","max":"חייבים מלא"},{"t":"scale","q":"אחרי יום עמוס, כמה מתחשק לצאת מהבית?","min":"ישר הביתה","max":"תמיד יש תוכנית"},{"t":"mc","q":"איך נראה בוקר מושלם?","o":["קפה בשקט","הליכה בחוץ","שינה עד מאוחר","לקום ולהספיק הכול"]},{"t":"mc","q":"איפה הכי נוח לשבת בבית?","o":["הספה","המיטה","המרפסת","המטבח"]},{"t":"mc","q":"מה הכי מעצבן בבית?","o":["כלים בכיור","בגדים על הכיסא","אור שנשאר דולק","דלתות פתוחות"]},{"t":"mc","q":"ערב פנוי: מה עושים?","o":["סדרה","ספר","שיחה עם חבר","סידורים בבית"]},{"t":"mc","q":"מה עושים ראשון בבוקר?","o":["שותים קפה","מתקלחים","בודקים טלפון","אוכלים משהו"]},{"t":"mc","q":"סוף שבוע אידיאלי?","o":["מנוחה בבית","טיול משפחתי","ארוחה אצל המשפחה","פרויקטים וסידורים"]},{"t":"rank","q":"סדרו הרגלים מהכי אהוב להכי פחות","o":["שנת צהריים","קפה","הליכה","מוזיקה"]},{"t":"rank","q":"מטלות בית: מהכי נסבלת להכי מעצבנת","o":["שטיפת כלים","קיפול כביסה","שטיפת רצפה","גיהוץ"]},{"t":"rank","q":"סדרו ימי שבוע מהאהוב ביותר","o":["ראשון","רביעי","חמישי","שישי"]},{"t":"rank","q":"סדרו חלקי יום לפי כמה אתם אוהבים אותם","o":["בוקר","צהריים","ערב","לילה"]},{"t":"who","q":"מי מאיתנו יותר מאחר?"},{"t":"who","q":"מי מאיתנו מסודר יותר?"},{"t":"who","q":"מי מאיתנו נרדם ראשון?"},{"t":"who","q":"מי מאיתנו מאבד יותר פעמים את הטלפון או המפתחות?"},{"t":"ab","q":"קפה בבית או בבית קפה?","o":["בבית","בבית קפה"]},{"t":"ab","q":"ללכת ברגל או לנסוע?","o":["ברגל","לנסוע"]},{"t":"ab","q":"לישון עם חלון פתוח או סגור?","o":["פתוח","סגור"]},{"t":"ab","q":"בגדים בארון מקופלים או תלויים?","o":["מקופלים","תלויים"]},{"t":"ab","q":"עיר גדולה או יישוב קטן?","o":["עיר","יישוב קטן"]},{"t":"ab","q":"מקלחת חמה מאוד או פושרת?","o":["חמה מאוד","פושרת"]},{"t":"ab","q":"קניות שבועיות גדולות או קטנות כל יום?","o":["גדולות","קטנות"]},{"t":"ab","q":"לנקות קצת כל יום או הכול ביום אחד?","o":["כל יום","יום אחד"]},{"t":"ab","q":"לקרוא חדשות בבוקר או להתעלם?","o":["לקרוא","להתעלם"]},{"t":"ab","q":"שעון מעורר בטלפון או שעון רגיל?","o":["טלפון","שעון רגיל"]},{"t":"scale","q":"כמה שעות מסך ביום זה מספיק?","min":"כמה שפחות","max":"בלי הגבלה"},{"t":"scale","q":"כמה חשוב לצאת להליכה בחוץ?","min":"לא חובה","max":"כל יום"},{"t":"scale","q":"כמה קשה לזרוק דברים ישנים?","min":"זורקים הכול","max":"שומרים הכול"},{"t":"scale","q":"כמה אוהבים תוכניות קבועות?","min":"שונאים שגרה","max":"אוהבים סדר"},{"t":"scale","q":"כמה קל להישאר בלי טלפון שעה?","min":"בלתי אפשרי","max":"קל"},{"t":"scale","q":"כמה חשוב קפה בבוקר?","min":"לא קריטי","max":"בלי קפה אין בוקר"},{"t":"mc","q":"הטמפרטורה הכי נעימה בבית?","o":["קריר","חמים","מזגן קבוע","שמיכה ודי"]},{"t":"mc","q":"איך נרגעים אחרי יום עמוס?","o":["מקלחת","הליכה","מוזיקה","שינה"]},{"t":"mc","q":"מה תמיד בתיק?","o":["בקבוק מים","מטען נייד","ממחטות","נשנוש"]},{"t":"mc","q":"איפה הכי נוח לעבוד?","o":["שולחן","ספה","בית קפה","במיטה"]},{"t":"mc","q":"מה הכי מבזבז זמן?","o":["גלילה בטלפון","חיפוש מפתחות","פקקים","תורים"]},{"t":"mc","q":"איזה ריח הכי נעים בבית?","o":["קפה","כביסה נקייה","אפייה","פרחים"]},{"t":"rank","q":"סדרו מכשירי בית מהכי חיוני","o":["מכונת כביסה","מדיח כלים","מזגן","שואב רובוטי"]},{"t":"rank","q":"על מה הכי כיף להוציא כסף? סדרו","o":["בגדים","טכנולוגיה","אוכל טוב","חוויות"]},{"t":"rank","q":"סדרו מה הכי מעצבן","o":["רעש","אי סדר","איחורים","פקקים"]},{"t":"rank","q":"סדרו ריחות מהכי נעים","o":["קפה","פרחים","גשם","לחם טרי"]},{"t":"who","q":"מי מאיתנו שומר יותר דברים ישנים?"},{"t":"who","q":"מי מאיתנו יותר מתקן דברים בבית?"},{"t":"who","q":"מי מאיתנו יותר במצב רוח טוב בבוקר?"},{"t":"who","q":"מי מאיתנו מזמין יותר דברים אונליין?"}]},{"id":"love","name":"אהבה","emoji":"💞","group":"couples","audience":"couples","desc":"דייטים, מתנות ואיך משלימים אחרי ויכוח","questions":[{"t":"ab","q":"מתנה מפתיעה או מתנה שביקשו?","o":["מפתיעה","שביקשו"]},{"t":"ab","q":"דייט בבית או בחוץ?","o":["בבית","בחוץ"]},{"t":"ab","q":"לכתוב מילים טובות או להגיד בקול?","o":["לכתוב","להגיד בקול"]},{"t":"ab","q":"אחרי ויכוח: להשלים מיד או לקחת זמן לצנן?","o":["להשלים מיד","זמן לצנן"]},{"t":"ab","q":"לתכנן דייט מראש או להפתיע ברגע?","o":["לתכנן","להפתיע"]},{"t":"ab","q":"ארוחה מבושלת בבית או מסעדה?","o":["בבית","מסעדה"]},{"t":"ab","q":"טיול זוגי בטבע או בעיר?","o":["בטבע","בעיר"]},{"t":"ab","q":"לצלם כל רגע או פשוט ליהנות?","o":["לצלם","ליהנות"]},{"t":"ab","q":"לזכור תאריכים בראש או ביומן?","o":["בראש","ביומן"]},{"t":"ab","q":"פרחים או שוקולד?","o":["פרחים","שוקולד"]},{"t":"scale","q":"כמה חשוב לחגוג יום מיוחד של שניכם?","min":"יום רגיל","max":"חגיגה גדולה"},{"t":"scale","q":"כמה קשה להתנצל?","min":"מתנצלים מהר","max":"קשה מאוד"},{"t":"scale","q":"כמה אוהבים הפתעות?","min":"בלי הפתעות","max":"רק הפתעות"},{"t":"scale","q":"כמה חשוב זמן איכות בלי טלפונים?","min":"לא משנה","max":"חובה"},{"t":"scale","q":"אחרי יום קשה, כמה זמן לבד צריך?","min":"חצי דקה","max":"הרבה שעות"},{"t":"scale","q":"כמה חשוב לשמוע מילים טובות בקול?","min":"פחות חשוב","max":"חשוב מאוד"},{"t":"mc","q":"איזו מחווה קטנה הכי מרגשת?","o":["כוס קפה מוכנה","פתק קטן","טלפון באמצע היום","עזרה בלי לבקש"]},{"t":"mc","q":"הדייט המושלם?","o":["טיול בטבע","ארוחה במסעדה","ערב בבית עם סדרה","סיבוב בעיר"]},{"t":"mc","q":"מה הכי עוזר להשלים אחרי ריב?","o":["שיחה רגועה","מתנה קטנה","פתק או הודעה","הליכה ביחד"]},{"t":"mc","q":"מה הכי מעצבן בוויכוח?","o":["קטיעת דבריי","שתיקה","העלאת העבר","הרמת קול"]},{"t":"mc","q":"מה הדרך העיקרית שלך להרגיש אהוב?","o":["מילים טובות","זמן איכות","מתנות","עזרה בבית"]},{"t":"mc","q":"איזו מתנה הכי מוצלחת?","o":["חוויה משותפת","משהו לבית","תכשיט או אביזר","ספר או משחק"]},{"t":"rank","q":"סדרו מחוות מהכי מרגשת להכי פחות","o":["פרחים","פתק","ארוחה","מתנה"]},{"t":"rank","q":"מה הכי חשוב בזוגיות? סדרו","o":["אמון","הומור","תקשורת","עזרה הדדית"]},{"t":"rank","q":"סדרו תוכניות לערב לפי הכי מתחשק","o":["סדרה","מסעדה","הליכה","משחק קופסה"]},{"t":"rank","q":"סדרו חופשות משותפות מהחלומית ביותר","o":["צימר","חו״ל","טיול בארץ","חופשה בבית"]},{"t":"who","q":"מי מאיתנו מתנצל ראשון אחרי ויכוח?"},{"t":"who","q":"מי מאיתנו מפתיע יותר?"},{"t":"who","q":"מי מאיתנו שוכח יותר תאריכים חשובים?"},{"t":"who","q":"מי מאיתנו מחליט מהר יותר איפה לאכול?"},{"t":"ab","q":"מכתב ארוך או הודעה קצרה?","o":["מכתב","הודעה"]},{"t":"ab","q":"ערב שקט לשניים או עם זוג חברים?","o":["לשניים","עם חברים"]},{"t":"ab","q":"להתייעץ בכל החלטה או להחליט לבד על דברים קטנים?","o":["להתייעץ","להחליט לבד"]},{"t":"ab","q":"מתנה אחת גדולה או כמה קטנות?","o":["גדולה","כמה קטנות"]},{"t":"ab","q":"לחגוג אירוע מיוחד בגדול או בשקט?","o":["בגדול","בשקט"]},{"t":"ab","q":"ללכת לקניות ביחד או כל אחד לבד?","o":["ביחד","לבד"]},{"t":"ab","q":"להתקשר באמצע היום או לשלוח הודעה?","o":["להתקשר","הודעה"]},{"t":"ab","q":"קפה בבוקר ביחד או כל אחד בנפרד?","o":["ביחד","בנפרד"]},{"t":"ab","q":"לשתף הכול או לשמור פרטיות קטנה?","o":["לשתף הכול","פרטיות קטנה"]},{"t":"ab","q":"לצחוק על עצמנו או להתייחס ברצינות?","o":["לצחוק","ברצינות"]},{"t":"scale","q":"כמה חשוב לצחוק ביחד כל יום?","min":"מדי פעם","max":"כל יום"},{"t":"scale","q":"כמה חשוב לתכנן עתיד ביחד?","min":"לזרום","max":"תוכנית מסודרת"},{"t":"scale","q":"כמה קשה לבקש עזרה?","min":"קל","max":"קשה מאוד"},{"t":"scale","q":"כמה קל לסלוח?","min":"לוקח זמן","max":"מיד"},{"t":"scale","q":"כמה חשוב שלכל אחד יהיה תחביב משלו?","min":"הכול ביחד","max":"כל אחד לעצמו"},{"t":"scale","q":"כמה נעים לשמוע מחמאה מול אחרים?","min":"מתבייש","max":"מתמוסס"},{"t":"mc","q":"מה הכי מצחיק בזוגיות?","o":["בדיחות פנימיות","הרגלים משונים","ויכוחים קטנים","שכחנות"]},{"t":"mc","q":"איזו הפתעה הכי מחממת?","o":["ארוחה מוכנה","יציאה מאורגנת","מתנה קטנה","פתק בתיק"]},{"t":"mc","q":"מה עושים כשלא מסכימים?","o":["מדברים","ישנים על זה","מתפשרים","נותנים לזה לעבור"]},{"t":"mc","q":"איזו תכונה הכי חשובה בבן או בת זוג?","o":["נדיבות","הומור","אחריות","רגישות"]},{"t":"mc","q":"מה הכי נעים בבית ביחד?","o":["קפה בשקט","סדרה","בישול ביחד","שיחה על הכול"]},{"t":"mc","q":"מה הכי מחכים לו בחופשה זוגית?","o":["מנוחה","טיולים","אוכל","תמונות"]},{"t":"rank","q":"סדרו מה הכי מחמם את הלב","o":["מילה טובה","עזרה","הפתעה","פתק"]},{"t":"rank","q":"סדרו זמנים לבילוי ביחד מהאהוב","o":["בוקר","צהריים","ערב","סוף שבוע"]},{"t":"rank","q":"סדרו מתנות מהכי מוצלחת","o":["ספר","בושם","פרחים","תכשיט"]},{"t":"rank","q":"סדרו מה הכי מעצבן בזוגיות","o":["איחורים","שכחנות","בלגן","שתיקה"]},{"t":"who","q":"מי מאיתנו יותר סנטימנטלי?"},{"t":"who","q":"מי מאיתנו יותר יכין קפה לשני?"},{"t":"who","q":"מי מאיתנו שומר יותר מזכרות ופתקים?"},{"t":"who","q":"מי מאיתנו יותר עקשן בוויכוח?"}]},{"id":"entertainment","name":"בידור","emoji":"🎬","group":"fun","audience":"all","desc":"סרטים, סדרות, משחקים וספוילרים","questions":[{"t":"ab","q":"סרט או סדרה?","o":["סרט","סדרה"]},{"t":"ab","q":"קולנוע או סלון?","o":["קולנוע","סלון"]},{"t":"ab","q":"קומדיה או דרמה?","o":["קומדיה","דרמה"]},{"t":"ab","q":"הספר או הסרט שנעשה לפיו?","o":["הספר","הסרט"]},{"t":"ab","q":"פרק אחד ולישון או כמה פרקים ברצף?","o":["פרק אחד","כמה ברצף"]},{"t":"ab","q":"סטנדאפ או הצגה?","o":["סטנדאפ","הצגה"]},{"t":"ab","q":"משחק קופסה או משחק בטלפון?","o":["קופסה","טלפון"]},{"t":"ab","q":"סרט שכבר ראית או סרט חדש?","o":["שכבר ראיתי","חדש"]},{"t":"ab","q":"ספוילרים מראש או הפתעה עד הסוף?","o":["ספוילרים","הפתעה"]},{"t":"ab","q":"יצירה בבית או ספורט בחוץ?","o":["יצירה בבית","ספורט בחוץ"]},{"t":"scale","q":"כמה ספוילרים מפריעים לך?","min":"לא מפריע","max":"עבירה חמורה"},{"t":"scale","q":"כמה סרטים מרגשים אותך עד דמעות?","min":"אף אחד","max":"כמעט כולם"},{"t":"scale","q":"כמה קל להתמכר לסדרה טובה?","min":"פרק ביום","max":"עד הבוקר"},{"t":"scale","q":"כמה נהנים מקריאת ספרים?","min":"בקושי","max":"מאוד"},{"t":"scale","q":"כמה אקשן צריך בסרט?","min":"כמעט בלי","max":"בלי הפסקה"},{"t":"scale","q":"כמה חשוב לנצח במשחק?","min":"העיקר ליהנות","max":"חייבים לנצח"},{"t":"mc","q":"הז'אנר המושלם לערב סרט?","o":["קומדיה","פעולה","מתח","אנימציה"]},{"t":"mc","q":"איזה מופע הכי כיף?","o":["סטנדאפ","מחזמר","קונצרט","הצגה"]},{"t":"mc","q":"משחק ערב הכי אהוב?","o":["שש בש","שחמט","מונופול","קלפים"]},{"t":"mc","q":"איפה הכי כיף לקרוא ספר?","o":["במיטה","בסלון","במרפסת","בדרכים"]},{"t":"mc","q":"איך בוחרים מה לראות?","o":["המלצה מחברים","לפי דירוג","שחקן אהוב","טריילר מוצלח"]},{"t":"mc","q":"איזה תחביב הכי מתאים?","o":["צילום","אפייה ובישול","מוזיקה","ספורט"]},{"t":"rank","q":"סדרו ז'אנרים מהאהוב ביותר","o":["קומדיה","מתח","דרמה","אנימציה"]},{"t":"rank","q":"סדרו פעילויות פנאי מהכי מתחשק","o":["קריאה","משחקים","סדרות","מוזיקה"]},{"t":"rank","q":"סדרו מקומות צפייה מהנוח ביותר","o":["המיטה","הספה","הקולנוע","המחשב"]},{"t":"rank","q":"סדרו משחקי חברה מהמנצח לאחרון","o":["שש בש","קלפים","חידות","מונופול"]},{"t":"who","q":"מי מאיתנו יותר נרדם באמצע סרט?"},{"t":"who","q":"מי מאיתנו יותר מתעקש לנצח במשחק?"},{"t":"who","q":"מי מאיתנו זוכר יותר ציטוטים מסרטים?"},{"t":"who","q":"מי מאיתנו יסיים סדרה ראשון?"},{"t":"ab","q":"כתוביות או דיבוב?","o":["כתוביות","דיבוב"]},{"t":"ab","q":"סרט ישראלי או הוליוודי?","o":["ישראלי","הוליוודי"]},{"t":"ab","q":"סדרה ארוכה או מיני סדרה?","o":["ארוכה","מיני סדרה"]},{"t":"ab","q":"אנימציה לילדים בלבד או גם למבוגרים?","o":["לילדים בלבד","גם למבוגרים"]},{"t":"ab","q":"ספר מודפס או דיגיטלי?","o":["מודפס","דיגיטלי"]},{"t":"ab","q":"פודקאסט או מוזיקה בדרך?","o":["פודקאסט","מוזיקה"]},{"t":"ab","q":"חידות הגיון או משחקי מהירות?","o":["חידות","מהירות"]},{"t":"ab","q":"טריוויה או משחקי מילים?","o":["טריוויה","מילים"]},{"t":"ab","q":"מופע בחוץ או יוטיוב בבית?","o":["מופע בחוץ","יוטיוב"]},{"t":"ab","q":"סוף שמח או סוף פתוח?","o":["שמח","פתוח"]},{"t":"scale","q":"כמה מפחיד מדי בסרט מתח?","min":"הכול בסדר","max":"לא לילדים"},{"t":"scale","q":"כמה זמן מותר להתלבט איזה סרט לראות?","min":"חמש דקות","max":"עד חצות"},{"t":"scale","q":"כמה אוהבים לראות סרט שוב ושוב?","min":"פעם אחת מספיקה","max":"מכירים בעל פה"},{"t":"scale","q":"כמה חשוב לראות סדרה ברגע שיוצאת?","min":"מחכים","max":"מיד"},{"t":"scale","q":"כמה אתם טובים בחידות?","min":"תמיד תקועים","max":"פותרים הכול"},{"t":"scale","q":"כמה קל לצחוק בקול?","min":"חצי חיוך","max":"פורצים"},{"t":"mc","q":"איפה הכי כיף לשחק משחקי חברה?","o":["ליד שולחן","על הרצפה","במרפסת","בחוץ"]},{"t":"mc","q":"איזו דמות הכי אהובה?","o":["גיבור","נבל","חבר מצחיק","מוח מתכנן"]},{"t":"mc","q":"מתי הכי מתאים לסרט?","o":["מוצאי שבת","יום חול","חופשה","חג"]},{"t":"mc","q":"איזה סוג ספרים הכי מושך?","o":["מתח","היסטוריה","הומור","פנטזיה"]},{"t":"mc","q":"ערב חורף מושלם?","o":["סדרה מתחת לשמיכה","משחק קלפים","ספר","אפיית עוגיות"]},{"t":"mc","q":"מה הכי חשוב בסרט טוב?","o":["עלילה","שחקנים","מוזיקה","הומור"]},{"t":"rank","q":"סדרו מופעים מהכי כיפי","o":["סטנדאפ","מחזמר","קונצרט","קרקס"]},{"t":"rank","q":"סדרו בידור ביתי מהכי אהוב","o":["טלוויזיה","טלפון","ספר","רדיו"]},{"t":"rank","q":"סדרו תחביבים מהכי מושך","o":["ציור","צילום","בישול","מוזיקה"]},{"t":"rank","q":"סדרו משחקי מחשבה מהאהוב","o":["שחמט","סודוקו","תשבץ","חידות היגיון"]},{"t":"who","q":"מי מאיתנו יותר מספר ספוילרים?"},{"t":"who","q":"מי מאיתנו בוחר סרט יותר מהר?"},{"t":"who","q":"מי מאיתנו צוחק יותר בקול בסרט?"},{"t":"who","q":"מי מאיתנו יותר ממליץ על סדרות לאחרים?"}]},{"id":"big","name":"שאלות גדולות","emoji":"🌌","group":"life","audience":"all","desc":"על מה שבאמת חשוב בחיים","questions":[{"t":"ab","q":"להיות עשיר ולא מוכר או מפורסם ועני?","o":["עשיר ולא מוכר","מפורסם ועני"]},{"t":"ab","q":"לדעת מתי יקרה הדבר הבא הגדול בחיים או להיות מופתע?","o":["לדעת מראש","להיות מופתע"]},{"t":"ab","q":"חיים שקטים בכפר או חיים עמוסים בעיר?","o":["שקט בכפר","עיר שמתעוררת"]},{"t":"ab","q":"להיות הכי חכם בחדר או הכי נחמד בחדר?","o":["הכי חכם","הכי נחמד"]},{"t":"ab","q":"לחיות בעבר או לחיות בעתיד?","o":["בעבר","בעתיד"]},{"t":"ab","q":"עצה מחוכם מבוגר או ניסיון על בשרך?","o":["עצה מחכם","ללמוד לבד"]},{"t":"ab","q":"להצליח במה שאוהבים או להצליח במה שמרוויחים ממנו?","o":["במה שאוהב","במה שמרוויח"]},{"t":"ab","q":"לוותר ולשמור על שלום או להתעקש ולהיות צודק?","o":["לוותר","להתעקש"]},{"t":"ab","q":"הרבה חברים קרובים בינוניים או שניים-שלושה חברי נפש?","o":["הרבה חברים","חברי נפש"]},{"t":"ab","q":"תכנון לכל החיים או לזרום עם מה שבא?","o":["תכנון","לזרום"]},{"t":"scale","q":"כמה אתם מאמינים שהכול קורה לטובה?","min":"בכלל לא","max":"בטוח לגמרי"},{"t":"scale","q":"כמה אתם מרוצים מהחיים כרגע?","min":"יש מקום לשיפור","max":"הכול מושלם"},{"t":"scale","q":"כמה חשוב לכם מה אנשים חושבים עליכם?","min":"לא מעניין אותי","max":"חשוב מאוד"},{"t":"scale","q":"כמה אתם מוכנים לקחת סיכון בשביל חלום?","min":"רק בטוח","max":"הולך עד הסוף"},{"t":"scale","q":"כמה אתם חושבים שאפשר לשנות אדם בוגר?","min":"בלתי אפשרי","max":"לגמרי אפשרי"},{"t":"scale","q":"כמה אתם מרגישים שהזמן בורח?","min":"יש המון זמן","max":"אין רגע לנשום"},{"t":"mc","q":"מה הכי חשוב כדי להיות מאושר?","o":["משפחה","בריאות","שקט נפשי","הצלחה"]},{"t":"mc","q":"איזו תכונה הכי חשוב שתהיה לאדם?","o":["יושר","נדיבות","חכמה","הומור"]},{"t":"mc","q":"מה הכי כואב לוותר עליו?","o":["זמן עם המשפחה","עצמאות","ביטחון כלכלי","תחביבים"]},{"t":"mc","q":"איזה רגע בחיים הכי מרגש?","o":["חתונה","לידה","הישג אישי","רגע של תפילה"]},{"t":"mc","q":"מה הכי עוזר כשקשה?","o":["שיחה עם מישהו","שקט ולבד","תפילה או חיזוק","לעשות משהו אחר"]},{"t":"mc","q":"במה הייתם משקיעים מיליון שקל ביד חופשית?","o":["בית","מסע בעולם","עסק משלי","צדקה ועזרה"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות חשוב","o":["כסף","בריאות","משפחה","חופש"]},{"t":"rank","q":"סדרו מה הכי מביא אושר ליום יומיים","o":["אוכל טוב","חברים","שינה טובה","טיול"]},{"t":"rank","q":"סדרו מה הכי מפחיד","o":["לבד","לחץ כלכלי","מחלה","להתחרט"]},{"t":"rank","q":"סדרו מה הכי חסר לאנשים בימינו","o":["סבלנות","זמן","אמון","הכרת תודה"]},{"t":"who","q":"מי מאיתנו יותר חולם בגדול?"},{"t":"who","q":"מי מאיתנו יותר מתחרט על דברים מהעבר?"},{"t":"who","q":"מי מאיתנו יותר נותן עצות חכמות לאחרים?"},{"t":"who","q":"מי מאיתנו יותר עומד על שלו כשזה חשוב?"},{"t":"ab","q":"לדעת את כל האמת תמיד או לחיות בלי לדעת הכול?","o":["לדעת הכול","לא לדעת"]},{"t":"ab","q":"חיים ארוכים ורגילים או חיים קצרים ומלאי הרפתקאות?","o":["ארוכים ורגילים","קצרים ומלאי הרפתקאות"]},{"t":"ab","q":"להשאיר מורשת גדולה או זיכרון חם אצל המשפחה?","o":["מורשת גדולה","זיכרון חם"]},{"t":"ab","q":"ללכת עם הלב או ללכת עם השכל?","o":["עם הלב","עם השכל"]},{"t":"ab","q":"להתנצל ראשון או לחכות שהצד השני יתנצל?","o":["להתנצל ראשון","לחכות"]},{"t":"ab","q":"סכום גדול לצדקה פעם בשנה או סכום קטן כל יום?","o":["גדול פעם בשנה","קטן כל יום"]},{"t":"ab","q":"לחזור לגיל 18 עם הידע של היום או לקפוץ לגיל 70 עם הכול מסודר?","o":["חוזר לגיל 18","קופץ לגיל 70"]},{"t":"ab","q":"שנה של שקט מוחלט או שנה של חוויות בלי הפסקה?","o":["שנה של שקט","שנה של חוויות"]},{"t":"ab","q":"לגור קרוב להורים או רחוק ועצמאי?","o":["קרוב להורים","רחוק ועצמאי"]},{"t":"ab","q":"להיות זכור כאדם טוב או כאדם מצליח?","o":["אדם טוב","אדם מצליח"]},{"t":"scale","q":"כמה אתם חושבים על העתיד הרחוק?","min":"חיים ברגע","max":"מתכנן הכול"},{"t":"scale","q":"כמה קל לכם לסלוח?","min":"נשאר לי בלב","max":"שוכח מיד"},{"t":"scale","q":"כמה החיים שלכם נראים כמו שדמיינתם?","min":"שונה לגמרי","max":"בדיוק כמו בחלום"},{"t":"scale","q":"כמה אתם סומכים על האינטואיציה?","min":"רק עובדות","max":"הבטן תמיד צודקת"},{"t":"scale","q":"כמה אתם מרגישים הכרת תודה על מה שיש?","min":"לא חושב על זה","max":"כל יום מודה"},{"t":"scale","q":"כמה קשה לכם לבקש עזרה?","min":"מבקש בקלות","max":"כמעט בלתי אפשרי"},{"t":"mc","q":"מה הכי מגדיר אדם גדול?","o":["טוב לב","עשייה","ידע","אמונה"]},{"t":"mc","q":"איזה כישרון הכי הייתם רוצים פתאום?","o":["לנגן בכל כלי","זיכרון מושלם","לדבר בכל שפה","לא להתעייף"]},{"t":"mc","q":"מה המתנה הכי גדולה שאפשר לתת לילדים?","o":["זמן","חינוך","ערכים","ביטחון כלכלי"]},{"t":"mc","q":"ממה הכי חוששים בהתבגרות?","o":["בריאות","בדידות","כסף","להיות לא רלוונטי"]},{"t":"mc","q":"מה הכי הופך יום לטוב?","o":["שיחה טובה","הישג קטן","זמן שקט","אוכל טעים"]},{"t":"mc","q":"איזה שיעור חיים למדתם בדרך הקשה?","o":["לא לסמוך על כולם","לשמור על בריאות","לחסוך כסף","להקשיב יותר"]},{"t":"rank","q":"סדרו מה הכי מרגיש כהצלחה","o":["בית משלי","משפחה מאושרת","שם טוב","חשבון מלא"]},{"t":"rank","q":"סדרו מה הכי קשה לסלוח עליו","o":["שקר","פגיעה באמון","זלזול","שכחה"]},{"t":"rank","q":"סדרו מה הכי מחזק אדם","o":["אמונה","משפחה","חברים","הצלחות"]},{"t":"rank","q":"סדרו במה הכי שווה להשקיע שעה ביום","o":["ללמוד","לנוח","להיות עם אנשים","לעבוד על עצמי"]},{"t":"who","q":"מי מאיתנו יותר סולח מהר?"},{"t":"who","q":"מי מאיתנו יותר מתלבט לפני החלטות גדולות?"},{"t":"who","q":"מי מאיתנו יותר מודה על כל דבר קטן?"},{"t":"who","q":"מי מאיתנו יותר חושב על העתיד הרחוק?"}]},{"id":"music","name":"מוזיקה","emoji":"🎧","group":"fun","audience":"all","desc":"מי שולט ברמקול ומי רק מזמזם","questions":[{"t":"ab","q":"שיר חדש שכולם שומעים או שיר ישן שאוהבים?","o":["שיר חדש","שיר ישן"]},{"t":"ab","q":"לשיר בקול רם ברכב או לשמוע בשקט?","o":["שר בקול","שומע בשקט"]},{"t":"ab","q":"הופעה חיה או האזנה באוזניות?","o":["הופעה חיה","אוזניות"]},{"t":"ab","q":"מילים או לחן — מה תופס קודם?","o":["מילים","לחן"]},{"t":"ab","q":"אלבום שלם או רק להיטים?","o":["אלבום שלם","רק להיטים"]},{"t":"ab","q":"מוזיקה בשפה העברית או באנגלית?","o":["עברית","אנגלית"]},{"t":"ab","q":"פלייליסט מסודר או שאפל רנדומלי?","o":["פלייליסט","שאפל"]},{"t":"ab","q":"שיר שמח לחתונה או שיר איטי ומרגש?","o":["שמח וקצבי","איטי ומרגש"]},{"t":"ab","q":"מוזיקה ברקע בזמן עבודה או שקט מוחלט?","o":["מוזיקה ברקע","שקט"]},{"t":"ab","q":"לחזור על אותו שיר עשר פעמים או לגוון כל הזמן?","o":["חוזר על אותו","מגוון תמיד"]},{"t":"scale","q":"כמה אתם יודעים את המילים של שירים?","min":"מזמזם ומנחש","max":"יודע הכול בעל פה"},{"t":"scale","q":"כמה אתם שרים טוב?","min":"עדיף שלא","max":"קול של זמר"},{"t":"scale","q":"כמה אתם מתרגשים משיר מרגש?","min":"לא זז לי","max":"דמעות מובטחות"},{"t":"scale","q":"כמה חשוב לכם להיות מעודכנים בשירים החדשים?","min":"לא מעניין","max":"מכיר הכול ראשון"},{"t":"scale","q":"כמה אתם רוקדים כששומעים שיר טוב?","min":"יושב בשקט","max":"לא יכול לעצור"},{"t":"scale","q":"כמה קשה לכם לשמוע שיר שאתם לא אוהבים?","min":"לא אכפת לי","max":"מחליף מיד"},{"t":"mc","q":"איזה סגנון הכי מתאים לך כרגע?","o":["חסידי","ים תיכוני","פופ","מזרחי"]},{"t":"mc","q":"איפה אתם הכי שומעים מוזיקה?","o":["ברכב","בבית","באוזניות בהליכה","בעבודה"]},{"t":"mc","q":"מה השיר שהכי מעלה מצב רוח?","o":["שיר חסידי קצבי","להיט פופ","שיר ישראלי ישן","מוזיקה אלקטרונית"]},{"t":"mc","q":"באיזו הופעה הכי הייתם רוצים להיות?","o":["מרכז חסידי גדול","זמר ישראלי מצליח","להקת פופ בינלאומית","קונצרט תזמורת"]},{"t":"mc","q":"איך מגלים שירים חדשים?","o":["יוטיוב","חברים","רדיו","ספוטיפיי"]},{"t":"mc","q":"איזה כלי נגינה הכי מקסים?","o":["גיטרה","פסנתר","כינור","תופים"]},{"t":"rank","q":"סדרו מהכי אהוב להכי פחות","o":["פופ","חסידי","מזרחי","קלאסי"]},{"t":"rank","q":"סדרו איפה הכי כיף לשמוע מוזיקה","o":["ברכב","בהופעה","בבית","בטיול"]},{"t":"rank","q":"סדרו מה הכי חשוב בשיר","o":["מילים","לחן","קצב","קול הזמר"]},{"t":"rank","q":"סדרו מה הכי כיף לעשות עם מוזיקה","o":["לשיר","לרקוד","להקשיב בשקט","לנגן"]},{"t":"who","q":"מי מאיתנו יותר שר בקול רם ברכב?"},{"t":"who","q":"מי מאיתנו מכיר יותר מילים של שירים?"},{"t":"who","q":"מי מאיתנו שולט בפלייליסט כשנוסעים יחד?"},{"t":"who","q":"מי מאיתנו יותר מתרגש מהופעה?"},{"t":"ab","q":"ניגון בלי מילים או שיר עם מילים?","o":["ניגון","שיר עם מילים"]},{"t":"ab","q":"להקה חיה בשמחה או הקלטה איכותית?","o":["להקה חיה","הקלטה איכותית"]},{"t":"ab","q":"לדעת לנגן בכלי או לדעת לשיר יפה?","o":["לנגן","לשיר"]},{"t":"ab","q":"שיר שמח ביום גשום או שיר עצוב ביום שמש?","o":["שמח בגשם","עצוב בשמש"]},{"t":"ab","q":"לשיר במקהלה או להיות סולן?","o":["מקהלה","סולן"]},{"t":"ab","q":"שיר שמתחיל חזק או שיר שמתבשל לאט?","o":["מתחיל חזק","מתבשל לאט"]},{"t":"ab","q":"רדיו עם מגישים או פלייליסט בלי הפרעות?","o":["רדיו","פלייליסט"]},{"t":"ab","q":"לשיר מול קהל או לשיר רק במקלחת?","o":["מול קהל","רק במקלחת"]},{"t":"ab","q":"גרסה חדשה לשיר ישן או רק המקור?","o":["גרסה חדשה","רק המקור"]},{"t":"ab","q":"מנוי מוזיקה בתשלום או מוזיקה חינם עם פרסומות?","o":["מנוי בתשלום","חינם עם פרסומות"]},{"t":"scale","q":"כמה אתם מזהים שיר אחרי שנייה?","min":"צריך לשמוע הכול","max":"מזהה מיד"},{"t":"scale","q":"כמה אתם נשארים נאמנים לזמר אהוב?","min":"מחליף כל הזמן","max":"נאמן לנצח"},{"t":"scale","q":"כמה אתם מזמזמים בלי לשים לב?","min":"כמעט אף פעם","max":"כל היום"},{"t":"scale","q":"כמה שיר ישן מחזיר אתכם לרגע מסוים?","min":"כלום","max":"ישר לשם"},{"t":"scale","q":"כמה אתם מוכנים לשלם על כרטיס להופעה?","min":"רק זול","max":"כל מחיר"},{"t":"scale","q":"כמה אתם אוהבים מוזיקה בווליום גבוה?","min":"שקט ונעים","max":"עד הסוף"},{"t":"mc","q":"מה שומעים בנסיעה ארוכה?","o":["שירים לשיר יחד","ניגונים שקטים","פודקאסט או שיעור","רדיו"]},{"t":"mc","q":"איזו תקופה במוזיקה הכי אהובה?","o":["שנות ה-80 וה-90","שנות ה-2000","העשור האחרון","שירים ישנים ממש"]},{"t":"mc","q":"מה הכי מעצבן בשיר?","o":["חזרה אינסופית על שורה","פרסומת באמצע","ווליום לא אחיד","שיר שנגמר פתאום"]},{"t":"mc","q":"מה הכי נעים לקבל כמתנה מוזיקלית?","o":["כרטיס להופעה","אוזניות איכותיות","רמקול","מנוי מוזיקה"]},{"t":"mc","q":"איזו מוזיקה הכי מתאימה לעבודה בבית?","o":["קצבית","רגועה","בלי מילים","ניגונים חסידיים"]},{"t":"mc","q":"איזה שיר הכי מתאים לשמחה משפחתית?","o":["ריקוד חסידי","שיר ישראלי ישן","להיט עכשווי","שיר מרגש ואיטי"]},{"t":"rank","q":"סדרו מה הכי מעצבן במוזיקה","o":["שיר שנתקע בראש","פרסומת באמצע","ווליום גבוה מדי","שיר שמתנגן בכל מקום"]},{"t":"rank","q":"סדרו אירועים לפי כמה המוזיקה בהם חשובה","o":["חתונה","בר מצווה","טיול","מסיבת חנוכה"]},{"t":"rank","q":"סדרו לפי כמה אתם אוהבים לשיר","o":["שירי ילדות","להיטי רדיו","ניגוני שבת","שירי חגים"]},{"t":"rank","q":"סדרו כישרון מוזיקלי מהכי מקסים","o":["קול יפה","נגינה","כתיבת שירים","אוזן מוזיקלית"]},{"t":"who","q":"מי מאיתנו יותר מזמזם בלי לשים לב?"},{"t":"who","q":"מי מאיתנו יותר מתעצבן כשמחליפים שיר באמצע?"},{"t":"who","q":"מי מאיתנו יותר מוכן לעלות לשיר מול קהל?"},{"t":"who","q":"מי מאיתנו יותר מגלה שירים חדשים לפני כולם?"}]},{"id":"childhood","name":"ילדות","emoji":"🧸","group":"life","audience":"all","desc":"חזרה לימים של הפסקות וממתקים","questions":[{"t":"ab","q":"הפסקה בחצר או הפסקה בכיתה?","o":["בחצר","בכיתה"]},{"t":"ab","q":"לשחק בחוץ עד שהחשיך או לשחק בבית בשקט?","o":["בחוץ","בבית"]},{"t":"ab","q":"קייטנה או סתם להשתעמם בבית?","o":["קייטנה","בבית"]},{"t":"ab","q":"הילד שמכין שיעורים מיד או הילד שדוחה לרגע האחרון?","o":["מיד","דוחה"]},{"t":"ab","q":"יום הולדת עם חברים או חגיגה משפחתית?","o":["עם חברים","משפחתית"]},{"t":"ab","q":"סבתא או סבא — אצל מי היה יותר כיף?","o":["סבתא","סבא"]},{"t":"ab","q":"קיץ בבריכה או חורף ושלוליות?","o":["קיץ ובריכה","חורף ושלוליות"]},{"t":"ab","q":"לאסוף קלפים או לאסוף מדבקות?","o":["קלפים","מדבקות"]},{"t":"ab","q":"ילד שקט שיושב בצד או ילד שמוביל את המשחק?","o":["שקט בצד","מוביל"]},{"t":"ab","q":"טיול שנתי או חנוכה במסיבה בכיתה?","o":["טיול שנתי","מסיבת חנוכה"]},{"t":"scale","q":"כמה אהבתם ללכת לבית הספר?","min":"בקושי נגררתי","max":"אהבתי כל יום"},{"t":"scale","q":"כמה הייתם ילדים שובבים?","min":"מלאך אמיתי","max":"הצרה של הכיתה"},{"t":"scale","q":"כמה אתם מתגעגעים לילדות?","min":"מעדיף להיום","max":"הייתי חוזר מיד"},{"t":"scale","q":"כמה הייתם מפחדים מהחושך כשהייתם קטנים?","min":"בכלל לא","max":"אור דלוק כל הלילה"},{"t":"scale","q":"כמה הייתם ילדים בררנים באוכל?","min":"אכלתי הכול","max":"רק מה שאני אוהב"},{"t":"scale","q":"כמה זכור לכם מהילדות?","min":"כמעט כלום","max":"זוכר כל פרט"},{"t":"mc","q":"איזה ממתק היה הכי שווה?","o":["במבה","שוקולד פרה","סוכריות על מקל","ביסלי"]},{"t":"mc","q":"מה היה המשחק הכי אהוב בחצר?","o":["תופסת","כדורגל","קלאס","מחבואים"]},{"t":"mc","q":"מה רצית להיות כשתהיה גדול?","o":["רופא או מדען","שחקן כדורגל","מורה או רב","נהג או טייס"]},{"t":"mc","q":"איזה תוכנית ילדים הכי אהבתם?","o":["קריקטורות","סרט אנימציה","סדרת הרפתקאות","שום דבר, שיחקתי בחוץ"]},{"t":"mc","q":"מה הכי היה מעצבן בתור ילד?","o":["ללכת לישון מוקדם","שיעורי בית","לאכול ירקות","לחכות בתור"]},{"t":"mc","q":"איזה חג הכי אהבתם בתור ילדים?","o":["פורים","חנוכה","פסח","סוכות"]},{"t":"rank","q":"סדרו מהכי כיף להכי פחות כיף בבית הספר","o":["הפסקה","שיעור","טיול","מבחן"]},{"t":"rank","q":"סדרו ממתקים מהכי אהוב להכי פחות","o":["שוקולד","סוכריות גומי","ופלים","מסטיק"]},{"t":"rank","q":"סדרו משחקי ילדות מהכי אהוב להכי פחות","o":["תופסת","מחבואים","גולות","קלפים"]},{"t":"rank","q":"סדרו מה היה הכי מרגש כילד","o":["חופש גדול","יום הולדת","חג","מתנה חדשה"]},{"t":"who","q":"מי מאיתנו היה ילד שובב יותר?"},{"t":"who","q":"מי מאיתנו היה יותר טוב בשיעורים?"},{"t":"who","q":"מי מאיתנו היה יותר פחדן בילדות?"},{"t":"who","q":"מי מאיתנו היה יותר מפונק כשהיה קטן?"},{"t":"ab","q":"חוגים אחר הצהריים או חופש מלא?","o":["חוגים","חופש מלא"]},{"t":"ab","q":"כריך מהבית או לקנות בקיוסק?","o":["מהבית","בקיוסק"]},{"t":"ab","q":"מורה קפדן שלומדים ממנו או מורה נחמד שכיף איתו?","o":["קפדן","נחמד"]},{"t":"ab","q":"אופניים או קורקינט?","o":["אופניים","קורקינט"]},{"t":"ab","q":"לישון אצל סבתא או לישון אצל חבר?","o":["אצל סבתא","אצל חבר"]},{"t":"ab","q":"חדר משלי או חדר משותף עם אחים?","o":["חדר משלי","חדר משותף"]},{"t":"ab","q":"ספרים או קומיקס?","o":["ספרים","קומיקס"]},{"t":"ab","q":"לבנות בלגו או לצייר?","o":["לבנות","לצייר"]},{"t":"ab","q":"סיפור לפני השינה או שיר ערש?","o":["סיפור","שיר ערש"]},{"t":"ab","q":"דמי כיס קבועים כל שבוע או לבקש כשצריך?","o":["דמי כיס קבועים","לבקש כשצריך"]},{"t":"scale","q":"כמה הייתם ילדים חסרי סבלנות?","min":"סבלנות אין סופית","max":"הכול מיד"},{"t":"scale","q":"כמה התנגדתם לשעת השינה?","min":"הולך לישון בשמחה","max":"מתנגד עד הסוף"},{"t":"scale","q":"כמה הייתם ילדים סקרנים ששואלים הכול?","min":"לא שאלתי","max":"שאלה אחרי שאלה"},{"t":"scale","q":"כמה הייתם ילדים דרמטיים?","min":"רגוע תמיד","max":"דרמה בכל דבר"},{"t":"scale","q":"כמה הייתם קשורים לצעצוע אהוב?","min":"לא התחברתי","max":"לא נפרד ממנו"},{"t":"scale","q":"כמה אהבתם להיות במרכז תשומת הלב?","min":"מעדיף צד","max":"תמיד במרכז"},{"t":"mc","q":"מה הכי אהבתם בשבת כילדים?","o":["ארוחה משפחתית","משחקים עם חברים","מנוחה בצהריים","טיול בשכונה"]},{"t":"mc","q":"איך הכי אהבתם להגיע לבית הספר?","o":["ברגל עם חברים","ברכב של ההורים","באוטובוס","באופניים"]},{"t":"mc","q":"מה הכי הלחיץ בבית הספר?","o":["מבחן","לעמוד מול הכיתה","להישאר לבד בהפסקה","להיקרא למנהל"]},{"t":"mc","q":"מה היה הכי שווה לעשות עם דמי כיס?","o":["ממתקים","קלפים או מדבקות","לחסוך בקופה","צעצוע קטן"]},{"t":"mc","q":"איזה צעצוע הכי אהבתם?","o":["לגו","בובות או דמויות","מכוניות","משחקי קופסה"]},{"t":"mc","q":"איזו ארוחה הכי אהבתם בבית?","o":["מרק עוף","שניצל ופירה","פסטה","פנקייקים"]},{"t":"rank","q":"סדרו מה הכי היה מביך בילדות","o":["ליפול מול כולם","לשכוח מילה בהצגה","שיקראו לי בשם חיבה","להגיע עם בגד לא מתאים"]},{"t":"rank","q":"סדרו מקומות מהכי כיף להכי פחות","o":["גן שעשועים","בריכה","בית של סבתא","חצר בבניין"]},{"t":"rank","q":"סדרו מה הכי עצוב בילדות","o":["שמשחק נגמר","שחבר עבר דירה","שהחופש נגמר","ששבר צעצוע"]},{"t":"rank","q":"סדרו מה הכי שמח לקבל","o":["דמי חג","ממתק מסבתא","מדבקה","חיבוק"]},{"t":"who","q":"מי מאיתנו היה יותר חולמן בכיתה?"},{"t":"who","q":"מי מאיתנו היה יותר חסכן עם דמי כיס?"},{"t":"who","q":"מי מאיתנו היה יותר אהוב על המורים?"},{"t":"who","q":"מי מאיתנו היה יותר ממציא משחקים וסיפורים?"}]},{"id":"workmoney","name":"עבודה וכסף","emoji":"💼","group":"life","audience":"all","desc":"משכורת, בוסים וחלום לא לעבוד","questions":[{"t":"ab","q":"לחסוך כל חודש או ליהנות מהכסף עכשיו?","o":["לחסוך","ליהנות"]},{"t":"ab","q":"לעבוד אצל מישהו או להיות עצמאי?","o":["שכיר","עצמאי"]},{"t":"ab","q":"עבודה שאוהבים עם משכורת קטנה או עבודה משעממת עם משכורת גדולה?","o":["אוהב וקטן","משעמם וגדול"]},{"t":"ab","q":"להתחיל מוקדם בבוקר או לסיים מאוחר בערב?","o":["מוקדם בבוקר","מאוחר בערב"]},{"t":"ab","q":"עבודה מהבית או מהמשרד?","o":["מהבית","מהמשרד"]},{"t":"ab","q":"לקנות מוצר יקר ואיכותי או שניים זולים?","o":["יקר ואיכותי","שניים זולים"]},{"t":"ab","q":"קנייה בחנות או הזמנה באינטרנט?","o":["בחנות","באינטרנט"]},{"t":"ab","q":"בוס קשוח אבל הוגן או בוס נחמד אבל מבולבל?","o":["קשוח והוגן","נחמד ומבולבל"]},{"t":"ab","q":"לבקש העלאה בשכר או לחכות שיציעו?","o":["לבקש","לחכות"]},{"t":"ab","q":"להחליף עבודה כל כמה שנים או להישאר במקום אחד?","o":["להחליף","להישאר"]},{"t":"scale","q":"כמה אתם מוציאים כסף בלי לחשוב?","min":"סופר כל אגורה","max":"בלי חשבון"},{"t":"scale","q":"כמה אתם אוהבים את העבודה שלכם?","min":"סופר ימים לשישי","max":"אוהב כל יום"},{"t":"scale","q":"כמה אתם מתעצבנים כשמשהו מתייקר?","min":"לא מבחין","max":"ממש מתעצבן"},{"t":"scale","q":"כמה אתם מתמקחים על מחיר?","min":"משלם מה שכתוב","max":"לא קונה בלי מיקוח"},{"t":"scale","q":"כמה אתם לחוצים בעבודה?","min":"רגוע לגמרי","max":"לחוץ כל הזמן"},{"t":"scale","q":"כמה אתם מרגישים שמגיע לכם יותר כסף?","min":"שבע רצון","max":"בטוח שמגיע לי יותר"},{"t":"mc","q":"מה היית עושה עם בונוס פתאומי?","o":["חוסך","קונה משהו גדול","יוצא לחופשה","נותן לצדקה"]},{"t":"mc","q":"מה הכי חשוב בעבודה?","o":["משכורת","אווירה","גמישות","קידום"]},{"t":"mc","q":"מה העבודה החלומית?","o":["בעל עסק משלי","מורה או מרצה","יוצר תוכן","עבודה בשקט בלי לחץ"]},{"t":"mc","q":"על מה הכי קשה לוותר בקניות?","o":["בגדים","נעליים","אוכל טוב","גאדג'טים"]},{"t":"mc","q":"מה הכי מעצבן בעבודה?","o":["ישיבות מיותרות","לקוחות קשים","בוס שמציק","עומס ברגע האחרון"]},{"t":"mc","q":"מתי מרגישים הכי טוב עם הכסף?","o":["כשיש חיסכון בבנק","כשקונים משהו שרצינו","כשמשלמים חובות","כשנותנים מתנה"]},{"t":"rank","q":"סדרו מה הכי שווה להוציא עליו כסף","o":["אוכל","בגדים","טיולים","גאדג'טים"]},{"t":"rank","q":"סדרו מה הכי חשוב בעבודה","o":["שכר","אווירה","שעות נוחות","קידום"]},{"t":"rank","q":"סדרו מה הכי מעצבן בעבודה","o":["ישיבות","מיילים","בוס","עומס"]},{"t":"rank","q":"סדרו איפה הכי כיף לעבוד","o":["בית","משרד","חנות","בחוץ"]},{"t":"who","q":"מי מאיתנו יותר חסכן?"},{"t":"who","q":"מי מאיתנו יותר מבזבז על דברים מיותרים?"},{"t":"who","q":"מי מאיתנו יותר שאפתן בעבודה?"},{"t":"who","q":"מי מאיתנו היה מקבל החלטה טובה יותר על השקעה?"},{"t":"ab","q":"משכורת קבועה או עמלות לפי הצלחה?","o":["משכורת קבועה","עמלות"]},{"t":"ab","q":"לשלם במזומן או בכרטיס?","o":["מזומן","כרטיס"]},{"t":"ab","q":"לקנות במבצע גם מה שלא צריך או רק מה שברשימה?","o":["גם במבצע","רק מה שברשימה"]},{"t":"ab","q":"לעבוד בצוות או לעבוד לבד?","o":["בצוות","לבד"]},{"t":"ab","q":"יום עבודה קצר עם משכורת קטנה או ארוך עם גדולה?","o":["קצר וקטן","ארוך וגדול"]},{"t":"ab","q":"לשכור דירה או לקנות ולהיות במשכנתא?","o":["לשכור","לקנות"]},{"t":"ab","q":"לחלק חשבון שווה או לפי מה שכל אחד אכל?","o":["שווה בשווה","כל אחד לפי מה שאכל"]},{"t":"ab","q":"מתנה יקרה אחת או כמה מתנות קטנות?","o":["יקרה אחת","כמה קטנות"]},{"t":"ab","q":"להתקדם מהר עם לחץ או לאט ובשקט?","o":["מהר עם לחץ","לאט ובשקט"]},{"t":"ab","q":"ללמוד מקצוע חדש בגיל מבוגר או להישאר במה שמכירים?","o":["מקצוע חדש","במה שמכיר"]},{"t":"scale","q":"כמה אתם מוכנים לעבוד שעות נוספות?","min":"בדיוק בזמן","max":"כמה שצריך"},{"t":"scale","q":"כמה אתם מסודרים בשולחן העבודה?","min":"בלגן יצירתי","max":"הכול במקום"},{"t":"scale","q":"כמה אתם חושבים שכסף משפיע על האושר?","min":"כמעט בכלל לא","max":"מאוד"},{"t":"scale","q":"כמה אתם דוחים משימות לרגע האחרון?","min":"הכול מיד","max":"הכול בדקה ה-90"},{"t":"scale","q":"כמה אתם חולמים על פנסיה מוקדמת?","min":"אוהב לעבוד","max":"סופר את הימים"},{"t":"scale","q":"כמה נעים לכם לדבר על כסף?","min":"מתבייש","max":"פתוח לגמרי"},{"t":"mc","q":"איך הכי טוב להתחיל בוקר בעבודה?","o":["קפה ושקט","שיחה עם עמיתים","רשימת משימות","ישר לעבודה"]},{"t":"mc","q":"מה הייתם עושים עם יום חופש נוסף?","o":["טיול","שינה","סידורים בבית","זמן עם משפחה וחברים"]},{"t":"mc","q":"איך הכי נוח לחסוך?","o":["הוראת קבע","קופה בבית","השקעה","בלי חיסכון קבוע"]},{"t":"mc","q":"מה הכי שווה לקבל מהמעסיק?","o":["בונוס","יום חופש נוסף","הכשרה ולימודים","רכב או נסיעות"]},{"t":"mc","q":"איזה עסק הכי הייתם פותחים?","o":["חנות","מסעדה או קפה","עסק אונליין","שירותים ויעוץ"]},{"t":"mc","q":"מה הכי מלחיץ בכסף?","o":["הוצאה גדולה פתאומית","הלוואה","חוב","שלא יספיק לסוף חודש"]},{"t":"rank","q":"סדרו מה הכי נעים לעשות בהפסקה בעבודה","o":["קפה","לצאת לאוויר","לדבר עם חבר","לאכול"]},{"t":"rank","q":"סדרו במה הכי שווה לחסוך","o":["דירה","חופשה","רכב","רשת ביטחון"]},{"t":"rank","q":"סדרו תכונות של בוס טוב","o":["הוגן","מעודד","מסודר","נותן חופש"]},{"t":"rank","q":"סדרו מה הכי מעצבן בקניות","o":["תור לקופה","מחיר שמשתנה","משלוח שמתעכב","מידה שחסרה"]},{"t":"who","q":"מי מאיתנו יותר מחפש מבצעים לפני שקונה?"},{"t":"who","q":"מי מאיתנו יותר מתקשה להגיד לא בעבודה?"},{"t":"who","q":"מי מאיתנו יותר מתאים להיות בוס?"},{"t":"who","q":"מי מאיתנו יותר שוכח לאן הלך הכסף בסוף חודש?"}]},{"id":"tech","name":"טכנולוגיה ורשתות","emoji":"📱","group":"fun","audience":"all","desc":"מסכים, התראות ובינה מלאכותית","questions":[{"t":"ab","q":"הודעה קולית או הודעת טקסט?","o":["קולית","טקסט"]},{"t":"ab","q":"לענות מיד להודעה או לחכות קצת?","o":["מיד","לחכות"]},{"t":"ab","q":"שיחת טלפון או הודעה בוואטסאפ?","o":["שיחה","הודעה"]},{"t":"ab","q":"טלפון תמיד על שקט או תמיד עם צלצול?","o":["על שקט","עם צלצול"]},{"t":"ab","q":"להשאיר טלפון בבית ליום שלם או להישאר בלי ארנק?","o":["בלי טלפון","בלי ארנק"]},{"t":"ab","q":"אפליקציה לכל דבר או לעשות הכול בדרך הישנה?","o":["אפליקציה לכל","דרך ישנה"]},{"t":"ab","q":"צילום תמונות על כל דבר או ליהנות מהרגע בלי מצלמה?","o":["מצלם הכול","נהנה בלי מצלמה"]},{"t":"ab","q":"סטטוס שמח לכולם או להישאר פרטי?","o":["מעלה סטטוס","פרטי"]},{"t":"ab","q":"להיות בקבוצת וואטסאפ גדולה או לא להיות בכלל?","o":["בקבוצות","בלי קבוצות"]},{"t":"ab","q":"שואלים בינה מלאכותית או מחפשים בגוגל?","o":["בינה מלאכותית","גוגל"]},{"t":"scale","q":"כמה זמן אתם מול הטלפון ביום?","min":"כמעט לא","max":"כל הזמן"},{"t":"scale","q":"כמה אתם מאבדים שליטה כשהסוללה נגמרת?","min":"רגוע לגמרי","max":"פאניקה מוחלטת"},{"t":"scale","q":"כמה התראות כבויות אצלכם?","min":"הכול דולק","max":"הכול כבוי"},{"t":"scale","q":"כמה אתם סומכים על בינה מלאכותית?","min":"בכלל לא","max":"סומך על הכול"},{"t":"scale","q":"כמה אתם מתעצבנים כשהאינטרנט איטי?","min":"מחכה בסבלנות","max":"מתפוצץ"},{"t":"scale","q":"כמה אתם אוהבים לנסות גאדג'טים חדשים?","min":"נשאר עם הישן","max":"הראשון לנסות"},{"t":"mc","q":"איזו אפליקציה הכי קשה לוותר עליה?","o":["וואטסאפ","מפות וניווט","יוטיוב","מצלמה"]},{"t":"mc","q":"מה עושים כשמשעמם בתור?","o":["גוללים בטלפון","מדברים עם מישהו","מסתכלים סביב","שומעים מוזיקה"]},{"t":"mc","q":"מה הכי מעצבן בטלפון?","o":["מקום מלא בזיכרון","סוללה חלשה","התראות מיותרות","מסך סדוק"]},{"t":"mc","q":"במה הכי שימושי להשתמש בבינה מלאכותית?","o":["כתיבה","רעיונות","תרגום","מידע מהיר"]},{"t":"mc","q":"מתי הכי משתמשים בטלפון?","o":["בבוקר","בצהריים","בערב","לפני השינה"]},{"t":"mc","q":"איזו תמונה הכי מצלמים?","o":["אוכל","משפחה","נוף","צילומי מסך"]},{"t":"rank","q":"סדרו אפליקציות מהכי נחוצה להכי פחות","o":["וואטסאפ","מצלמה","מפות","יוטיוב"]},{"t":"rank","q":"סדרו מה הכי מעצבן בטכנולוגיה","o":["סוללה נגמרת","אינטרנט איטי","התראות","מסך נעול"]},{"t":"rank","q":"סדרו מה הכי קשה לחיות בלעדיו","o":["טלפון","מחשב","אוזניות","מטען"]},{"t":"rank","q":"סדרו איפה מבלים הכי הרבה זמן במסך","o":["וואטסאפ","יוטיוב","גלישה","משחקים"]},{"t":"who","q":"מי מאיתנו יותר שקוע בטלפון?"},{"t":"who","q":"מי מאיתנו עונה יותר לאט להודעות?"},{"t":"who","q":"מי מאיתנו יותר שולח הודעות קוליות ארוכות?"},{"t":"who","q":"מי מאיתנו יותר מבין בטכנולוגיה?"},{"t":"ab","q":"מצב כהה או מצב בהיר?","o":["מצב כהה","מצב בהיר"]},{"t":"ab","q":"מסך גדול או טלפון קטן ונוח?","o":["מסך גדול","טלפון קטן"]},{"t":"ab","q":"לצלם סלפי או לצלם נוף?","o":["סלפי","נוף"]},{"t":"ab","q":"אימוג'ים בהודעות או רק מילים?","o":["אימוג'ים","רק מילים"]},{"t":"ab","q":"לעדכן גרסה מיד או לדחות בלי סוף?","o":["מיד","לדחות"]},{"t":"ab","q":"אוזניות חוטיות או אלחוטיות?","o":["חוטיות","אלחוטיות"]},{"t":"ab","q":"ספר נייר או קריאה במסך?","o":["ספר נייר","קריאה במסך"]},{"t":"ab","q":"שיחת וידאו או שיחה רגילה?","o":["וידאו","שיחה רגילה"]},{"t":"ab","q":"למחוק תמונות ישנות או לשמור הכול לנצח?","o":["למחוק","לשמור הכול"]},{"t":"ab","q":"תשלום באפליקציה או ארנק עם כרטיסים?","o":["באפליקציה","ארנק"]},{"t":"scale","q":"כמה אתם מסודרים בגלריה של הטלפון?","min":"בלגן מוחלט","max":"הכול מסודר"},{"t":"scale","q":"כמה אתם זוכרים סיסמאות בלי לשכוח?","min":"תמיד שוכח","max":"זוכר הכול"},{"t":"scale","q":"כמה אתם קוראים הודעות ארוכות עד הסוף?","min":"קורא רק את ההתחלה","max":"כל מילה"},{"t":"scale","q":"כמה אתם מוטרדים מפרטיות באינטרנט?","min":"לא מעניין","max":"מוטרד מאוד"},{"t":"scale","q":"כמה אתם מתעצבנים כשלא עונים לכם להודעה?","min":"רגוע","max":"נשרף מכעס"},{"t":"scale","q":"כמה אתם בטוחים שתתקנו תקלה במחשב לבד?","min":"מיד מתקשר למישהו","max":"מתקן הכול"},{"t":"mc","q":"איזו מתנה טכנולוגית הכי משמחת?","o":["אוזניות","שעון חכם","רמקול","מטען נייד"]},{"t":"mc","q":"מה גורם לכם להחליף טלפון?","o":["סוללה גוססת","מסך שבור","מצלמה טובה יותר","מבצע"]},{"t":"mc","q":"איפה שומרים סיסמאות?","o":["בראש","במחברת","בנייד","אותה סיסמה לכל דבר"]},{"t":"mc","q":"איזו קבוצת וואטסאפ הכי עמוסה?","o":["משפחה","עבודה","חברים","שכונה או בניין"]},{"t":"mc","q":"מה עושים כשהטלפון נתקע?","o":["מכבים ומדליקים","מחכים בסבלנות","מתקשרים למומחה","קונים חדש"]},{"t":"mc","q":"איזו טכנולוגיה הכי תשנה את העתיד?","o":["רכב אוטונומי","רובוט בבית","תרגום בזמן אמת","רפואה מתקדמת"]},{"t":"rank","q":"סדרו מה הכי מעצבן בהודעות","o":["אין תשובה","הודעות קוליות ארוכות","וי כחול בלי מענה","הודעות בשעה מאוחרת"]},{"t":"rank","q":"סדרו מה הכי מחפשים בגוגל","o":["מתכונים","מזג אוויר","חדשות","מידע על מוצר"]},{"t":"rank","q":"סדרו איפה הכי מעצבן לראות מישהו בטלפון","o":["ארוחה משפחתית","תפילה","פגישה","הצגה"]},{"t":"rank","q":"סדרו מה הכי שווה לשדרג בטלפון","o":["מצלמה","סוללה","מסך","מהירות"]},{"t":"who","q":"מי מאיתנו יותר שוכח סיסמאות?"},{"t":"who","q":"מי מאיתנו יותר נשאר בלי סוללה?"},{"t":"who","q":"מי מאיתנו יותר שולח סרטונים מצחיקים?"},{"t":"who","q":"מי מאיתנו יותר מתעלם מקבוצות וואטסאפ?"}]},{"id":"home","name":"החיים בבית","emoji":"🏠","group":"life","audience":"all","desc":"מי שוטף כלים ומי רק מבטיח","questions":[{"t":"ab","q":"לשטוף כלים מיד אחרי האוכל או להשאיר לבוקר?","o":["מיד","לבוקר"]},{"t":"ab","q":"בית מסודר להפליא או בית חמים ומרוהט בכיף?","o":["מסודר להפליא","חמים ולא מושלם"]},{"t":"ab","q":"לארח אצלנו או להתארח אצל אחרים?","o":["לארח","להתארח"]},{"t":"ab","q":"לנקות בבת אחת ביום אחד או קצת בכל יום?","o":["הכול ביום אחד","קצת כל יום"]},{"t":"ab","q":"ספה גדולה ורכה או שולחן אוכל ענק?","o":["ספה","שולחן"]},{"t":"ab","q":"לבשל מתכון חדש או להכין את המנה הקבועה?","o":["מתכון חדש","המנה הקבועה"]},{"t":"ab","q":"תאורה לבנה וחזקה או צהובה ונעימה?","o":["לבנה וחזקה","צהובה ונעימה"]},{"t":"ab","q":"לצבוע קירות בצבע נועז או להישאר בלבן?","o":["צבע נועז","לבן"]},{"t":"ab","q":"לקנות רהיט חדש או לחפש יד שנייה במצב מעולה?","o":["חדש","יד שנייה"]},{"t":"ab","q":"לדבר עם השכנים במדרגות או להספיק לחייך ולברוח?","o":["שיחה","חיוך וביי"]},{"t":"scale","q":"כמה חשוב לך שהמיטה תהיה מוצעת כל בוקר?","min":"בכלל לא","max":"חובה מוחלטת"},{"t":"scale","q":"כמה בלגן בבית אפשר לסבול?","min":"אפס","max":"חי בשמחה בתוכו"},{"t":"scale","q":"כמה כיף לארח?","min":"מעדיפים שקט","max":"הדלת תמיד פתוחה"},{"t":"scale","q":"כמה מרגש לקנות כלי בית חדשים?","min":"סתם כלים","max":"שמחה אמיתית"},{"t":"scale","q":"כמה אפשר לסמוך עליך לתקן דברים בבית?","min":"מזמין/ה בעל מקצוע","max":"ארגז כלים בכל חדר"},{"t":"scale","q":"כמה אכפת לך מה השכנים חושבים על הבית?","min":"בכלל לא","max":"מנקה לפני כל ביקור"},{"t":"mc","q":"איזו מטלה בבית הכי מעצבנת?","o":["כביסה וקיפול","שטיפת כלים","שאיבת אבק","לסדר את הארונות"]},{"t":"mc","q":"איפה בבית הכי כיף להיות?","o":["הספה בסלון","המטבח","המיטה","המרפסת"]},{"t":"mc","q":"מה הכי חשוב כשמארחים?","o":["אוכל מעולה","בית נקי","אווירה טובה","קינוח מרשים"]},{"t":"mc","q":"מה עושים כשהבית מתחיל להיות בלגן?","o":["מסדרים מיד","מחכים לסופ\"ש","מעמידים פנים שלא רואים","מזמינים עזרה"]},{"t":"mc","q":"איזה חדר הכי כדאי להשקיע בו בעיצוב?","o":["סלון","מטבח","חדר שינה","כניסה"]},{"t":"mc","q":"מה הצליל הכי מרגיע בבית?","o":["קומקום רותח","גשם בחלון","מכונת כביסה מסיימת","שקט מוחלט"]},{"t":"rank","q":"סדרו מהמטלה הכי פחות מעצבנת להכי מעצבנת","o":["שטיפת כלים","כביסה","ניקוי רצפה","הוצאת זבל"]},{"t":"rank","q":"סדרו מהדבר החשוב ביותר בבית ועד הפחות חשוב","o":["ניקיון","סדר","עיצוב יפה","נוחות"]},{"t":"rank","q":"סדרו את החדרים מהאהוב ביותר לפחות אהוב","o":["סלון","מטבח","חדר שינה","מרפסת"]},{"t":"rank","q":"סדרו מהכי כיף להכי פחות לקנות לבית","o":["כלי מטבח","כריות וכיסויים","מנורה","שטיח"]},{"t":"who","q":"מי מאיתנו יותר משאיר דברים לא במקומם?"},{"t":"who","q":"מי מאיתנו מסדר את הבית ביותר דקדקנות?"},{"t":"who","q":"מי מאיתנו יותר נוטה להזמין אורחים בלי להתריע?"},{"t":"who","q":"מי מאיתנו מוצא תמיד תירוץ לא להוציא את הזבל?"},{"t":"ab","q":"מקלחת בבוקר או בערב?","o":["בבוקר","בערב"]},{"t":"ab","q":"חלונות פתוחים או מזגן?","o":["חלונות פתוחים","מזגן"]},{"t":"ab","q":"שטיח בכל חדר או רצפה חשופה?","o":["שטיחים","רצפה חשופה"]},{"t":"ab","q":"ארון מסודר לפי צבעים או לפי סוגים?","o":["לפי צבעים","לפי סוגים"]},{"t":"ab","q":"מרפסת עם צמחים או מרפסת עם פינת ישיבה?","o":["צמחים","פינת ישיבה"]},{"t":"ab","q":"טלוויזיה גדולה בסלון או סלון בלי מסך בכלל?","o":["טלוויזיה","בלי מסך"]},{"t":"ab","q":"בית פרטי עם גינה או דירה בקומה גבוהה?","o":["בית עם גינה","דירה גבוהה"]},{"t":"ab","q":"מטבח פתוח לסלון או מטבח סגור?","o":["פתוח","סגור"]},{"t":"ab","q":"לתלות כביסה בשמש או להשתמש במייבש?","o":["בשמש","מייבש"]},{"t":"ab","q":"לקום מוקדם ולהנות משקט בבית או להישאר במיטה עד הרגע האחרון?","o":["לקום מוקדם","להישאר במיטה"]},{"t":"scale","q":"כמה אתם אוהבים צמחים בבית?","min":"הכול מתייבש אצלי","max":"ג'ונגל אמיתי"},{"t":"scale","q":"כמה חשוב שהבית יריח טוב?","min":"לא שם לב","max":"חייב ריח נעים כל הזמן"},{"t":"scale","q":"כמה קר צריך להיות בבית בחורף לפני שמדליקים חימום?","min":"מדליק מיד","max":"סובל עם שלוש שכבות"},{"t":"scale","q":"כמה אתם נהנים לקשט את הבית לקראת חגים?","min":"מינימום","max":"כל פינה מקושטת"},{"t":"scale","q":"כמה קשה לכם לזרוק דברים ישנים?","min":"זורק בקלות","max":"שומר הכול ליתר ביטחון"},{"t":"scale","q":"כמה רעש מותר לעשות בבית בערב?","min":"שקט מוחלט","max":"מוזיקה והמולה"},{"t":"mc","q":"מה הכי חשוב בדירה חדשה?","o":["מטבח גדול","מרפסת","מיקום טוב","שקט"]},{"t":"mc","q":"איפה נמצאים המפתחות בדרך כלל?","o":["במקום קבוע","בכיס של המעיל","על השולחן","מחפשים כל בוקר"]},{"t":"mc","q":"מה מציל ערב ביתי?","o":["סרט","משחק קופסה","תה ושיחה","מאפה חם"]},{"t":"mc","q":"איזה פינוק קטן הכי משדרג את הבית?","o":["נר ריחני","פרחים","כרית חדשה","מפיות יפות"]},{"t":"mc","q":"מה הכי מעצבן במטבח?","o":["כלים בכיור","מגירה תקועה","פח מלא","כיור סתום"]},{"t":"mc","q":"איזה שכן הכי קשה לחיות לידו?","o":["רעשן","סקרן","חונה במקום שלך","משאיל ולא מחזיר"]},{"t":"rank","q":"סדרו מהכי נעים להכי פחות אחרי יום ארוך","o":["מקלחת חמה","ספה","ארוחה חמה","שקט מוחלט"]},{"t":"rank","q":"סדרו מהמכשיר הכי שימושי בבית להכי פחות","o":["מדיח כלים","מייבש כביסה","שואב רובוטי","מיקרוגל"]},{"t":"rank","q":"סדרו מהריח הכי אהוב בבית להכי פחות","o":["קפה","אפייה","כביסה נקייה","פרחים"]},{"t":"rank","q":"סדרו מהמטלה הכי כיפית לעשות ביחד להכי פחות","o":["בישול","קניות","סידור","קישוט"]},{"t":"who","q":"מי מאיתנו מחפש יותר את הטלפון בתוך הבית?"},{"t":"who","q":"מי מאיתנו קר לו יותר בבית?"},{"t":"who","q":"מי מאיתנו היה קונה עוד כרית דקורטיבית בלי לחשוב פעמיים?"},{"t":"who","q":"מי מאיתנו מתעורר ראשון בבית?"}]},{"id":"holidays","name":"חגים ומסורות","emoji":"🕎","group":"life","audience":"all","desc":"מצה, סופגניות וכל מה שביניהם","questions":[{"t":"ab","q":"סופגנייה עם ריבה או עם קרם?","o":["ריבה","קרם"]},{"t":"ab","q":"סוכה מקושטת בהידורים או פשוטה וחמימה?","o":["מקושטת","פשוטה וחמימה"]},{"t":"ab","q":"חנוכה או פורים?","o":["חנוכה","פורים"]},{"t":"ab","q":"סדר פסח ארוך ומפורט או קצר וקליל?","o":["ארוך ומפורט","קצר וקליל"]},{"t":"ab","q":"לביבות או סופגניות?","o":["לביבות","סופגניות"]},{"t":"ab","q":"ארוחת חג אצלנו או אצל ההורים?","o":["אצלנו","אצל ההורים"]},{"t":"ab","q":"תחפושת מושקעת או אחת מהירה מהארון?","o":["מושקעת","מהירה"]},{"t":"ab","q":"חלה ביתית או חלה מהמאפייה?","o":["ביתית","מהמאפייה"]},{"t":"ab","q":"לשחק בסביבון או להדליק נרות?","o":["סביבון","להדליק נרות"]},{"t":"ab","q":"שבת עם אורחים או שבת משפחתית שקטה?","o":["עם אורחים","שקטה"]},{"t":"scale","q":"כמה אתם אוהבים את ההכנות לפסח?","min":"סיוט","max":"חלק מהכיף"},{"t":"scale","q":"כמה חשוב לשמור על מנהגי המשפחה בדיוק כמו פעם?","min":"גמישים","max":"בלי שינויים"},{"t":"scale","q":"כמה קשה להישאר ער אחרי ארוחת ליל הסדר?","min":"קל","max":"נרדם על הכיסא"},{"t":"scale","q":"כמה מרגש לשמוע תקיעת שופר?","min":"נעים","max":"צמרמורת"},{"t":"scale","q":"כמה אתם נהנים מקריאת המגילה?","min":"מחכים שייגמר","max":"כל מילה בשמחה"},{"t":"scale","q":"כמה חשוב משלוחי מנות מושקעים?","min":"סמלי","max":"אמנות שלמה"},{"t":"mc","q":"מה הכי טעים בארוחת ליל שבת?","o":["החלה","הדגים","המרק","הקוגל"]},{"t":"mc","q":"איזה חג הכי אהוב?","o":["פסח","סוכות","חנוכה","פורים"]},{"t":"mc","q":"איזה סימן הכי מתאים לראש השנה?","o":["תפוח בדבש","רימון","ראש דג","תמרים"]},{"t":"mc","q":"מה הכי מחכים לו בפורים?","o":["משלוחי מנות","הסעודה","התחפושות","המגילה"]},{"t":"mc","q":"מה הזיכרון הכי חזק מילדות בחג?","o":["ריח המטבח","השירים","הבגדים החדשים","המשחקים עם הילדים"]},{"t":"mc","q":"מה הכי חשוב בסעודת חג?","o":["האוכל","האנשים","השירים","הדברי תורה"]},{"t":"rank","q":"סדרו מהחג האהוב ביותר לפחות אהוב","o":["פסח","סוכות","חנוכה","פורים"]},{"t":"rank","q":"סדרו את המאכלים מהכי טעים להכי פחות","o":["צ'ולנט","קוגל","גפילטע פיש","קובה"]},{"t":"rank","q":"סדרו מהמשימה הכי כיפית להכי פחות לפני חג","o":["בישולים","ניקיונות","קניות","סידור השולחן"]},{"t":"rank","q":"סדרו מהמתנה הכי שווה בחג להכי פחות","o":["דמי חנוכה","מתנות פורים","בגדי חג","ספר חדש"]},{"t":"who","q":"מי מאיתנו יותר מתלהב מההכנות לחג?"},{"t":"who","q":"מי מאיתנו יזכור יותר מנהגים של הסבתא?"},{"t":"who","q":"מי מאיתנו יאכל יותר סופגניות בחנוכה?"},{"t":"who","q":"מי מאיתנו ישנה יותר באמצע הסעודה?"},{"t":"ab","q":"מצה עם חמאה או מצה עם שוקולד?","o":["חמאה","שוקולד"]},{"t":"ab","q":"לבנות סוכה בעצמנו או לקנות סוכה מוכנה?","o":["לבנות בעצמנו","מוכנה"]},{"t":"ab","q":"חנוכייה מכסף מהודר או חנוכיית ילדים מפלסטלינה?","o":["כסף מהודר","פלסטלינה"]},{"t":"ab","q":"ארוחת חג עם המון אורחים או משפחה מצומצמת?","o":["המון אורחים","משפחה מצומצמת"]},{"t":"ab","q":"זמירות סביב השולחן או שיחה נעימה בשקט?","o":["זמירות","שיחה בשקט"]},{"t":"ab","q":"בלינצס או עוגת גבינה בשבועות?","o":["בלינצס","עוגת גבינה"]},{"t":"ab","q":"ל\"ג בעומר: מדורה גדולה או טיול משפחתי?","o":["מדורה","טיול"]},{"t":"ab","q":"תחפושת משפחתית אחידה או כל אחד מתחפש לבד?","o":["אחידה","כל אחד לבד"]},{"t":"ab","q":"חול המועד בטיול בצפון או בבית עם משחקים?","o":["טיול בצפון","בבית"]},{"t":"ab","q":"עוגת דבש או עוגת תפוחים בראש השנה?","o":["עוגת דבש","עוגת תפוחים"]},{"t":"scale","q":"כמה אתם אוהבים לשיר בשולחן החג?","min":"מעדיפים להקשיב","max":"שרים עד הבוקר"},{"t":"scale","q":"כמה קל לכם לצום ביום כיפור?","min":"קשה מאוד","max":"עובר בקלות"},{"t":"scale","q":"כמה מרגש להדליק נרות חנוכה?","min":"נעים","max":"צמרמורת בכל פעם"},{"t":"scale","q":"כמה אתם אוהבים לבנות ולקשט סוכה?","min":"עבודה מיותרת","max":"החלק הכי טוב בחג"},{"t":"scale","q":"כמה קשה לוותר על לחם בפסח?","min":"קל","max":"מתגעגעים כל יום"},{"t":"scale","q":"כמה אתם מתרגשים מבגדי חג חדשים?","min":"אותו דבר","max":"כמו ילדים"},{"t":"mc","q":"מה הכי מזכיר את סוכות?","o":["הסכך","האתרוג והלולב","ארוחות בסוכה","הקישוטים"]},{"t":"mc","q":"מה הכי טעים בליל הסדר?","o":["מרק עוף עם קניידלך","חרוסת","קציצות","עוגת אגוזים"]},{"t":"mc","q":"מה הכי כיף בשבועות?","o":["מאכלי חלב","ליל לימוד","פרחים בבית","העוגות"]},{"t":"mc","q":"מה הכי מרגש בליל הסדר?","o":["מה נשתנה","האפיקומן","פתיחת הדלת לאליהו","השירים בסוף"]},{"t":"mc","q":"איזה מנהג משפחתי הכי אהוב?","o":["שיר קבוע","מתכון משפחתי","מקום קבוע בשולחן","ברכת ההורים"]},{"t":"mc","q":"מה הכי נעים בערב יום כיפור?","o":["הברכות","הנרות","הלבוש הלבן","השקט ברחוב"]},{"t":"rank","q":"סדרו את הקינוחים מהכי טעים להכי פחות","o":["עוגת דבש","סופגניות","עוגת גבינה","אוזני המן"]},{"t":"rank","q":"סדרו מהחג הכי מרגש להכי פחות","o":["ראש השנה","יום כיפור","שבועות","ל\"ג בעומר"]},{"t":"rank","q":"סדרו מהכי כיף להכי פחות בסוכות","o":["לישון בסוכה","לאכול בסוכה","לקשט","ארבעת המינים"]},{"t":"rank","q":"סדרו מהחלק האהוב בשבת להכי פחות","o":["ליל שבת","שינת צהריים","סעודת שבת","מוצאי שבת"]},{"t":"who","q":"מי מאיתנו יותר מתעקש על הנוסח המשפחתי?"},{"t":"who","q":"מי מאיתנו שר יותר חזק בזמירות?"},{"t":"who","q":"מי מאיתנו היה מחכה יותר לדמי חנוכה כילד?"},{"t":"who","q":"מי מאיתנו שוכח אנשים ברשימת משלוחי מנות?"}]},{"id":"wyr","name":"מה הייתם מעדיפים?","emoji":"🤔","group":"fun","audience":"all","desc":"דילמות קשות, בחירות מצחיקות","questions":[{"t":"ab","q":"להיות תמיד שעה מוקדם מדי או תמיד חמש דקות באיחור?","o":["שעה מוקדם","חמש דקות באיחור"]},{"t":"ab","q":"לאכול רק פיצה כל החיים או רק פלאפל?","o":["רק פיצה","רק פלאפל"]},{"t":"ab","q":"לדעת לדבר עם כל חיה או לדעת כל שפה בעולם?","o":["עם חיות","כל שפה"]},{"t":"ab","q":"לעוף כמו ציפור או לנשום מתחת למים?","o":["לעוף","לנשום במים"]},{"t":"ab","q":"לגור בבית עץ ביער או בדירה בראש מגדל?","o":["בית עץ","מגדל"]},{"t":"ab","q":"לקבל מיליון שקל עכשיו או שקל שמכפיל את עצמו כל יום במשך חודש?","o":["מיליון עכשיו","להכפיל כל יום"]},{"t":"ab","q":"שהטלפון ייעלם לשבוע או שהנעלים הכי אהובות ייעלמו לתמיד?","o":["הטלפון לשבוע","הנעליים לתמיד"]},{"t":"ab","q":"לחיות בלי סוכר או בלי מלח?","o":["בלי סוכר","בלי מלח"]},{"t":"ab","q":"לחזור לילדות עם הידע של היום או לקפוץ קדימה לעתיד?","o":["לילדות","לעתיד"]},{"t":"ab","q":"לנסוע בחופשה שלמה באוטובוס או בחופשה שלמה בטיולי רגל?","o":["אוטובוס","רגל"]},{"t":"scale","q":"כמה הייתם מוכנים לוותר על הטלפון בשביל מיליון שקל?","min":"אף פעם","max":"מיד, תנו את הכסף"},{"t":"scale","q":"כמה קשה לבחור כשכל האפשרויות נהדרות?","min":"בוחרים מהר","max":"נתקעים לשעות"},{"t":"scale","q":"כמה הייתם אמיצים לקפוץ מצנח אם היה בחינם?","min":"לא זז","max":"כבר מחכה במטוס"},{"t":"scale","q":"כמה הייתם רוצים לדעת מה יקרה בעתיד?","min":"עדיף הפתעה","max":"רוצה הכול"},{"t":"scale","q":"כמה הייתם נהנים לגור שנה בחו\"ל?","min":"בית זה בית","max":"מארזים מחר"},{"t":"scale","q":"כמה יהיה קשה לא לדבר יום שלם?","min":"קל","max":"בלתי אפשרי"},{"t":"mc","q":"איזה כוח על הכי שווה?","o":["שקיפות","טלפורטציה","קריאת מחשבות","עצירת זמן"]},{"t":"mc","q":"איפה הייתם בוחרים לגור למשך שנה?","o":["הרים","חוף ים","עיר גדולה","כפר שקט"]},{"t":"mc","q":"מה הייתם מעדיפים לקבל?","o":["יום חופש נוסף כל שבוע","משכורת כפולה","בית חלומות","חופשה בלי הגבלה"]},{"t":"mc","q":"איזה אוכל תמיד יהיה מחכה לכם בבית?","o":["שניצל","פסטה","שווארמה","מרק חם"]},{"t":"mc","q":"מה הייתם הופכים לחדר שלם בבית?","o":["קולנוע ביתי","ספרייה","חדר משחקים","מטבח ענק"]},{"t":"mc","q":"אילו חיים הייתם בוחרים לשבוע?","o":["שף מפורסם","שחקן כדורגל","מדען","מטייל בעולם"]},{"t":"rank","q":"סדרו מהכי רוצים להכי פחות רוצים","o":["לעוף","להיות בלתי נראים","לקרוא מחשבות","לעצור זמן"]},{"t":"rank","q":"סדרו מהמזל הכי גדול להכי קטן","o":["זכייה בפיס","מציאת ארנק מלא","קידום ענק","בית חדש חינם"]},{"t":"rank","q":"סדרו מהדבר שהכי קשה לוותר עליו","o":["אינטרנט","כסף","שינה טובה","אוכל טעים"]},{"t":"rank","q":"סדרו מהכי משעשע להכי פחות כשזה קורה בטעות","o":["שכחתם את השם של מישהו","שפכתם משקה","התקשרתם למי שלא התכוונתם","נתקעתם במעלית"]},{"t":"who","q":"מי מאיתנו היה בוחר להיות בלתי נראה?"},{"t":"who","q":"מי מאיתנו היה מתקשה יותר לבחור בדילמה הזאת?"},{"t":"who","q":"מי מאיתנו היה בוחר את הסכום הגדול ולא מתחרט?"},{"t":"who","q":"מי מאיתנו היה מסכים לאכול הכול רק בשביל האתגר?"},{"t":"ab","q":"להיות הכי חכם בחדר או הכי מצחיק בחדר?","o":["הכי חכם","הכי מצחיק"]},{"t":"ab","q":"לאבד את חוש הטעם או את חוש הריח?","o":["טעם","ריח"]},{"t":"ab","q":"לחיות בלי מקרר או בלי מכונת כביסה?","o":["בלי מקרר","בלי מכונת כביסה"]},{"t":"ab","q":"להיות מפורסם בכל העולם או עשיר בסתר?","o":["מפורסם","עשיר בסתר"]},{"t":"ab","q":"לצחוק בכל פעם שאתם נלחצים או לבכות בכל פעם שאתם שמחים?","o":["לצחוק מלחץ","לבכות משמחה"]},{"t":"ab","q":"ללכת אחורה כל היום או לדבר בחרוזים כל היום?","o":["ללכת אחורה","לדבר בחרוזים"]},{"t":"ab","q":"שנה של טיול מסביב לעולם או בית חלומות לתמיד?","o":["טיול שנתי","בית חלומות"]},{"t":"ab","q":"לשכוח תמיד איפה הנחתם דברים או לשכוח תמיד שמות של אנשים?","o":["איפה הנחתי","שמות"]},{"t":"ab","q":"לחיות בעבר בלי טכנולוגיה או בעתיד עם רובוט לכל מטלה?","o":["בעבר","בעתיד"]},{"t":"ab","q":"לדעת תמיד מה השעה או לדעת תמיד מה מזג האוויר?","o":["השעה","מזג האוויר"]},{"t":"scale","q":"כמה הייתם מוכנים לאכול משהו מוזר בשביל מאה שקל?","min":"בחיים לא","max":"תנו כפית"},{"t":"scale","q":"כמה הייתם רוצים לחיות מאה ועשרים שנה?","min":"מספיק פחות","max":"כמה שאפשר"},{"t":"scale","q":"כמה הייתם מסוגלים לשיר מול קהל גדול?","min":"נעלם מהחדר","max":"כבר על הבמה"},{"t":"scale","q":"כמה הייתם רוצים להיות מפורסמים?","min":"פרטיות קודם","max":"שיכירו אותי בכל מקום"},{"t":"scale","q":"כמה הייתם מסוגלים לשמור סוד ענק בלי לספר?","min":"מתפוצץ אחרי דקה","max":"כספת"},{"t":"scale","q":"כמה הייתם נהנים מיום בלי שום תוכניות?","min":"לחוץ בלי תוכנית","max":"חלום"},{"t":"mc","q":"איזו חיה הייתם רוצים להיות ליום אחד?","o":["אריה","דולפין","נשר","חתול"]},{"t":"mc","q":"איזה כישרון הייתם רוצים לקבל בן רגע?","o":["נגינה בכל כלי","ציור מדהים","קול זהב","בישול של שף"]},{"t":"mc","q":"לאיזו תקופה הייתם מבקרים?","o":["ימי התנ\"ך","ימי הביניים","העתיד הרחוק","שנות השמונים"]},{"t":"mc","q":"מה הייתם לוקחים לאי בודד?","o":["ספרים","גיטרה","סכין שווייצרי","סירה"]},{"t":"mc","q":"מה הייתם עושים ביום אחד בלי שום השלכות?","o":["אוכלים הכול","ישנים כל היום","קונים כל מה שרוצים","נוסעים רחוק"]},{"t":"mc","q":"איזה רובוט ביתי הייתם רוצים?","o":["מבשל","מנקה","מקפל כביסה","נהג אישי"]},{"t":"rank","q":"סדרו מהכי נורא להכי פחות בחופשה","o":["מזוודה שאבדה","טיסה שבוטלה","גשם כל השבוע","מלון עם תקלות"]},{"t":"rank","q":"סדרו מהכי כיף לקבל להכי פחות","o":["חופשה","טלפון חדש","שנת אוכל חינם","יום חופש"]},{"t":"rank","q":"סדרו מהמקום שהכי הייתם רוצים לגור בו","o":["פריז","ניו יורק","הרי שווייץ","אי טרופי"]},{"t":"rank","q":"סדרו מהכי מעצבן להכי פחות כשמחכים","o":["תור ארוך","פקק","המתנה טלפונית","אינטרנט איטי"]},{"t":"who","q":"מי מאיתנו היה שורד יותר זמן על אי בודד?"},{"t":"who","q":"מי מאיתנו היה מנצח באתגר שתיקה של שעה?"},{"t":"who","q":"מי מאיתנו היה מסכים להופיע בטלוויזיה?"},{"t":"who","q":"מי מאיתנו היה מתכנן יותר מהר מה לעשות עם מיליון שקל?"}],"isNew":true},{"id":"bff","name":"חברים הכי טובים","emoji":"👯","group":"fun","audience":"friends","desc":"נאמנות, איחורים וסודות משותפים","questions":[{"t":"ab","q":"לצאת לטיול ספונטני או לתכנן הכול חודש מראש?","o":["ספונטני","מתכננים"]},{"t":"ab","q":"חבר שתמיד מאחר אבל מצחיק או חבר שמגיע בזמן ושקט?","o":["מאחר ומצחיק","בזמן ושקט"]},{"t":"ab","q":"להגיד לחבר את האמת המרה או להעדיף שקט נעים?","o":["אמת מרה","שקט נעים"]},{"t":"ab","q":"לבלות בקבוצה גדולה או רק שנינו?","o":["קבוצה גדולה","רק שנינו"]},{"t":"ab","q":"הודעה קולית או הודעת טקסט?","o":["קולית","טקסט"]},{"t":"ab","q":"לשמור סוד של חבר גם כשזה קשה או להתייעץ עם מישהו אחד?","o":["שומרים לגמרי","מתייעצים"]},{"t":"ab","q":"לעזור לחבר באמצע הלילה או לעזור בכל יום בשעות סבירות?","o":["באמצע הלילה","בשעות סבירות"]},{"t":"ab","q":"לתת מתנה יקרה או מתנה מרגשת וזולה?","o":["יקרה","מרגשת וזולה"]},{"t":"ab","q":"לצחוק על עצמך עם חברים או לשמור על כבוד?","o":["לצחוק על עצמי","לשמור על כבוד"]},{"t":"ab","q":"טיול שנתי עם החברים או שבת שקטה בבית?","o":["טיול","שבת שקטה"]},{"t":"scale","q":"כמה זה בסדר לאחר לפגישה עם חברים?","min":"חמש דקות הן יותר מדי","max":"זה חלק מהסטייל"},{"t":"scale","q":"כמה אתם טובים בלשמור על סודות?","min":"נשבר מהר","max":"קבר"},{"t":"scale","q":"כמה קל לכם לבקש טובה מחבר?","min":"נורא קשה","max":"בלי היסוס"},{"t":"scale","q":"כמה אתם זוכרים תאריכי יום הולדת של חברים?","min":"צריכים תזכורת","max":"כולם בראש"},{"t":"scale","q":"כמה מצחיקים הבדיחות הפנימיות שלכם בעיני אחרים?","min":"אף אחד לא מבין","max":"כולם מתפוצצים"},{"t":"scale","q":"כמה אתם מוכנים לשנות תוכניות בשביל חבר?","min":"כבר סגור","max":"הכול בשבילו"},{"t":"mc","q":"מה הכי מעצבן בחבר?","o":["מאחר","מבטל ברגע האחרון","לא עונה להודעות","שוכח מה סיפרנו לו"]},{"t":"mc","q":"איזה סוג חבר אתם בקבוצה?","o":["המארגן","הצחקן","המקשיב","המתפרע"]},{"t":"mc","q":"מה הכי כיף לעשות עם חברים?","o":["לטייל","לאכול","לשחק","סתם לדבר"]},{"t":"mc","q":"איך הכי נכון לפייס חבר אחרי ריב?","o":["להתקשר","לבוא אליו","לשלוח הודעה","להביא משהו טוב"]},{"t":"mc","q":"מה עושים כשחבר מספר בדיחה גרועה?","o":["צוחקים בנימוס","מגלגלים עיניים","מגיבים בבדיחה גרועה יותר","שותקים"]},{"t":"mc","q":"איזו תכונה הכי חשובה בחבר טוב?","o":["נאמנות","הומור","כנות","זמינות"]},{"t":"rank","q":"סדרו מהכי חשוב בחברות להכי פחות","o":["אמון","הומור","זמן ביחד","עזרה בצרה"]},{"t":"rank","q":"סדרו את הפעילויות מהכי כיף להכי פחות עם חברים","o":["טיול","סעודה","משחק קבוצתי","סרט"]},{"t":"rank","q":"סדרו מהכי מעצבן להכי פחות","o":["איחורים","ביטולים","לא עונה","שכחה"]},{"t":"rank","q":"סדרו מהכי כיף לקבל מחבר להכי פחות","o":["הפתעה","מכתב","עזרה","הודעה מצחיקה"]},{"t":"who","q":"מי מאיתנו מאחר יותר?"},{"t":"who","q":"מי מאיתנו שומר יותר טוב על סודות?"},{"t":"who","q":"מי מאיתנו זה שמתכנן את כל היציאות?"},{"t":"who","q":"מי מאיתנו יותר מזכיר את הבדיחות הפנימיות שוב ושוב?"},{"t":"ab","q":"לשבת בבית קפה או לטייל ברגל?","o":["בית קפה","טיול ברגל"]},{"t":"ab","q":"שיחת טלפון ארוכה או כמה הודעות קצרות?","o":["שיחה ארוכה","הודעות קצרות"]},{"t":"ab","q":"לתת עצה בלי שביקשו או להקשיב ולשתוק?","o":["לתת עצה","להקשיב"]},{"t":"ab","q":"חבר ילדות ותיק או חבר חדש ומרתק?","o":["חבר ילדות","חבר חדש"]},{"t":"ab","q":"יום הולדת עם הפתעה או יום הולדת שקט?","o":["הפתעה","שקט"]},{"t":"ab","q":"קבוצת וואטסאפ שמתפוצצת או קבוצה שקטה?","o":["מתפוצצת","שקטה"]},{"t":"ab","q":"לישון באותו חדר בטיול או כל אחד בחדר משלו?","o":["אותו חדר","חדר משלו"]},{"t":"ab","q":"משחק קופסה תחרותי או משחק שיתופי?","o":["תחרותי","שיתופי"]},{"t":"ab","q":"להתארח אצל חבר לסוף שבוע או שהחבר יתארח אצלנו?","o":["להתארח","לארח"]},{"t":"ab","q":"לבקש סליחה ראשון או לחכות שהחבר יתחיל?","o":["לבקש ראשון","לחכות"]},{"t":"scale","q":"כמה אתם מתגעגעים לחברים אחרי שבוע בלי קשר?","min":"בקושי","max":"סופרים ימים"},{"t":"scale","q":"כמה קל לכם לשתף חבר ברגשות?","min":"מעדיפים לשתוק","max":"פתוחים לגמרי"},{"t":"scale","q":"כמה אתם שומרים על קשר עם חברים מהעבר?","min":"אבד הקשר","max":"מדברים כל שבוע"},{"t":"scale","q":"כמה אתם תחרותיים במשחקים עם חברים?","min":"העיקר שכיף","max":"חייבים לנצח"},{"t":"scale","q":"כמה אתם מוכנים להשאיל לחבר חפץ אהוב?","min":"בשום אופן","max":"תיקחו, אין בעיה"},{"t":"scale","q":"כמה קל לכם להגיד \"לא\" לחבר?","min":"כמעט בלתי אפשרי","max":"בלי בעיה"},{"t":"mc","q":"מה עושים כשחבר במצב רוח רע?","o":["מביאים אוכל","מקשיבים","מצחיקים","יוצאים לטייל"]},{"t":"mc","q":"איזו שיחה הכי מעניינת עם חברים?","o":["זיכרונות","תוכניות לעתיד","סתם צחוקים","רעיונות משוגעים"]},{"t":"mc","q":"איזה תפקיד אתם בנסיעה משותפת?","o":["הנהג","הנווט","אחראי מוזיקה","אחראי חטיפים"]},{"t":"mc","q":"איזו מתנה הכי מתאימה לחבר ליום הולדת?","o":["ספר","ארוחה","חפץ אישי","חוויה משותפת"]},{"t":"mc","q":"מה הכי מחבר בין חברים?","o":["בדיחות משותפות","קשיים שעברו ביחד","תחביב משותף","אוכל טוב"]},{"t":"mc","q":"איפה הכי כיף להיפגש?","o":["בבית של מישהו","בפארק","בבית קפה","בטיול"]},{"t":"rank","q":"סדרו מהכי חשוב בחבר לטיול להכי פחות","o":["סבלנות","הומור","גמישות","סדר"]},{"t":"rank","q":"סדרו מהכי כיף להכי פחות בנסיעה משותפת","o":["מוזיקה","שיחות","חטיפים","שתיקה נעימה"]},{"t":"rank","q":"סדרו מהשעה הכי נוחה לשיחה עם חבר להכי פחות","o":["בוקר","צהריים","ערב","לילה מאוחר"]},{"t":"rank","q":"סדרו את סוגי החברים מהכי מועדף להכי פחות","o":["הצחקן","הרציני","האמין","הספונטני"]},{"t":"who","q":"מי מאיתנו שולח יותר הודעות קוליות ארוכות?"},{"t":"who","q":"מי מאיתנו מקדים להתנצל אחרי ריב?"},{"t":"who","q":"מי מאיתנו מגיע ראשון כשחבר צריך עזרה?"},{"t":"who","q":"מי מאיתנו מספר יותר סיפורים ארוכים?"}],"isNew":true},{"id":"animals","name":"חיות","emoji":"🐾","group":"fun","audience":"all","desc":"חתולים, כלבים ומה שביניהם","questions":[{"t":"ab","q":"כלב או חתול?","o":["כלב","חתול"]},{"t":"ab","q":"גן חיות או ספארי?","o":["גן חיות","ספארי"]},{"t":"ab","q":"חיה גדולה וחמה או קטנה ושקטה?","o":["גדולה וחמה","קטנה ושקטה"]},{"t":"ab","q":"לצפות בדולפינים או בלווייתנים?","o":["דולפינים","לווייתנים"]},{"t":"ab","q":"להגיע לחווה ולהאכיל חיות או לטייל ביער ולחפש אותן?","o":["חווה","יער"]},{"t":"ab","q":"ציפור שרה בבית או דגים באקווריום?","o":["ציפור","דגים"]},{"t":"ab","q":"חיה שמתרגשת מכל כניסה לבית או חיה עצמאית שלא מתרגשת?","o":["מתרגשת","עצמאית"]},{"t":"ab","q":"לפגוש פיל או ג'ירף?","o":["פיל","ג'ירף"]},{"t":"ab","q":"סוס לרכיבה או גמל למדבר?","o":["סוס","גמל"]},{"t":"ab","q":"חתלתול קטן או גור כלבים?","o":["חתלתול","גור"]},{"t":"scale","q":"כמה אתם מפחדים מעכברים?","min":"חמודים","max":"קפיצה על הכיסא"},{"t":"scale","q":"כמה אתם רוצים חיית מחמד בבית?","min":"בלי","max":"עוד היום"},{"t":"scale","q":"כמה אתם נהנים לבקר בגן חיות?","min":"שעמום","max":"נשאר עד הסגירה"},{"t":"scale","q":"כמה אתם מפחדים מצרצרים וג'וקים?","min":"לא מזיז","max":"בורחים"},{"t":"scale","q":"כמה אתם מדברים עם חיות כאילו הן מבינות?","min":"אף פעם","max":"שיחות שלמות"},{"t":"scale","q":"כמה קל לכם לשמור על ניקיון עם חיה בבית?","min":"סיוט","max":"אין בעיה"},{"t":"mc","q":"איזו חיה הכי חמודה?","o":["פנדה","קואלה","חתלתול","דולפין"]},{"t":"mc","q":"איזו חיה הייתם רוצים כחיית מחמד?","o":["כלב","חתול","ארנב","תוכי"]},{"t":"mc","q":"איזו חיה הכי מפחידה?","o":["נחש","עכביש","כריש","דוב"]},{"t":"mc","q":"איזו חיה הכי מצחיקה?","o":["קוף","פינגווין","לאמה","פלמינגו"]},{"t":"mc","q":"איזו חיה הכי מרשימה?","o":["אריה","נשר","פיל","לווייתן"]},{"t":"mc","q":"איזה שם נותנים לחיית מחמד?","o":["שם של אוכל","שם אנושי","שם מצחיק","שם מלכותי"]},{"t":"rank","q":"סדרו את החיות מהאהובה ביותר לפחות אהובה","o":["כלב","חתול","סוס","ציפור"]},{"t":"rank","q":"סדרו מהכי מפחיד להכי פחות","o":["נחש","עכביש","כריש","צרעה"]},{"t":"rank","q":"סדרו את החיות מהכי חכמה להכי פחות","o":["דולפין","תוכי","כלב","חתול"]},{"t":"rank","q":"סדרו מהחיה שהכי הייתם רוצים לפגוש בספארי","o":["אריה","פיל","ג'ירף","קרנף"]},{"t":"who","q":"מי מאיתנו היה מאמץ חיה אחרי שלוש דקות?"},{"t":"who","q":"מי מאיתנו יותר מפחד מחרקים?"},{"t":"who","q":"מי מאיתנו היה מרגיש בבית בחווה עם כבשים?"},{"t":"who","q":"מי מאיתנו היה נותן לחיית המחמד שם יותר מצחיק?"},{"t":"ab","q":"ארנב או אוגר?","o":["ארנב","אוגר"]},{"t":"ab","q":"גן פרפרים או בית זוחלים?","o":["גן פרפרים","בית זוחלים"]},{"t":"ab","q":"כלב קטן ורעשן או כלב גדול ורגוע?","o":["קטן ורעשן","גדול ורגוע"]},{"t":"ab","q":"תוכי שמדבר או חתול שמתעלם?","o":["תוכי","חתול"]},{"t":"ab","q":"לגדל תרנגולות בחצר או גינת ירק?","o":["תרנגולות","גינת ירק"]},{"t":"ab","q":"לצפות בציפורים או לצלול בין דגים?","o":["ציפורים","דגים"]},{"t":"ab","q":"לטייל עם כלב בבוקר או בערב?","o":["בבוקר","בערב"]},{"t":"ab","q":"כלב שמביא כדור או חתול שמביא מתנות?","o":["כלב","חתול"]},{"t":"ab","q":"חיה שישנה איתכם על המיטה או במיטה משלה?","o":["על המיטה","במיטה משלה"]},{"t":"ab","q":"חיה ששומרת על הבית או חיה שמקשטת את הבית?","o":["שומרת","מקשטת"]},{"t":"scale","q":"כמה אתם מפחדים מכלבים גדולים?","min":"אוהבים אותם","max":"עוברים מדרכה"},{"t":"scale","q":"כמה אתם אוהבים סרטוני חיות ברשת?","min":"לא מתחברים","max":"צופים שעות"},{"t":"scale","q":"כמה אתם אוהבים לצפות בציפורים?","min":"משעמם","max":"יושבים בשקט שעות"},{"t":"scale","q":"כמה אתם מוכנים להתעורר בלילה בשביל חיה?","min":"ממשיכים לישון","max":"קמים מיד"},{"t":"scale","q":"כמה אתם מתרגשים לראות חיית בר בטבע?","min":"עוד חיה","max":"קופצים משמחה"},{"t":"scale","q":"כמה אתם טובים בזיהוי קולות של חיות?","min":"לא מזהים כלום","max":"מזהים הכול"},{"t":"mc","q":"איזו חיית חווה הכי חביבה?","o":["פרה","כבשה","עז","תרנגולת"]},{"t":"mc","q":"מה הכי חשוב בחיית מחמד?","o":["נאמנות","שקט","חמידות","עצמאות"]},{"t":"mc","q":"איזו חיית ים הכי מעניינת?","o":["דולפין","צב ים","תמנון","סוס ים"]},{"t":"mc","q":"איזה קול של חיה הכי נעים?","o":["ציוץ ציפורים","גרגור של חתול","נביחה שמחה","צרצרים בערב"]},{"t":"mc","q":"איזה חרק הכי פחות מפריע?","o":["פרפר","חיפושית","נמלה","דבורה"]},{"t":"mc","q":"איזו פעילות עם חיות הכי כיף?","o":["רכיבה על סוס","צפייה בציפורים","שיט עם דולפינים","טיול עם כלבים"]},{"t":"rank","q":"סדרו מהכי חמוד להכי פחות","o":["גור חתולים","גור כלבים","ארנבון","אפרוח"]},{"t":"rank","q":"סדרו את חיות הים מהאהובה ביותר לפחות אהובה","o":["דולפין","צב ים","תמנון","סוס ים"]},{"t":"rank","q":"סדרו מהכי קל לגדל בבית להכי פחות","o":["אוגר","ארנב","צב","דג"]},{"t":"rank","q":"סדרו מהכי הייתם רוצים לראות בטבע להכי פחות","o":["לווייתן","דוב קוטב","פנדה","קנגורו"]},{"t":"who","q":"מי מאיתנו היה קם בלילה לטפל בחיה חולה?"},{"t":"who","q":"מי מאיתנו מדבר יותר עם חיות ברחוב?"},{"t":"who","q":"מי מאיתנו מצלם יותר חיות בטיולים?"},{"t":"who","q":"מי מאיתנו יותר דומה לחתול באופי?"}],"isNew":true},{"id":"sport","name":"ספורט וכושר","emoji":"🏋️","group":"life","audience":"all","desc":"מי רץ, מי יושב, ומי רק מתכנן להתחיל","questions":[{"t":"ab","q":"הליכה בבוקר או הליכה בערב?","o":["בוקר","ערב"]},{"t":"ab","q":"חדר כושר או אימון בבית?","o":["חדר כושר","בבית"]},{"t":"ab","q":"לעלות במדרגות או במעלית?","o":["מדרגות","מעלית"]},{"t":"ab","q":"לאמן לבד או עם שותף לאימון?","o":["לבד","עם שותף"]},{"t":"ab","q":"לראות משחק בטלוויזיה או ללכת לאצטדיון?","o":["טלוויזיה","אצטדיון"]},{"t":"ab","q":"ריצה או הליכה מהירה?","o":["ריצה","הליכה מהירה"]},{"t":"ab","q":"אימון קצר ואינטנסיבי או ארוך ורגוע?","o":["קצר ואינטנסיבי","ארוך ורגוע"]},{"t":"ab","q":"קפה לפני האימון או מים בלבד?","o":["קפה","מים"]},{"t":"ab","q":"לשלם על מנוי שנתי או לקנות כרטיסייה?","o":["מנוי שנתי","כרטיסייה"]},{"t":"ab","q":"כושר עם מוזיקה באוזניות או בלי כלום?","o":["עם מוזיקה","בלי כלום"]},{"t":"scale","q":"כמה אתם באמת מתמידים באימונים?","min":"מתחילים כל שני","max":"קבוע כמו שעון"},{"t":"scale","q":"כמה אתם אוהבים להזיע?","min":"בקושי","max":"ככל שיותר זיעה כך יותר טוב"},{"t":"scale","q":"כמה אכפת לכם מצעדים ביום?","min":"לא סופרים","max":"בודקים בשעון כל שעה"},{"t":"scale","q":"כמה קשה לכם לקום לאימון בבוקר?","min":"קם בקלות","max":"בלתי אפשרי"},{"t":"scale","q":"כמה אתם תחרותיים במשחקי ספורט עם חברים?","min":"העיקר להשתתף","max":"חייבים לנצח"},{"t":"scale","q":"כמה אתם מרגישים אשמה אחרי יום בלי תנועה?","min":"בכלל לא","max":"מיד יוצאים להליכה"},{"t":"mc","q":"איזה ענף ספורט הכי מושך אתכם?","o":["כדורגל","שחייה","רכיבה על אופניים","כדורסל"]},{"t":"mc","q":"הארוחה המושלמת אחרי אימון?","o":["שייק חלבון","כריך גדול","פירות","ארוחה חמה בבית"]},{"t":"mc","q":"מה הכי מרתיע אתכם מלהתחיל להתאמן?","o":["חוסר זמן","עייפות","מבוכה","שעמום"]},{"t":"mc","q":"איפה הכי כיף לצאת לטיול רגלי?","o":["שביל בטבע","טיילת בחוף","רחובות העיר","פארק שכונתי"]},{"t":"mc","q":"איזה תירוץ הכי נפוץ לדלג על אימון?","o":["גשם","עייפות","הרבה עבודה","כואב לי משהו"]},{"t":"mc","q":"איזה ציוד ספורט הכי חשוב לכם?","o":["נעלי ספורט טובות","שעון חכם","אוזניות","בקבוק מים מגניב"]},{"t":"rank","q":"סדרו מהכי אהוב להכי פחות","o":["שחייה","ריצה","אופניים","כושר בחדר"]},{"t":"rank","q":"סדרו מהכי קל להכי קשה לעשות","o":["שכיבות סמיכה","בטן","ריצה של חמישה ק״מ","מתיחות"]},{"t":"rank","q":"סדרו ספורט לצפייה מהכי מרתק להכי פחות","o":["כדורגל","כדורסל","טניס","אתלטיקה"]},{"t":"rank","q":"סדרו מהכי בריא להכי פחות בצורת חטיף אחרי ספורט","o":["בננה","חטיף חלבון","במבה","עוגיה"]},{"t":"who","q":"מי מאיתנו יותר יקום מחר בבוקר לרוץ?"},{"t":"who","q":"מי מאיתנו יותר יקנה ציוד ספורט יקר ולא ישתמש בו?"},{"t":"who","q":"מי מאיתנו יותר יתעצבן אם הקבוצה שלו תפסיד?"},{"t":"who","q":"מי מאיתנו יותר יתחיל דיאטה ביום ראשון ויפסיק ביום שני?"},{"t":"ab","q":"אימון בחוץ או אימון בתוך חדר?","o":["בחוץ","בתוך חדר"]},{"t":"ab","q":"אופניים רגילים או אופניים חשמליים?","o":["רגילים","חשמליים"]},{"t":"ab","q":"להתאמן עם תוכנית כתובה או לפי הרגשה?","o":["תוכנית כתובה","לפי הרגשה"]},{"t":"ab","q":"בריכה או ים לשחייה?","o":["בריכה","ים"]},{"t":"ab","q":"שיעור קבוצתי או מאמן אישי?","o":["שיעור קבוצתי","מאמן אישי"]},{"t":"ab","q":"מקלחת מיד אחרי אימון או מנוחה קודם?","o":["מקלחת מיד","מנוחה קודם"]},{"t":"ab","q":"לשחק כדורגל או כדורסל בחצר?","o":["כדורגל","כדורסל"]},{"t":"ab","q":"לסיים אימון מוקדם או להוסיף עוד סיבוב אחד?","o":["לסיים מוקדם","עוד סיבוב"]},{"t":"ab","q":"טיול הרים תלול או טיול שטוח וארוך?","o":["הר תלול","שטוח וארוך"]},{"t":"ab","q":"תחרות ריצה אמיתית עם מספר על החולצה או ריצה פרטית?","o":["תחרות אמיתית","ריצה פרטית"]},{"t":"scale","q":"כמה אתם אוהבים מתיחות?","min":"מדלגים עליהן","max":"עושים כל יום"},{"t":"scale","q":"כמה אתם סובלים מכאבי שרירים יום אחרי?","min":"כמעט לא","max":"לא מצליחים לרדת במדרגות"},{"t":"scale","q":"כמה אתם אוהבים ללבוש בגדי ספורט גם כשלא מתאמנים?","min":"רק לאימון","max":"יוצאים בהם לכל מקום"},{"t":"scale","q":"כמה אתם טובים בלהפסיד בכבוד?","min":"שבוע של כעס","max":"לוחצים יד ומחייכים"},{"t":"scale","q":"כמה אתם מתרגשים לראות אולימפיאדה?","min":"לא מתעניינים","max":"לא מפספסים אף ענף"},{"t":"scale","q":"כמה אתם מוכנים לקום מוקדם בשביל טיול רגלי?","min":"רק בצהריים","max":"יוצאים עם הזריחה"},{"t":"mc","q":"איזה ענף הכי מצחיק לצפות בו?","o":["התעמלות קרקע","ג׳ודו","קפיצה למים","ריצת משוכות"]},{"t":"mc","q":"מה הכי עוזר לכם להתמיד?","o":["חבר שמחכה","מוזיקה טובה","תוצאות שרואים","פרס אחרי"]},{"t":"mc","q":"איזה משקה הכי טוב בזמן אימון?","o":["מים קרים","משקה איזוטוני","מים עם לימון","מים מהברז"]},{"t":"mc","q":"מה הרגע הכי טוב באימון?","o":["ההתחלה","הסיום","המנוחה באמצע","המוזיקה הטובה"]},{"t":"mc","q":"באיזה גיל הכי כיף היה לשחק בחוץ?","o":["גן","יסודי","חטיבה","תיכון"]},{"t":"mc","q":"איזה מכשיר חדר כושר הכי מפחיד אתכם?","o":["הליכון מהיר","משקולות כבדות","מכשיר מוזר שלא מבינים","מתח"]},{"t":"rank","q":"סדרו משחקי חצר מהכי כיפי להכי פחות","o":["תופסת","מחבואים","כדור עף","חבל"]},{"t":"rank","q":"סדרו מהכי קשה להכי קל","o":["לקום מוקדם לאימון","להמשיך כשכואב","לוותר על ממתק","להתחיל אחרי הפסקה"]},{"t":"rank","q":"סדרו כלי אימון מהכי אהוב להכי פחות","o":["חבל קפיצה","משקולות","גומיות","כדור פילאטיס"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות בטיול רגלי","o":["נוף","חברה טובה","כריכים","נעליים נוחות"]},{"t":"who","q":"מי מאיתנו יותר יתעקש להמשיך לרוץ למרות שכואב?"},{"t":"who","q":"מי מאיתנו יותר יתלונן באמצע טיול רגלי?"},{"t":"who","q":"מי מאיתנו יותר ישחק כדורגל עם ילדים וישכח שהוא מבוגר?"},{"t":"who","q":"מי מאיתנו יותר יספר לכולם על האימון שהוא עשה?"}],"isNew":true},{"id":"football","name":"כדורגל","emoji":"⚽","group":"fun","audience":"all","desc":"אוהדים, אגדות ומשחקים בשכונה","questions":[{"t":"ab","q":"מסי או רונאלדו?","o":["מסי","רונאלדו"]},{"t":"ab","q":"ליגה ישראלית או ליגה אירופית?","o":["ישראלית","אירופית"]},{"t":"ab","q":"לראות משחק עם חברים או לבד בשקט?","o":["עם חברים","לבד בשקט"]},{"t":"ab","q":"להיות חלוץ או שוער?","o":["חלוץ","שוער"]},{"t":"ab","q":"הגנה חזקה או התקפה יפה?","o":["הגנה חזקה","התקפה יפה"]},{"t":"ab","q":"מונדיאל או יורו?","o":["מונדיאל","יורו"]},{"t":"ab","q":"חולצה רטרו או חולצה עונה נוכחית?","o":["רטרו","עונה נוכחית"]},{"t":"ab","q":"משחק ברחוב או מגרש דשא?","o":["ברחוב","מגרש דשא"]},{"t":"ab","q":"לראות משחק מלא או רק תקציר?","o":["משחק מלא","תקציר"]},{"t":"ab","q":"הכרעה בפנדלים: מרגש או מלחיץ מדי?","o":["מרגש","מלחיץ"]},{"t":"scale","q":"כמה אתם נאמנים לקבוצה אחת?","min":"אוהב כדורגל בכלל","max":"נאמן עד הסוף"},{"t":"scale","q":"כמה אתם מתרגשים בזמן משחק גדול?","min":"רגוע לגמרי","max":"קופץ מהספה"},{"t":"scale","q":"כמה טוב אתם משחקים בפועל?","min":"שוער נאלץ","max":"כוכב השכונה"},{"t":"scale","q":"כמה חולצות כדורגל אתם רוצים בארון?","min":"אחת מספיקה","max":"אוסף שלם"},{"t":"scale","q":"כמה אתם זוכרים תוצאות ושמות שחקנים?","min":"כמעט כלום","max":"אנציקלופדיה מהלכת"},{"t":"scale","q":"כמה אתם מתעצבנים על שופטים?","min":"מקבל את הדין","max":"צועק על המסך"},{"t":"mc","q":"איזו קבוצה אירופית הכי כיף לצפות בה?","o":["ברצלונה","ריאל מדריד","מנצ׳סטר יוניטד","ליברפול"]},{"t":"mc","q":"איזה שחקן אגדי הכי מרשים אתכם?","o":["פלה","מרדונה","זידאן","רונאלדיניו"]},{"t":"mc","q":"איזו קבוצה ישראלית הכי קרובה ללב?","o":["מכבי תל אביב","הפועל באר שבע","מכבי חיפה","בית״ר ירושלים"]},{"t":"mc","q":"איזה רגע מונדיאל הכי זכור?","o":["גול מדהים","פנדלים דרמטיים","הפתעה גדולה","חגיגות הניצחון"]},{"t":"mc","q":"איפה הכי כיף לשחק כדורגל?","o":["חצר בית הספר","מגרש שכונתי","חוף הים","פארק"]},{"t":"mc","q":"מה הכי חשוב בחולצת כדורגל?","o":["העיצוב","השם על הגב","הנוחות","המספר"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות בקבוצה טובה","o":["מאמן","שוער","חלוץ","אוהדים"]},{"t":"rank","q":"סדרו משחקים מהכי מרגש להכי פחות","o":["גמר המונדיאל","דרבי מקומי","ליגת האלופות","משחק בשכונה"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות לשחקן","o":["מהירות","טכניקה","כושר גופני","ראש קר"]},{"t":"rank","q":"סדרו חטיפים למשחק מהכי טעים להכי פחות","o":["גרעינים","במבה","בייגלה","חטיף תירס"]},{"t":"who","q":"מי מאיתנו יותר יתעצבן כשהקבוצה שלו מפסידה?"},{"t":"who","q":"מי מאיתנו היה שחקן יותר טוב בילדות?"},{"t":"who","q":"מי מאיתנו יותר יזכור תוצאה של משחק מלפני עשר שנים?"},{"t":"who","q":"מי מאיתנו יותר יקנה חולצת כדורגל חדשה השנה?"},{"t":"ab","q":"גול יפה מבחוץ או גול אחרי מסירות יפות?","o":["מבחוץ","אחרי מסירות"]},{"t":"ab","q":"מאמן קשוח או מאמן חבר של השחקנים?","o":["קשוח","חבר"]},{"t":"ab","q":"לשחק בקבוצה או לשחק לבד בחצר עם כדור?","o":["בקבוצה","לבד"]},{"t":"ab","q":"כדורגל בגשם או בשמש?","o":["בגשם","בשמש"]},{"t":"ab","q":"שוער שמציל או חלוץ שמבקיע?","o":["שוער","חלוץ"]},{"t":"ab","q":"לקנות כרטיס לגמר או לראות אותו עם כל המשפחה בבית?","o":["כרטיס לגמר","בבית עם המשפחה"]},{"t":"ab","q":"כדורגל משחקים או משחק קלפי שחקנים?","o":["משחקים בפועל","קלפי שחקנים"]},{"t":"ab","q":"צבע אדום או צבע כחול בחולצה?","o":["אדום","כחול"]},{"t":"ab","q":"קפטן שמדבר הרבה או קפטן שמוביל בשקט?","o":["מדבר הרבה","בשקט"]},{"t":"ab","q":"תוצאה 5:4 מטורפת או 1:0 מתוחה?","o":["5:4","1:0"]},{"t":"scale","q":"כמה אתם מתרגשים בזמן הפנדל האחרון?","min":"רגועים לגמרי","max":"לא מסוגלים להסתכל"},{"t":"scale","q":"כמה אתם מתלהבים מקישוטי אוהדים, דגלים וצעיפים?","min":"לא צריך","max":"הבית מלא"},{"t":"scale","q":"כמה אתם אוהבים לנחש תוצאות לפני משחק?","min":"לא מנחשים","max":"מנחשים לכולם"},{"t":"scale","q":"כמה אתם אוהבים לשחק פיפ״א או משחק כדורגל במחשב?","min":"בכלל לא","max":"מתחרים על הכול"},{"t":"scale","q":"כמה אתם מאמינים בקללות ובמזל טוב של אוהדים?","min":"לא מאמינים","max":"יש לנו טקס קבוע"},{"t":"scale","q":"כמה אתם אוהבים לדבר על כדורגל בארוחה?","min":"מחליפים נושא","max":"לא מפסיקים"},{"t":"mc","q":"איזו עמדה הכי קשה במגרש?","o":["שוער","בלם","קשר","חלוץ"]},{"t":"mc","q":"איזה אירוע כדורגל הכי כיף לחוות?","o":["גמר גביע","משחק פתיחה בעונה","משחק מונדיאל","דרבי"]},{"t":"mc","q":"מה הכי מעצבן במשחק?","o":["בזבוז זמן","התעלפויות מזויפות","החמצה מול שער ריק","שריקה לא ברורה"]},{"t":"mc","q":"איזה שיר הכי מתאים לחגיגת גול?","o":["שיר אוהדים","מוזיקת ריקודים","מנגינה עצובה בצחוק","שקט מוחלט"]},{"t":"mc","q":"איזו מדינה הכי כיף לעודד במונדיאל?","o":["ברזיל","ארגנטינה","צרפת","גרמניה"]},{"t":"mc","q":"מה הכי כיף לאכול בזמן משחק?","o":["גרעינים","פופקורן","פיצה","פירות"]},{"t":"rank","q":"סדרו עמדות משחק מהכי מוערכת להכי פחות","o":["שוער","חלוץ","קשר","בלם"]},{"t":"rank","q":"סדרו מהכי כיף להכי פחות בכדורגל","o":["להבקיע","לתת מסירה מושלמת","להציל שער","לנצח בתיקול"]},{"t":"rank","q":"סדרו תחרויות מהכי יוקרתיות להכי פחות","o":["מונדיאל","ליגת האלופות","יורו","גביע המדינה"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות באוהד טוב","o":["נאמנות","קול חזק","ידע בכדורגל","חולצה בארון"]},{"t":"who","q":"מי מאיתנו יותר יעשה חגיגת גול מוגזמת בחצר?"},{"t":"who","q":"מי מאיתנו יותר ישכנע את כולם לראות משחק בטלוויזיה?"},{"t":"who","q":"מי מאיתנו יותר יתווכח עם השופט מהספה?"},{"t":"who","q":"מי מאיתנו יותר יבחר שחקן שיעשה את השיפוט בין החברים?"}],"isNew":true},{"id":"future","name":"זוגיות ועתיד","emoji":"🏡","group":"couples","audience":"couples","desc":"חלומות, תכנונים וזקנה מאושרת ביחד","questions":[{"t":"ab","q":"בית פרטי עם חצר או דירה בעיר?","o":["בית עם חצר","דירה בעיר"]},{"t":"ab","q":"לגור קרוב להורים או קצת רחוק?","o":["קרוב","קצת רחוק"]},{"t":"ab","q":"לחסוך בכל חודש או ליהנות מהיום?","o":["לחסוך","ליהנות"]},{"t":"ab","q":"לתכנן חופשה חצי שנה מראש או להחליט ברגע האחרון?","o":["לתכנן מראש","ברגע האחרון"]},{"t":"ab","q":"להחליט על קניות גדולות ביחד או כל אחד לפי מה שחשוב לו?","o":["ביחד תמיד","כל אחד לפי שיקול"]},{"t":"ab","q":"ריהוט חדש או יד שנייה במצב טוב?","o":["חדש","יד שנייה"]},{"t":"ab","q":"חופשה בחו״ל או טיול בארץ?","o":["חו״ל","בארץ"]},{"t":"ab","q":"עיצוב מודרני או חם וביתי?","o":["מודרני","חם וביתי"]},{"t":"ab","q":"לקנות דירה או לשכור ולהיות גמישים?","o":["לקנות","לשכור"]},{"t":"ab","q":"שבת משפחתית אצל ההורים או בבית שלנו?","o":["אצל ההורים","בבית שלנו"]},{"t":"scale","q":"כמה חשוב לכם שיהיה לכם בית מסודר כל הזמן?","min":"כאוס יצירתי","max":"הכול על מקומו"},{"t":"scale","q":"כמה אתם מתכננים את העתיד?","min":"מה שיהיה יהיה","max":"גיליון אקסל לעשר שנים"},{"t":"scale","q":"כמה אתם אוהבים הפתעות בתכנון משותף?","min":"אל תפתיעו אותי","max":"תמיד להפתיע"},{"t":"scale","q":"כמה חשוב לכם שהחגים יתקיימו אצלכם בבית?","min":"לא משנה איפה","max":"רק אצלנו"},{"t":"scale","q":"כמה קל לכם לדבר על כסף עם בן או בת הזוג?","min":"מביך","max":"פתוח לגמרי"},{"t":"scale","q":"כמה אתם רואים את עצמכם עושים טיולים כשתהיו מבוגרים?","min":"בבית בנחת","max":"בדרכים כל הזמן"},{"t":"mc","q":"מה הדבר הראשון שתקנו בבית החלומות?","o":["ספה גדולה ונוחה","מטבח מושקע","ספרייה","גינה יפה"]},{"t":"mc","q":"איפה הכי נחמד לגור?","o":["עיר גדולה","יישוב קטן","שכונה שקטה","קרוב לים"]},{"t":"mc","q":"איך הכי נעים לחגוג יום נישואין?","o":["ארוחה במסעדה","טיול קצר","מתנה מיוחדת","ערב שקט בבית"]},{"t":"mc","q":"מה הכי חשוב בניהול כסף יחד?","o":["שקיפות","חיסכון קבוע","תקציב מסודר","לשמור על חופש אישי"]},{"t":"mc","q":"איזו מסורת משפחתית הכי חשוב לשמור?","o":["ארוחת ליל שבת","חגים אצל המשפחה","טיול שנתי","ערב משפחתי קבוע"]},{"t":"mc","q":"איך תרצו לבלות את הגיל השלישי?","o":["טיולים בעולם","בית עם נכדים","פינה שקטה בטבע","מעורבות בקהילה"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות בבחירת בית","o":["מיקום","גודל","מחיר","עיצוב"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות לזוגיות טובה","o":["תקשורת","אמון","הומור","זמן איכות"]},{"t":"rank","q":"סדרו חופשות מהכי נחשקת להכי פחות","o":["טיול בטבע","עיר אירופית","מלון ספא","קרוואן בארץ"]},{"t":"rank","q":"סדרו הוצאות מהכי שווה להכי פחות","o":["חופשה","ריהוט","מכשירי חשמל","חוגים לילדים"]},{"t":"who","q":"מי מאיתנו יותר יחסוך כסף בלי להתאמץ?"},{"t":"who","q":"מי מאיתנו יותר יתכנן את החופשה הבאה?"},{"t":"who","q":"מי מאיתנו יותר יקבל החלטה בקניות גדולות?"},{"t":"who","q":"מי מאיתנו יותר יהיה סבא או סבתא נדיב עם ממתקים?"},{"t":"ab","q":"שני ילדים או משפחה גדולה?","o":["שניים","משפחה גדולה"]},{"t":"ab","q":"לעבור דירה לעיר חדשה או להישאר ליד המשפחה?","o":["עיר חדשה","ליד המשפחה"]},{"t":"ab","q":"לגדל כלב או לגדל חתול?","o":["כלב","חתול"]},{"t":"ab","q":"לטפל בגינה או לגור בקומה גבוהה עם מרפסת?","o":["גינה","קומה גבוהה"]},{"t":"ab","q":"לשמור את כל התמונות המשפחתיות באלבום או בענן?","o":["באלבום","בענן"]},{"t":"ab","q":"לתכנן את הכסף לשנה קדימה או לראות חודש בחודש?","o":["שנה קדימה","חודש בחודש"]},{"t":"ab","q":"לפתוח עסק משלנו או לעבוד במקום יציב?","o":["עסק משלנו","מקום יציב"]},{"t":"ab","q":"לטוס לחופשה גדולה אחת או כמה סופי שבוע קטנים?","o":["חופשה גדולה","כמה קטנים"]},{"t":"ab","q":"בית חכם עם הכול אוטומטי או בית פשוט וקלאסי?","o":["בית חכם","פשוט וקלאסי"]},{"t":"ab","q":"לכתוב מכתב לעצמנו לעוד עשר שנים או לא לדעת מה יהיה?","o":["לכתוב מכתב","להפתיע את עצמנו"]},{"t":"scale","q":"כמה אתם חולמים על בית ענק עם חדרים ריקים?","min":"קטן וחמים","max":"ארמון"},{"t":"scale","q":"כמה אתם מתרגשים לחשוב על הקריירה בעוד חמש שנים?","min":"לא חושבים על זה","max":"יש תוכנית מלאה"},{"t":"scale","q":"כמה אתם מוכנים לשנות הרגלים בשביל החיים המשותפים?","min":"כמעט לא","max":"מוכנים להכול"},{"t":"scale","q":"כמה אתם חולמים להיות הורים מושלמים?","min":"מי צריך שלמות","max":"יש רשימה שלמה"},{"t":"scale","q":"כמה אתם מתכוננים לקנות דברים גדולים כמו רכב או מטבח?","min":"מחכים לרגע","max":"מחשבים כל שקל"},{"t":"scale","q":"כמה אתם מאמינים שכל חלום יתגשם?","min":"ריאליסטים","max":"בטוחים לגמרי"},{"t":"mc","q":"איזה רכב הכי מתאים למשפחה שלנו?","o":["קטן וחסכוני","גדול ומרווח","מונית משפחתית","אופניים ורגליים"]},{"t":"mc","q":"איפה נבלה את החגים בעוד עשר שנים?","o":["בבית שלנו","אצל ההורים","בשבת אצל כל המשפחה","בטיול משפחתי"]},{"t":"mc","q":"מה הכי חשוב להשאיר לילדים?","o":["חינוך טוב","זיכרונות","חיסכון","ערכים"]},{"t":"mc","q":"איזה תחביב נתחיל ביחד כשיהיה יותר זמן?","o":["בישול","טיולים","משחקי קופסה","גינון"]},{"t":"mc","q":"איזו מתנה הכי יפה לקבל מבן או בת הזוג בעוד שנים?","o":["מכתב מרגש","טיול הפתעה","חפץ משפחתי","ארוחה מיוחדת"]},{"t":"mc","q":"מה הכי יכול לאתגר אותנו בעתיד?","o":["זמן","כסף","עייפות","הבדלי דעות"]},{"t":"rank","q":"סדרו חלומות מהכי חשוב להכי פחות","o":["בית משלנו","משפחה גדולה","טיולים בעולם","עסק משלנו"]},{"t":"rank","q":"סדרו אילו שינויים הכי מרגשים להכי פחות","o":["מעבר דירה","תינוק חדש","עבודה חדשה","לימודים חדשים"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות בבית שלנו","o":["שקט","חצר","חדר אורחים","מטבח גדול"]},{"t":"rank","q":"סדרו מהכי נעים להכי פחות בזקנה","o":["נכדים בבית","בוקר שקט","טיול קצר","בישול משותף"]},{"t":"who","q":"מי מאיתנו יותר ישמור כל מסמך וקבלה למשך שנים?"},{"t":"who","q":"מי מאיתנו יותר יחלום על עוד חדר בבית?"},{"t":"who","q":"מי מאיתנו יותר יתרגש מהחלטה גדולה?"},{"t":"who","q":"מי מאיתנו יותר יספר סיפורים לנכדים?"}],"isNew":true},{"id":"shopping","name":"שופינג ואופנה","emoji":"🛍️","group":"fun","audience":"all","desc":"מבצעים, נעליים ומה באמת בעגלה","questions":[{"t":"ab","q":"קניות בחנות או באינטרנט?","o":["בחנות","באינטרנט"]},{"t":"ab","q":"קניון או שוק?","o":["קניון","שוק"]},{"t":"ab","q":"לקנות מה שצריך או ללכת עם הרגשה?","o":["רק מה שצריך","לפי הרגשה"]},{"t":"ab","q":"נעליים נוחות או נעליים יפות?","o":["נוחות","יפות"]},{"t":"ab","q":"להחזיר מוצר או להשאיר ולהסתדר?","o":["להחזיר","להשאיר"]},{"t":"ab","q":"בגדים בצבעים חיים או בגוונים שקטים?","o":["צבעים חיים","גוונים שקטים"]},{"t":"ab","q":"קניות לבד או בחברה?","o":["לבד","בחברה"]},{"t":"ab","q":"מותג מוכר או חנות לא ידועה בהנחה?","o":["מותג מוכר","הנחה"]},{"t":"ab","q":"קונים הכול בבת אחת או קצת בכל פעם?","o":["בבת אחת","קצת בכל פעם"]},{"t":"ab","q":"סגנון קלאסי או סגנון חדשני?","o":["קלאסי","חדשני"]},{"t":"scale","q":"כמה אתם נמשכים למבצעים?","min":"לא מעניין","max":"רץ לכל מבצע"},{"t":"scale","q":"כמה זמן אתם מחכים לפני שאתם קונים משהו יקר?","min":"קונה מיד","max":"שבועות של מחשבה"},{"t":"scale","q":"כמה אתם אוהבים לנסות בגדים בחנות?","min":"שונא לנסות","max":"מנסה הכול"},{"t":"scale","q":"כמה בגדים אתם לא לובשים בכלל?","min":"לובש הכול","max":"ארון מלא לא בשימוש"},{"t":"scale","q":"כמה אתם אוהבים להזמין משלוחים הביתה?","min":"נדיר","max":"שליח כל יום"},{"t":"scale","q":"כמה אכפת לכם איך אתם נראים כשיוצאים מהבית?","min":"העיקר נוח","max":"כל פרט מתוכנן"},{"t":"mc","q":"מה הכי כיף לקנות?","o":["נעליים","בגדים","אביזרים","מוצרים לבית"]},{"t":"mc","q":"איך מחליטים מה לקנות?","o":["המלצת חברים","ביקורות באינטרנט","מה שרואים בחנות","פרסומות"]},{"t":"mc","q":"איזה זמן הכי טוב לקניות?","o":["לפני חג","בעונת מבצעים","ערב רגוע","בלי קשר"]},{"t":"mc","q":"איזה פריט בגדים הכי חשוב בארון?","o":["ג׳ינס","חולצה מכופתרת","מעיל טוב","נעלי נוחות"]},{"t":"mc","q":"מה הכי מעצבן בקניות?","o":["תורים","מידות שנגמרו","מחירים גבוהים","מוכרים שמציקים"]},{"t":"mc","q":"מה הכי כיף לקבל במתנה?","o":["בגד","נעליים","בושם","חפץ מעוצב לבית"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות בבגד","o":["נוחות","מראה","מחיר","איכות"]},{"t":"rank","q":"סדרו מקומות קניות מהכי אהוב להכי פחות","o":["קניון","שוק","אתר אינטרנט","חנות שכונתית"]},{"t":"rank","q":"סדרו סוגי נעליים מהכי אהוב להכי פחות","o":["סניקרס","נעליים אלגנטיות","סנדלים","מגפיים"]},{"t":"rank","q":"סדרו מהכי מרגש להכי פחות","o":["חבילה שהגיעה","מבצע שנתפס","בגד חדש ביום חג","נעליים חדשות"]},{"t":"who","q":"מי מאיתנו יותר יקנה משהו לא נחוץ רק כי היה במבצע?"},{"t":"who","q":"מי מאיתנו יותר יבלה שעה בחנות אחת?"},{"t":"who","q":"מי מאיתנו יותר יחזיר מוצר לחנות?"},{"t":"who","q":"מי מאיתנו מקבל יותר חבילות בדואר?"},{"t":"ab","q":"חנות עם מוכר שעוזר או חנות שבה נותנים לבד לבחור?","o":["מוכר עוזר","לבד"]},{"t":"ab","q":"לקנות מתנה לבד או לשאול מה מבקשים?","o":["לבד","לשאול"]},{"t":"ab","q":"ארנק קטן וצנוע או תיק גדול עם הכול?","o":["ארנק קטן","תיק גדול"]},{"t":"ab","q":"רשימת קניות כתובה או זיכרון?","o":["רשימה","זיכרון"]},{"t":"ab","q":"חג ושמחה: בגד חדש או בגד שכבר יש?","o":["חדש","כבר יש"]},{"t":"ab","q":"להתחיל עם החנות הכי יקרה או הכי זולה?","o":["הכי יקרה","הכי זולה"]},{"t":"ab","q":"לבחור בגד לפי הצבע או לפי הגזרה?","o":["צבע","גזרה"]},{"t":"ab","q":"לקנות הרבה בזול או מעט באיכות?","o":["הרבה בזול","מעט באיכות"]},{"t":"ab","q":"סוף עונה: להמתין למבצע או לקנות מיד?","o":["להמתין","לקנות מיד"]},{"t":"ab","q":"שקית מתנה מהודרת או עטיפה פשוטה?","o":["מהודרת","פשוטה"]},{"t":"scale","q":"כמה אתם אוהבים להיכנס לחנות בלי לקנות כלום?","min":"מיד יוצאים","max":"מסתובבים שעה"},{"t":"scale","q":"כמה אתם מתלהבים מהצצה בחלונות ראווה?","min":"לא מסתכלים","max":"עוצרים בכל חלון"},{"t":"scale","q":"כמה אתם שומרים שקיות וקופסאות מקנייה?","min":"זורקים מיד","max":"יש מחסן שלם"},{"t":"scale","q":"כמה אתם אוהבים להתייעץ לפני קנייה?","min":"מחליטים לבד","max":"שואלים את כולם"},{"t":"scale","q":"כמה אתם אוהבים נעליים חדשות?","min":"לא מתלהבים","max":"מתרגשים כל פעם"},{"t":"scale","q":"כמה אתם מוכנים לשלם על בגד שמרגיש מושלם?","min":"רק זול","max":"כל מחיר"},{"t":"mc","q":"איך הכי כיף לקבל קבלה על קנייה?","o":["בנייר","במייל","בהודעה","בלי קבלה"]},{"t":"mc","q":"איזה אביזר הכי מחדש לוק?","o":["תיק","שעון","כובע","חגורה"]},{"t":"mc","q":"מה הכי מושך בחנות?","o":["שלט מבצע","ריח טוב","תצוגה יפה","מוזיקה נעימה"]},{"t":"mc","q":"איזה בגד הכי כיף לקנות לילדים?","o":["נעליים","חליפה","בגדי חג","כובעים"]},{"t":"mc","q":"איפה הכי כיף לבחור מתנה?","o":["חנות ספרים","חנות צעצועים","חנות בגדים","חנות לבית"]},{"t":"mc","q":"איזו עונה הכי כיף לקנות לה בגדים?","o":["סתיו","חורף","אביב","קיץ"]},{"t":"rank","q":"סדרו עונות קניות מהכי כיפיות להכי פחות","o":["לפני פסח","לפני ראש השנה","חזרה ללימודים","סוף עונה"]},{"t":"rank","q":"סדרו מהכי חשוב להכי פחות בנעל","o":["נוחות","איכות","עיצוב","מחיר"]},{"t":"rank","q":"סדרו מהכי מעצבן להכי פחות בקופה","o":["תור ארוך","קופה סגורה","כרטיס שלא עובד","שקית שנקרעת"]},{"t":"rank","q":"סדרו מתנות מהכי שמחות להכי פחות","o":["בגד","ספר","נעליים","גאדג׳ט"]},{"t":"who","q":"מי מאיתנו יותר יחזור הביתה עם שקיות שלא תכנן?"},{"t":"who","q":"מי מאיתנו יותר ימדוד חמישה בגדים ולא יקנה כלום?"},{"t":"who","q":"מי מאיתנו יותר ישמור בגד שלא לובש כבר שנים?"},{"t":"who","q":"מי מאיתנו יותר יתעקש להשוות מחירים בכמה אתרים?"}],"isNew":true},{"id":"israeli","name":"ישראלי בנשמה","emoji":"🇮🇱","group":"fun","audience":"all","desc":"תורים, פקקים, במבה ודודים בארוחה","questions":[{"t":"ab","q":"חוף ים או בריכה?","o":["חוף ים","בריכה"]},{"t":"ab","q":"במבה או ביסלי?","o":["במבה","ביסלי"]},{"t":"ab","q":"להגיע בזמן או להגיע ״עוד חמש דקות״?","o":["בזמן","עוד חמש דקות"]},{"t":"ab","q":"נסיעה בכביש מהיר או בדרך הפנימית?","o":["כביש מהיר","דרך פנימית"]},{"t":"ab","q":"לעמוד בתור בסבלנות או לנסות לעקוף?","o":["לעמוד בתור","לנסות לעקוף"]},{"t":"ab","q":"טיול בצפון או טיול בדרום?","o":["צפון","דרום"]},{"t":"ab","q":"שוק מחנה יהודה או סופר שכונתי?","o":["שוק","סופר שכונתי"]},{"t":"ab","q":"ארוחת שישי אצל סבתא או אצל אמא?","o":["אצל סבתא","אצל אמא"]},{"t":"ab","q":"קפה שחור או קפה הפוך?","o":["שחור","הפוך"]},{"t":"ab","q":"סלנג ישראלי או עברית תקנית?","o":["סלנג","עברית תקנית"]},{"t":"scale","q":"כמה אתם עצבניים בפקק?","min":"שומע מוזיקה ונרגע","max":"צופר ללא הפסקה"},{"t":"scale","q":"כמה אתם אוהבים ארוחות משפחתיות גדולות?","min":"מעט אנשים בלבד","max":"כמה שיותר דודים"},{"t":"scale","q":"כמה אתם שומרים על פרטיות מול השכנים?","min":"כולם מכירים אותי","max":"לא יודע איך קוראים להם"},{"t":"scale","q":"כמה החום של הקיץ הישראלי מפריע לכם?","min":"אוהב את החום","max":"בורח למזגן"},{"t":"scale","q":"כמה אתם אומרים ״סבבה״ ו״יאללה״ ביום?","min":"כמעט אף פעם","max":"כל משפט"},{"t":"scale","q":"כמה אתם אוהבים לעשות על האש?","min":"לא מעניין","max":"מנגל בכל הזדמנות"},{"t":"mc","q":"מה הכי ישראלי בארוחת בוקר?","o":["שקשוקה","סלט קצוץ","חביתה","לבנה וזיתים"]},{"t":"mc","q":"איזה חג הכי אהוב?","o":["פסח","סוכות","פורים","חנוכה"]},{"t":"mc","q":"איפה הכי כיף לבלות בקיץ?","o":["חוף ים","צפון הארץ","נחל","בית עם מזגן"]},{"t":"mc","q":"איזה חטיף ישראלי הכי אהוב?","o":["במבה","ביסלי","שוקולד פרה","אפרופו"]},{"t":"mc","q":"מה הכי משמעותי בארוחת שישי?","o":["החלה","המרק","הזמר","הדיבורים סביב השולחן"]},{"t":"mc","q":"איזה מנהג ישראלי הכי חמוד?","o":["לדבר עם כולם","לקרוא לכולם ״אחי״","להזמין אורחים בלי הודעה","לחכות לשירות בסבלנות"]},{"t":"rank","q":"סדרו מאכלים מהכי אהוב להכי פחות","o":["פלאפל","שווארמה","חומוס","סביח"]},{"t":"rank","q":"סדרו מהכי מעצבן להכי פחות","o":["פקק תנועה","תור ארוך","חום כבד","חניה בלי מקום"]},{"t":"rank","q":"סדרו מקומות לטיול מהכי אהוב להכי פחות","o":["ים המלח","כנרת","ירושלים","הנגב"]},{"t":"rank","q":"סדרו חגים מהכי אהוב להכי פחות","o":["ראש השנה","שבועות","ל״ג בעומר","יום העצמאות"]},{"t":"who","q":"מי מאיתנו יותר יתעכב בדרך ויגיד ״אני כבר מגיע״?"},{"t":"who","q":"מי מאיתנו יותר יעמוד בתור ארוך בלי להתלונן?"},{"t":"who","q":"מי מאיתנו יותר ישתמש בסלנג בכל משפט?"},{"t":"who","q":"מי מאיתנו יותר יזמין אורחים הביתה ברגע האחרון?"},{"t":"ab","q":"ירושלים או תל אביב לטיול של יום?","o":["ירושלים","תל אביב"]},{"t":"ab","q":"לטייל בחול המועד או ללכת לעבודה רגיל?","o":["לטייל","עבודה"]},{"t":"ab","q":"עוגת שמרים של סבתא או עוגת שוקולד של אמא?","o":["שמרים","שוקולד"]},{"t":"ab","q":"נסיעה ברכבת או נסיעה באוטובוס?","o":["רכבת","אוטובוס"]},{"t":"ab","q":"לשבת בסוכה או לשבת בחצר?","o":["בסוכה","בחצר"]},{"t":"ab","q":"חומוס עם גרגרים שלמים או חלק וקרמי?","o":["גרגרים שלמים","חלק וקרמי"]},{"t":"ab","q":"חורף עם גשם וקור או קיץ חם?","o":["חורף","קיץ"]},{"t":"ab","q":"לקרוא לשכן בשם פרטי או ״השכן״?","o":["שם פרטי","השכן"]},{"t":"ab","q":"שיחת טלפון או הודעה בוואטסאפ?","o":["שיחה","הודעה"]},{"t":"ab","q":"לבקש הוראות דרך מעובר אורח או לסמוך על אפליקציית ניווט?","o":["לבקש מעובר אורח","אפליקציה"]},{"t":"scale","q":"כמה אתם מכירים שמות של יישובים בארץ?","min":"רק את שלי","max":"מכירים כל נקודה"},{"t":"scale","q":"כמה אתם מתרגשים משירים ישראליים ישנים?","min":"לא מתחברים","max":"שרים בקול"},{"t":"scale","q":"כמה אתם אוהבים להתווכח בקול רם בכיף?","min":"שקט ושלום","max":"זה הכיף שלנו"},{"t":"scale","q":"כמה אתם מתרגשים מליל הסדר?","min":"סתם ארוחה","max":"האירוע הכי טוב בשנה"},{"t":"scale","q":"כמה אתם מכינים יותר מדי אוכל לאורחים?","min":"בדיוק כמו שצריך","max":"אוכל לעשרים"},{"t":"scale","q":"כמה אתם בעד לדבר עם נהג המונית?","min":"שותקים","max":"מכירים את כל החיים שלו"},{"t":"mc","q":"מה הכי ישראלי בסוף ארוחה?","o":["תה עם נענע","קפה","פירות","עוגה"]},{"t":"mc","q":"איזה ביטוי הכי ישראלי?","o":["סבבה","יאללה","אחלה","חבל על הזמן"]},{"t":"mc","q":"מה הכי טוב בערב חורף?","o":["מרק","שוקו חם","שמיכה וספר","סיפורי משפחה"]},{"t":"mc","q":"איזה אתר מטיולי בית הספר הכי זכור?","o":["מצדה","עין גדי","קיסריה","הכותל"]},{"t":"mc","q":"מה הכי חשוב בשבת בבוקר?","o":["שינה","תפילה","ארוחה משפחתית","טיול שקט"]},{"t":"mc","q":"איזה ריח הכי מזכיר בית?","o":["חלה בתנור","קפה","תבשיל של סבתא","פרחי הגינה"]},{"t":"rank","q":"סדרו מהכי הכי ישראלי להכי פחות","o":["שוק","פלאפל","בנדנה על הראש","שיר של אריק איינשטיין"]},{"t":"rank","q":"סדרו עונות מהכי אהובה להכי פחות","o":["אביב","קיץ","סתיו","חורף"]},{"t":"rank","q":"סדרו מהכי מרגש להכי פחות בחגים","o":["ליל סדר","הדלקת נרות חנוכה","תקיעת שופר","משלוח מנות"]},{"t":"rank","q":"סדרו תבלינים מהכי ישראליים להכי פחות","o":["זעתר","חריף","אפונת סומאק","סומסום"]},{"t":"who","q":"מי מאיתנו יותר יבקש מעובר אורח כיוונים גם כשיש ניווט?"},{"t":"who","q":"מי מאיתנו יותר יתווכח עם מוכר בשוק על המחיר?"},{"t":"who","q":"מי מאיתנו יותר ידבר עם זרים בתור?"},{"t":"who","q":"מי מאיתנו יותר יביא יותר מדי אוכל לטיול?"}],"isNew":true},{"id":"funny","name":"מצבים מביכים","emoji":"😂","group":"fun","audience":"all","desc":"הרגעים שרוצים למחוק מהזיכרון","questions":[{"t":"ab","q":"להתעטש חזק בשקט מוחלט או לפרוץ בצחוק בזמן רציני?","o":["להתעטש חזק","לפרוץ בצחוק"]},{"t":"ab","q":"לקרוא למישהו בטעות בשם הלא נכון או לשכוח לגמרי את השם שלו?","o":["שם לא נכון","לשכוח את השם"]},{"t":"ab","q":"להגיע ראשון לאירוע או להגיע אחרון?","o":["ראשון","אחרון"]},{"t":"ab","q":"לשלוח הודעה לא נכונה לאדם הלא נכון או לשלוח הודעה שעוד לא סיימת לכתוב?","o":["הודעה לאדם הלא נכון","הודעה לא גמורה"]},{"t":"ab","q":"להיתקע במעלית עם שכן שקט או עם שכן שמדבר בלי הפסקה?","o":["שכן שקט","שכן פטפטן"]},{"t":"ab","q":"לשכוח איפה החנית או לשכוח איפה שמת את הטלפון?","o":["איפה החנית","איפה הטלפון"]},{"t":"ab","q":"שיראו אותך שר לעצמך ברחוב או מדבר לעצמך?","o":["שר לעצמי","מדבר לעצמי"]},{"t":"ab","q":"להנהן למישהו כשלא שמעת מה הוא אמר או לבקש שיחזור על זה בפעם השלישית?","o":["להנהן ולקוות","לבקש שיחזור"]},{"t":"ab","q":"להגיד בטעות 'גם לך' למי שאמר לך 'בתיאבון' או להגיד 'תודה' כשצריך להגיד 'סליחה'?","o":["'גם לך' בטעות","'תודה' במקום 'סליחה'"]},{"t":"ab","q":"לשמוע את עצמך בהקלטה או לראות את עצמך בווידאו?","o":["לשמוע הקלטה","לראות וידאו"]},{"t":"ab","q":"לגלות בצהריים שהחולצה הפוכה או לגלות שיש כתם גדול על החולצה כבר מהבוקר?","o":["חולצה הפוכה","כתם מהבוקר"]},{"t":"ab","q":"להמציא תירוץ כדי לא להגיע לאירוע או להגיע ולהשתעמם?","o":["להמציא תירוץ","להגיע ולהשתעמם"]},{"t":"ab","q":"לספר בדיחה ושאף אחד לא צוחק או לצחוק לבד מבדיחה של עצמך?","o":["אף אחד לא צוחק","לצחוק לבד"]},{"t":"ab","q":"לשלוח בטעות הודעה קולית ארוכה או להתקשר בטעות למישהו?","o":["הודעה קולית בטעות","שיחה בטעות"]},{"t":"ab","q":"שיתפסו אותך רוקד לבד בבית או שר בקול ברכב?","o":["רוקד לבד","שר ברכב"]},{"t":"ab","q":"לגלות באמצע שיחת זום שהמצלמה דלוקה או שהמיקרופון דלוק?","o":["מצלמה דלוקה","מיקרופון דלוק"]},{"t":"ab","q":"פטרוזיליה בין השיניים כל הפגישה או מדבקת מחיר שנשארה על הבגד?","o":["פטרוזיליה בשיניים","מדבקת מחיר"]},{"t":"ab","q":"למשוך דלת שכתוב עליה 'דחוף' או לדחוף דלת שכתוב עליה 'משוך'?","o":["למשוך במקום לדחוף","לדחוף במקום למשוך"]},{"t":"ab","q":"לשכוח מילה באמצע משפט או לשכוח על מה התחלת לדבר?","o":["לשכוח מילה","לשכוח את הנושא"]},{"t":"ab","q":"להיות היחיד שלא הבין את הבדיחה או להיות היחיד שצוחק?","o":["היחיד שלא הבין","היחיד שצוחק"]},{"t":"scale","q":"כמה מביך לך לשיר מול אנשים?","min":"שר בכיף","max":"מעדיף להיבלע באדמה"},{"t":"scale","q":"כמה קל לך לפרוץ בצחוק בזמן לא מתאים?","min":"שומר על פוקר פייס","max":"נופל מהכיסא"},{"t":"scale","q":"כמה מביך להיתקל במכר בחנות כשלבושים בבגדי בית?","min":"ממש לא אכפת","max":"נעלם בין המדפים"},{"t":"scale","q":"כמה נוח לך לבקש עזרה מזרים ברחוב?","min":"מעדיף ללכת לאיבוד","max":"שואל כל אחד"},{"t":"scale","q":"כמה אתה זוכר שמות של אנשים שהכרת רגע קודם?","min":"נמחק תוך שנייה","max":"זוכר הכול"},{"t":"scale","q":"כמה לחץ עולה כשהסוללה בטלפון מגיעה ל־3 אחוז?","min":"רגוע לגמרי","max":"מחפש מטען בבהלה"},{"t":"scale","q":"כמה קשה לך לשמור הפתעה בסוד?","min":"קבר סגור","max":"מגלה אחרי דקה"},{"t":"scale","q":"כמה מביך לך כשמזמרים לך 'יום הולדת שמח' בציבור?","min":"מתענג על זה","max":"רוצה לברוח"},{"t":"scale","q":"כמה קשה לך להגיד 'לא' למישהו שמבקש טובה?","min":"אומר לא בקלות","max":"אומר כן ומתחרט"},{"t":"scale","q":"כמה קל לך להתחיל שיחה עם זר בתור?","min":"שתיקה עד הקופה","max":"מכיר את כל התור"},{"t":"scale","q":"כמה קשה לך לא להגיד 'אמרתי לך'?","min":"שותק בקלות","max":"חייב להגיד"},{"t":"scale","q":"כמה מצחיק אתה חושב שאתה?","min":"לא ממש","max":"קומיקאי מלידה"},{"t":"mc","q":"מה המצב הכי מביך?","o":["ליפול ברחוב מול כולם","לשכוח שם באמצע היכרות","לשלוח הודעה לאדם הלא נכון","להתעטש בשקט מוחלט"]},{"t":"mc","q":"מה עושים כשפוגשים מכר שממש לא בא לדבר איתו?","o":["מעמידים פנים שמדברים בטלפון","מחייכים ומדברים","חוצים כביש","מסתכלים הצידה"]},{"t":"mc","q":"מה התירוץ הכי נפוץ לאיחור?","o":["פקק נוראי","הטלפון לא צלצל","בדיוק יצאתי","היה לי טלפון חשוב"]},{"t":"mc","q":"מה עושים כשמישהו מספר בדיחה לא מצחיקה?","o":["צוחקים בנימוס","מחייכים בלבד","שותקים","מחליפים נושא"]},{"t":"mc","q":"מה עושים כשמקבלים מתנה שלא אוהבים?","o":["מחייכים ומודים","אומרים 'וואו, איזה יופי'","מחביאים בארון","מחליפים בשקט"]},{"t":"mc","q":"מה עושים כשהמלצר מביא מנה שלא הזמנו?","o":["אוכלים מה שהגיע","מבקשים לתקן","מחליפים עם החבר","מתלוננים בנימוס"]},{"t":"mc","q":"מה עושים כשהטלפון מצלצל בקול באמצע אירוע שקט?","o":["מנתקים במהירות","מתנצלים בהנהון","יוצאים מהחדר","מעמידים פנים שזה לא שלי"]},{"t":"mc","q":"מה עושים אחרי שנתפסים מדברים לעצמם?","o":["צוחקים על עצמנו","מעמידים פנים שבטלפון","ממשיכים כאילו כלום","מסבירים בהתלהבות"]},{"t":"mc","q":"מה הכי מעצבן בקבוצת וואטסאפ?","o":["הודעות קוליות ארוכות","'מי יודע?' בלי תשובה","שרשראות ברכה","תמונות בלי הסבר"]},{"t":"mc","q":"מה הכי קל לשכוח כשיוצאים מהבית?","o":["מפתחות","ארנק","טלפון","משקפיים"]},{"t":"mc","q":"מה עושים כשמישהו מברך אותנו ואנחנו לא זוכרים מי הוא?","o":["עונים 'וגם לך!'","מחייכים בחום","שואלים 'מה שלומך?'","מעמידים פנים שמזהים"]},{"t":"mc","q":"מה עושים כשנתקעים בתור ארוך?","o":["מסתכלים בטלפון","מדברים עם מי שלידנו","נאנחים בקול","עוברים לתור אחר"]},{"t":"rank","q":"סדרו מהכי מביך להכי פחות","o":["ליפול ברחוב","לשכוח שם של מכר","להתעטש באמצע הרצאה","מיקרופון דלוק בזום"]},{"t":"rank","q":"סדרו מהכי מעצבן להכי פחות","o":["מישהו מדבר בקול בתחבורה ציבורית","אנשים שלא עונים להודעות","מאחרים כרוניים","הודעה שמתחילה ב'היי' ושותקת"]},{"t":"rank","q":"סדרו מהכי נוח לכם להכי פחות","o":["לשיר מול קהל","לספר בדיחה לחברים","לנאום באירוע","לרקוד בשמחה"]},{"t":"rank","q":"סדרו מהכי מתאים לכם להכי פחות","o":["שוכח שמות","מאחר","מאבד חפצים","דוחה משימות"]},{"t":"rank","q":"סדרו תירוצים להתחמק מאירוע, מהכי טוב להכי חלש","o":["יש לי עבודה דחופה","אני לא מרגיש טוב","קיבלתי טלפון חשוב","הטלפון שלי נגמר"]},{"t":"rank","q":"סדרו מהכי מלחיץ להכי פחות","o":["לדבר מול קהל","לחכות לתשובה חשובה","לעלות על מטוס","לשבת אצל רופא שיניים"]},{"t":"rank","q":"סדרו מהכי מצחיק להכי פחות","o":["תינוקות שטועמים לימון","ילדים שאומרים דברים בלי פילטר","בדיחות אבא","סרטוני חתולים"]},{"t":"rank","q":"סדרו מה הכי קשה להימנע ממנו","o":["לבדוק את הטלפון","לאכול עוד חטיף","לענות על הודעה מיד","להגיד 'אמרתי לך'"]},{"t":"who","q":"מי מאיתנו יותר נוטה לאחר?"},{"t":"who","q":"מי מאיתנו יותר מתבלבל בשמות של אנשים?"},{"t":"who","q":"מי מאיתנו יותר עלול להיתפס מדבר לעצמו?"},{"t":"who","q":"מי מאיתנו יותר יצחק בזמן לא מתאים?"},{"t":"who","q":"מי מאיתנו יותר מאבד את הטלפון בתוך הבית?"},{"t":"who","q":"מי מאיתנו יותר יתחמק משיחת טלפון מביכה?"},{"t":"who","q":"מי מאיתנו יותר יספר בדיחה ששום אחד לא יצחק ממנה?"},{"t":"who","q":"מי מאיתנו יותר יימשך בטעות דלת שצריך לדחוף?"}],"isNew":true},{"id":"jewish","name":"שבת ויהדות","emoji":"🕯️","group":"life","audience":"all","desc":"קוגל, ניגונים וריח של שבת","questions":[{"t":"ab","q":"קוגל מתוק או קוגל פלפל?","o":["קוגל מתוק","קוגל פלפל"]},{"t":"ab","q":"חמין עם קישקע או חמין בלי?","o":["עם קישקע","בלי קישקע"]},{"t":"ab","q":"סעודה שלישית ארוכה עם ניגונים או קצרה ושקטה?","o":["ארוכה עם ניגונים","קצרה ושקטה"]},{"t":"ab","q":"להתפלל בנץ או לקום קצת יותר מאוחר?","o":["בנץ","קצת יותר מאוחר"]},{"t":"ab","q":"חלה רכה או חלה פריכה?","o":["חלה רכה","חלה פריכה"]},{"t":"ab","q":"זמירות בקול רם או זמירות בשקט ובנחת?","o":["בקול רם","בשקט ובנחת"]},{"t":"ab","q":"דרשה ארוכה ומעמיקה או דרשה קצרה ומתובלת בסיפור?","o":["ארוכה ומעמיקה","קצרה עם סיפור"]},{"t":"ab","q":"שולחן שבת עם הרבה אורחים או שולחן משפחתי בלבד?","o":["הרבה אורחים","משפחה בלבד"]},{"t":"ab","q":"ניגון שמח לרקוד איתו או ניגון איטי ומרגש?","o":["ניגון שמח","ניגון איטי ומרגש"]},{"t":"ab","q":"סעודת ליל שבת או סעודת שבת בבוקר?","o":["ליל שבת","שבת בבוקר"]},{"t":"ab","q":"לשמוע סיפור חסידי או לשמוע שיעור מעמיק?","o":["סיפור חסידי","שיעור מעמיק"]},{"t":"ab","q":"סיפורי דוד המלך או סיפורי יוסף ואחיו?","o":["דוד המלך","יוסף ואחיו"]},{"t":"ab","q":"לומר דרשה בבר מצווה או לקרוא בתורה בבר מצווה?","o":["לומר דרשה","לקרוא בתורה"]},{"t":"ab","q":"בית כנסת קטן וחם או בית כנסת גדול ומפואר?","o":["קטן וחם","גדול ומפואר"]},{"t":"ab","q":"לשבת בקדמת בית הכנסת או בקצה ליד הדלת?","o":["בקדמה","בקצה ליד הדלת"]},{"t":"ab","q":"גפילטע פיש מתוק או גפילטע פיש חריף?","o":["מתוק","חריף"]},{"t":"ab","q":"מרק עוף עם אטריות או עם קרעפלעך?","o":["עם אטריות","עם קרעפלעך"]},{"t":"ab","q":"סוכה מקושטת בהידור או סוכה פשוטה ונעימה?","o":["מקושטת","פשוטה ונעימה"]},{"t":"ab","q":"לחפש את האפיקומן או להחביא אותו?","o":["לחפש","להחביא"]},{"t":"ab","q":"סופגנייה עם ריבה או סופגנייה עם שוקולד?","o":["עם ריבה","עם שוקולד"]},{"t":"scale","q":"כמה אתם אוהבים לשבת ליד שולחן שבת ארוך?","min":"קמים אחרי המרק","max":"יושבים עד הערב"},{"t":"scale","q":"כמה אתם אוהבים לשיר זמירות סביב השולחן?","min":"מקשיבים בשקט","max":"שרים בכל הכוח"},{"t":"scale","q":"כמה האוכל של אמא או סבתא מנצח כל מסעדה?","min":"יש טובים ממנו","max":"אף אחד לא מתקרב"},{"t":"scale","q":"כמה חמין אפשר לאכול בשבת בצהריים?","min":"צלחת קטנה","max":"תוספת ועוד תוספת"},{"t":"scale","q":"כמה ניגון טוב יכול לרגש אתכם?","min":"נעים ולא יותר","max":"דמעות בעיניים"},{"t":"scale","q":"כמה אתם זוכרים מהבר מצווה שלכם?","min":"כמעט כלום","max":"כל פרט ופרט"},{"t":"scale","q":"כמה אתם אוהבים להזמין אורחים לשבת?","min":"מעדיפים שקט משפחתי","max":"הבית תמיד מלא"},{"t":"scale","q":"כמה קשה לקום להתפלל בבוקר?","min":"קם בקלות","max":"עוד חמש דקות"},{"t":"scale","q":"כמה אתם אוהבים סיפורי צדיקים?","min":"נחמד לפעמים","max":"יכול להקשיב שעות"},{"t":"scale","q":"כמה רגע הדלקת הנרות מרגיע?","min":"עוד משימה לפני שבת","max":"הרגע הכי שליו בשבוע"},{"t":"scale","q":"כמה אתם מכירים את פרשת השבוע?","min":"יודעים את השם","max":"יודעים את כל העלילה"},{"t":"scale","q":"כמה אתם מחכים לשבת כל השבוע?","min":"מגיעה כשמגיעה","max":"סופרים ימים מיום ראשון"},{"t":"mc","q":"מה הכי חשוב על שולחן ליל שבת?","o":["דגים","מרק עוף","קוגל","סלטים"]},{"t":"mc","q":"מי הדמות האהובה ביותר בתנ״ך?","o":["דוד המלך","יוסף הצדיק","משה רבנו","אסתר המלכה"]},{"t":"mc","q":"איזה חג הכי אהוב?","o":["פסח","סוכות","פורים","חנוכה"]},{"t":"mc","q":"מה הכי טעים בסעודה שלישית?","o":["סלט ביצים","חלה עם טחינה","עוגה","ירקות חתוכים"]},{"t":"mc","q":"מתי הכי נעים בבית הכנסת?","o":["קבלת שבת","תפילת שחרית","סיום מסכת","שמחת תורה"]},{"t":"mc","q":"איזו זמירה הכי אהובה?","o":["שלום עליכם","יה ריבון","מנוחה ושמחה","דרור יקרא"]},{"t":"mc","q":"מה הכי כיף בפורים?","o":["משלוחי מנות","הסעודה","התחפושות","קריאת המגילה"]},{"t":"mc","q":"איזו מצווה הכי נעים לקיים?","o":["הכנסת אורחים","קידוש","ארבעת המינים","מתנות לאביונים"]},{"t":"mc","q":"איפה הכי כיף לאכול סעודת שבת?","o":["בבית שלנו","אצל ההורים","אצל חברים","אצל סבא וסבתא"]},{"t":"mc","q":"מה הכי זוכרים מהבר מצווה?","o":["הנאום","הריקודים","המתנות","הקריאה בתורה"]},{"t":"mc","q":"מה הכי מזכיר לכם בית וחום?","o":["ריח של חלות","נרות שבת","זמירות סביב השולחן","שולחן ערוך ומלא"]},{"t":"mc","q":"איזה סיפור מהתנ״ך הכי מרתק?","o":["יציאת מצרים","עקדת יצחק","דוד וגוליית","מגילת אסתר"]},{"t":"rank","q":"סדרו מהכי אהוב להכי פחות","o":["קוגל","חמין","קישקע","גפילטע פיש"]},{"t":"rank","q":"סדרו חגים מהכי אהוב להכי פחות","o":["ראש השנה","שמחת תורה","חנוכה","ל״ג בעומר"]},{"t":"rank","q":"סדרו מהכי נעים בשבת להכי פחות","o":["שנת צהריים","סעודה טובה","שירה סביב השולחן","ספר טוב"]},{"t":"rank","q":"סדרו ספרי תנ״ך מהכי אהוב להכי פחות","o":["תהילים","משלי","רות","אסתר"]},{"t":"rank","q":"סדרו מהכי מרגש להכי פחות","o":["תקיעת שופר","הדלקת נרות חנוכה","הבדלה","סיום מסכת"]},{"t":"rank","q":"סדרו מתוקים מהכי טעים להכי פחות","o":["סופגניות","אוזני המן","לביבות","עוגת דבש"]},{"t":"rank","q":"סדרו חלקי סעודה מהכי חשוב להכי פחות","o":["מרק","דגים","עוף","קינוח"]},{"t":"rank","q":"סדרו מהכי חשוב בבית כנסת להכי פחות","o":["מקום קבוע","חזן טוב","דרשה קצרה","קידוש גדול"]},{"t":"who","q":"מי מאיתנו יותר יוסיף עוד מנה של חמין?"},{"t":"who","q":"מי מאיתנו יותר יקום ראשון לתפילה בשבת?"},{"t":"who","q":"מי מאיתנו יותר ישיר בקול רם סביב השולחן?"},{"t":"who","q":"מי מאיתנו יותר זוכר את פרשת השבוע?"},{"t":"who","q":"מי מאיתנו יותר ירדם בשנת צהריים בשבת?"},{"t":"who","q":"מי מאיתנו יותר ידאג שיהיו אורחים בשולחן?"},{"t":"who","q":"מי מאיתנו יותר יתרגש בתקיעת שופר?"},{"t":"who","q":"מי מאיתנו יותר זוכר מילים של זמירות?"}],"isNew":true}];
+</script>
+<script>
+
+</script>
+<script>
+'use strict';
+/* ============ helpers ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const COLORS = ['#7C5CFF', '#FF3D8B'];
+const IN_ARTIFACT_EARLY = !!(window.claude && typeof window.claude.use === 'function');
+const initial = n => (n || '?').trim().charAt(0);
+
+const DECKS = (window.DECKS || []).map(d => ({ ...d, questions: d.questions.map((q, i) => ({ ...q, id: d.id + ':' + i })) }));
+const GROUPS = [['all', 'הכול'], ['couples', 'זוגות'], ['fun', 'כיף'], ['life', 'חיים']];
+const TYPE_LBL = { ab: 'זה או זה', scale: 'דרגו מ-1 עד 10', mc: 'בחרו תשובה אחת', rank: 'לחצו לפי הסדר: הראשון = הכי', who: 'מי מכם?' };
+
+/* ============ storage ============ */
+const KEY = 'al-oto-gal-v1';
+let DB = { last: { p1: '', p2: '', mode: 'match', len: 12 }, games: 0, badges: {}, pairs: {}, settings: { sound: true, music: true } };
+try { const raw = localStorage.getItem(KEY); if (raw) DB = Object.assign(DB, JSON.parse(raw)); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} };
+const pairKey = (a, b) => [a.trim(), b.trim()].map(s => s.toLowerCase()).sort().join('|');
+
+/* ============ ranks & badges ============ */
+const RANKS = [
+  [0, 'מכירים', '🤝'], [3, 'חברים טובים', '😊'], [7, 'אחים לנשק', '💪'], [15, 'צוות מנצח', '🏆'], [30, 'נשמות תאומות', '👑']
+];
+const rankOf = games => { let r = RANKS[0]; for (const x of RANKS) if (games >= x[0]) r = x; return r; };
+const nextRank = games => RANKS.find(x => x[0] > games);
+
+const BADGES = [
+  ['first', '🌊', 'הגל הראשון', 'שיחקתם משחק ראשון'],
+  ['p100', '💯', 'טלפתיה מלאה', '100% במשחק אחד'],
+  ['p90', '💞', 'נשמות תאומות', '90% ומעלה'],
+  ['p0', '🪐', 'הפכים נמשכים', 'פחות מ-25% (וזה בסדר!)'],
+  ['streak5', '🔥', 'רצף חם', '5 התאמות ברצף'],
+  ['streak10', '⚡', 'בלתי ניתנים לעצירה', '10 התאמות ברצף'],
+  ['g10', '🎮', 'מכורים קלות', '10 משחקים'],
+  ['g25', '🕹️', 'מכורים רשמית', '25 משחקים'],
+  ['g50', '🏅', 'אגדות הגל', '50 משחקים'],
+  ['d5', '🃏', 'טועמים מכל דבר', '5 חפיסות שונות'],
+  ['d10', '🎴', 'אספנים', '10 חפיסות שונות'],
+  ['dall', '👑', 'ראיתם הכול', 'כל החפיסות'],
+  ['wyrdone', '🤔', 'מלכי הדילמות', 'סיימתם את "מה הייתם מעדיפים"'],
+  ['decdone', '✅', 'חפיסה שלמה', 'סיימתם חפיסה עד הסוף'],
+  ['long', '🏃', 'מרתון', 'משחק ארוך של 20 שאלות'],
+  ['guesswin', '🔮', 'קוראי מחשבות', 'ניחוש 80% ומעלה'],
+  ['scale3', '🎯', 'בול על המספר', '3 סקאלות זהות במשחק'],
+  ['night', '🦉', 'ינשופי לילה', 'משחק אחרי חצות'],
+  ['couple', '💑', 'זוג משחק', 'שיחקתם חפיסת זוגות'],
+  ['pairs3', '👥', 'מלך החבר\'ה', '3 זוגות שחקנים שונים'],
+];
+
+/* ============ audio ============ */
+const Snd = (() => {
+  let ctx = null, master = null, musicGain = null, musicTimer = null, step = 0, nextT = 0;
+  const init = () => {
+    if (ctx) return;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain(); master.gain.value = .9; master.connect(ctx.destination);
+      musicGain = ctx.createGain(); musicGain.gain.value = 0; musicGain.connect(master);
+    } catch (e) { ctx = null; }
+  };
+  const tone = (f, t0, dur, type = 'sine', vol = .2, dest) => {
+    if (!ctx) return;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0);
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol, t0 + .012); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(g); g.connect(dest || master); o.start(t0); o.stop(t0 + dur + .05);
+  };
+  const sfx = name => {
+    if (!DB.settings.sound) return;
+    init(); if (!ctx) return; if (ctx.state === 'suspended') ctx.resume();
+    const t = ctx.currentTime;
+    switch (name) {
+      case 'tap': tone(660, t, .08, 'triangle', .12); break;
+      case 'pick': tone(523, t, .1, 'triangle', .14); tone(784, t + .05, .14, 'triangle', .12); break;
+      case 'pass': { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(900, t + .25); g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + .3); o.connect(g); g.connect(master); o.start(t); o.stop(t + .32); break; }
+      case 'match': [523, 659, 784, 1047].forEach((f, i) => { tone(f, t + i * .08, .5, 'triangle', .16); tone(f * 2, t + i * .08, .3, 'sine', .05); }); break;
+      case 'close': [523, 659, 784].forEach((f, i) => tone(f, t + i * .09, .4, 'triangle', .13)); break;
+      case 'miss': tone(330, t, .22, 'sawtooth', .06); tone(247, t + .14, .35, 'triangle', .14); break;
+      case 'win': [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, t + i * .09, .7, 'triangle', .14)); [1047, 1319, 1568].forEach(f => tone(f, t + .6, 1.1, 'sine', .06)); break;
+      case 'badge': [880, 1175, 1568].forEach((f, i) => tone(f, t + i * .07, .45, 'sine', .14)); break;
+      case 'tick': tone(1200, t, .03, 'square', .04); break;
+    }
+  };
+  // gentle generative lo-fi loop
+  const CH = [[261.6, 329.6, 392, 493.9], [220, 261.6, 329.6, 392], [174.6, 220, 261.6, 329.6], [196, 246.9, 293.7, 392]];
+  const PENTA = [523.3, 587.3, 659.3, 784, 880, 1046.5];
+  const sched = () => {
+    while (nextT < ctx.currentTime + .25) {
+      const beat = step % 8, bar = Math.floor(step / 8) % 4, ch = CH[bar];
+      if (beat === 0) ch.forEach(f => tone(f, nextT, 3.4, 'sine', .045, musicGain));
+      if (beat === 0 || beat === 4) tone(ch[0] / 2, nextT, .9, 'triangle', .09, musicGain);
+      if (Math.random() < .42) tone(pick(PENTA), nextT, .5, 'triangle', .035, musicGain);
+      if (beat % 2 === 1) tone(5000, nextT, .03, 'square', .004, musicGain);
+      nextT += .43; step++;
+    }
+  };
+  const music = on => {
+    init(); if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    if (on && !musicTimer) { nextT = ctx.currentTime + .1; musicTimer = setInterval(sched, 90); musicGain.gain.setTargetAtTime(.55, ctx.currentTime, .8); }
+    if (!on && musicTimer) { musicGain.gain.setTargetAtTime(0, ctx.currentTime, .3); clearInterval(musicTimer); musicTimer = null; }
+  };
+  document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else ctx.resume(); });
+  return { sfx, music, init };
+})();
+const vib = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+let audioStarted = false;
+document.addEventListener('pointerdown', () => { if (audioStarted) return; audioStarted = true; Snd.init(); if (DB.settings.music) Snd.music(true); }, { once: false, capture: true });
+
+/* ============ confetti ============ */
+const FX = (() => {
+  const cv = $('#fx'), cx = cv.getContext('2d'); let parts = [], raf = 0;
+  const fit = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; };
+  addEventListener('resize', fit); fit();
+  const loop = () => {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter(p => p.life > 0);
+    for (const p of parts) {
+      p.vy += .25 * devicePixelRatio; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.globalAlpha = Math.min(1, p.life / 30);
+      cx.fillStyle = p.c;
+      if (p.s === 'h') { cx.font = `${p.w * 2}px serif`; cx.fillText(p.e, -p.w, p.w); } else cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      cx.restore();
+    }
+    raf = parts.length ? requestAnimationFrame(loop) : 0;
+  };
+  const burst = (n = 120, emojis) => {
+    const d = devicePixelRatio, cols = ['#7C5CFF', '#FF3D8B', '#FFB703', '#16C79A', '#A48BFF', '#FF8FBC'];
+    for (let i = 0; i < n; i++) {
+      const fromLeft = i % 2 === 0;
+      const p = { x: fromLeft ? 0 : cv.width, y: cv.height * .55, vx: (fromLeft ? 1 : -1) * (6 + Math.random() * 12) * d, vy: -(10 + Math.random() * 14) * d,
+        r: Math.random() * 6, vr: (Math.random() - .5) * .3, w: (6 + Math.random() * 6) * d, h: (10 + Math.random() * 8) * d, c: pick(cols), life: 110 + Math.random() * 60, s: 'r' };
+      if (emojis && Math.random() < .25) { p.s = 'h'; p.e = pick(emojis); p.w = 12 * d; }
+      parts.push(p);
+    }
+    if (!raf) raf = requestAnimationFrame(loop);
+  };
+  return { burst };
+})();
+
+/* ============ navigation ============ */
+let cur = 'home';
+const show = (id, dir) => {
+  const prev = $('#s-' + cur), next = $('#s-' + id);
+  if (prev && prev !== next) { prev.classList.remove('on'); }
+  next.classList.toggle('off-r', dir === 'back');
+  next.scrollTop = 0;
+  requestAnimationFrame(() => { if (cur !== id) return; $$('.screen.on').forEach(x => x !== next && x.classList.remove('on')); next.classList.remove('off-r'); next.classList.add('on'); });
+  cur = id;
+};
+try { if (!IN_ARTIFACT_EARLY) { history.replaceState({ s: 'root' }, ''); history.pushState({ s: 'app' }, ''); } } catch (e) {}
+addEventListener('popstate', () => { try { history.pushState({ s: 'app' }, ''); } catch (e) {} handleBack(); });
+function handleBack() {
+  if ($('#modal').classList.contains('on')) return closeModal();
+  if (['q', 'pass', 'reveal', 'wait', 'lobby'].includes(cur)) return confirmQuit();
+  if (cur === 'home') return;
+  if (cur === 'end') return goHome();
+  goHome();
+}
+const goHome = () => { renderHome(); show('home', 'back'); };
+$$('[data-back]').forEach(b => b.onclick = () => { Snd.sfx('tap'); goHome(); });
+$$('[data-home]').forEach(b => b.onclick = () => { Snd.sfx('tap'); goHome(); });
+
+/* ============ modal & toast ============ */
+const openModal = html => { $('#sheet').innerHTML = html; $('#modal').classList.add('on'); };
+const closeModal = () => $('#modal').classList.remove('on');
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+let toastQ = [], toasting = false;
+const toast = (emoji, text) => { toastQ.push([emoji, text]); if (!toasting) nextToast(); };
+const nextToast = () => {
+  const t = toastQ.shift(); if (!t) { toasting = false; return; } toasting = true;
+  const box = $('#toast'); box.querySelector('.te').textContent = t[0]; box.querySelector('b').textContent = t[1];
+  Snd.sfx('badge'); vib(40); box.classList.add('on');
+  setTimeout(() => { box.classList.remove('on'); setTimeout(nextToast, 450); }, 2600);
+};
+
+/* ============ HOME ============ */
+function renderHome() {
+  const rp = $('#home-rank');
+  if (DB.games > 0) { rp.hidden = false; rp.innerHTML = `🎮 ${DB.games} משחקים · 🏅 ${Object.keys(DB.badges).length}/${BADGES.length} תגים`; } else rp.hidden = true;
+}
+$('#btn-new').onclick = () => { Snd.sfx('pick'); openSetup(); };
+$('#btn-history').onclick = $('#btn-history2').onclick = () => { Snd.sfx('tap'); renderHistory(); show('hist'); };
+$('#btn-settings').onclick = () => { Snd.sfx('tap'); renderSettings(); };
+function renderSettings() {
+  openModal(`<h3>הגדרות</h3>
+    <div class="toggle">🔊 צלילים<button class="sw ${DB.settings.sound ? 'on' : ''}" data-k="sound"></button></div>
+    <div class="toggle">🎵 מוזיקה<button class="sw ${DB.settings.music ? 'on' : ''}" data-k="music"></button></div>
+    <p>ההתקדמות נשמרת בטלפון הזה בלבד.</p>
+    <button class="btn mt16" id="m-close">סגירה</button>`);
+  $$('#sheet .sw').forEach(b => b.onclick = () => {
+    const k = b.dataset.k; DB.settings[k] = !DB.settings[k]; b.classList.toggle('on', DB.settings[k]); save();
+    if (k === 'music') Snd.music(DB.settings.music); Snd.sfx('tap');
+  });
+  $('#m-close').onclick = closeModal;
+}
+
+/* ============ SETUP ============ */
+const setup = { where: DB.last.where || 'online', mode: DB.last.mode || 'match', len: DB.last.len || 12, group: 'all', deck: null, q: '' };
+const applyWhere = () => {
+  const on = setup.where === 'online';
+  $('#p2').hidden = on; $('#p1').placeholder = on ? 'השם שלך' : 'שם שחקן/ית 1';
+  $('#btn-start').innerHTML = `<span class="shine"></span>${on ? 'פותחים חדר 🌐' : 'יאללה, מתחילים'}`;
+  checkStart();
+};
+const MODE_HINT = {
+  match: 'כל אחד עונה על עצמו. תשובות זהות = נקודה להתאמה 💞',
+  guess: 'כל אחד עונה על עצמו ואז מנחש מה השני ענה. מי מכיר את מי יותר טוב? 🔮'
+};
+function segInit(id, key) {
+  $$(`#${id} button`).forEach(b => {
+    b.classList.toggle('on', String(setup[key]) === b.dataset.v);
+    b.onclick = () => { Snd.sfx('tap'); setup[key] = key === 'len' ? +b.dataset.v : b.dataset.v; $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); if (key === 'mode') $('#mode-hint').textContent = MODE_HINT[setup.mode]; if (key === 'where') applyWhere(); };
+  });
+}
+function openSetup() {
+  $('#p1').value = DB.last.p1 || ''; $('#p2').value = DB.last.p2 || '';
+  segInit('seg-where', 'where'); segInit('seg-mode', 'mode'); segInit('seg-len', 'len'); $('#mode-hint').textContent = MODE_HINT[setup.mode];
+  if (!setup.deck) setup.deck = DECKS[0] && DECKS[0].id;
+  renderChips(); renderDecks(); renderPreview(); applyWhere();
+  show('setup');
+}
+function renderChips() {
+  const c = $('#chips'); c.innerHTML = '';
+  GROUPS.forEach(([v, n]) => { const b = el('button', 'chip' + (setup.group === v ? ' on' : ''), n); b.onclick = () => { Snd.sfx('tap'); setup.group = v; renderChips(); renderDecks(); }; c.appendChild(b); });
+}
+const pairOf = () => { const a = $('#p1').value.trim(), b = $('#p2').value.trim(); return a && b ? DB.pairs[pairKey(a, b)] : null; };
+function visibleDecks() {
+  const q = setup.q.trim();
+  return DECKS.filter(d => (setup.group === 'all' || d.group === setup.group) && (!q || d.name.includes(q) || (d.desc || '').includes(q)));
+}
+function renderDecks() {
+  const g = $('#decks'); g.innerHTML = '';
+  const pr = pairOf(), list = visibleDecks();
+  if (!list.length) { g.innerHTML = '<div class="empty">לא מצאנו חפיסה כזאת 🤷</div>'; return; }
+  list.forEach(d => {
+    const seen = pr && pr.seen && pr.seen[d.id] ? pr.seen[d.id].length : 0;
+    const done = seen >= d.questions.length;
+    const b = el('button', 'deck' + (setup.deck === d.id ? ' on' : ''));
+    b.dataset.id = d.id;
+    b.innerHTML = `${done ? '<span class="badge-done">הושלם ✓</span>' : d.isNew ? '<span class="badge-new">חדש</span>' : ''}
+      <span class="em">${d.emoji}</span><span><b>${esc(d.name)}</b><small>${d.questions.length} שאלות${d.audience === 'couples' ? ' · 💑' : d.audience === 'friends' ? ' · 👯' : ''}</small></span>`;
+    b.onclick = () => { Snd.sfx('pick'); setup.deck = d.id; $$('.deck').forEach(x => x.classList.toggle('on', x === b)); renderPreview(); };
+    g.appendChild(b);
+  });
+}
+function renderPreview() {
+  const d = DECKS.find(x => x.id === setup.deck); const p = $('#preview');
+  if (!d) { p.innerHTML = '<span class="muted">בחרו חפיסה</span>'; return; }
+  p.innerHTML = `<span class="em">${d.emoji}</span><span><b style="color:var(--ink)">${esc(d.name)}</b> · ${esc(d.desc || '')}</span>`;
+}
+const checkStart = () => { $('#btn-start').disabled = !($('#p1').value.trim() && (setup.where === 'online' || $('#p2').value.trim()) && setup.deck); };
+['#p1', '#p2'].forEach(s => $(s).addEventListener('input', () => { checkStart(); renderDecks(); }));
+$('#search').addEventListener('input', e => { setup.q = e.target.value; renderDecks(); });
+$('#btn-surprise').onclick = () => {
+  const list = visibleDecks().length ? visibleDecks() : DECKS; let n = 0; const total = 12 + Math.floor(Math.random() * 6);
+  const spin = () => {
+    const d = pick(list); setup.deck = d.id; Snd.sfx('tick');
+    $$('.deck').forEach(x => { x.classList.toggle('on', x.dataset.id === d.id); if (x.dataset.id === d.id) { x.classList.remove('spin'); void x.offsetWidth; x.classList.add('spin'); } });
+    renderPreview();
+    if (++n < total) setTimeout(spin, 60 + n * 14); else { Snd.sfx('pick'); vib(30); const on = $('.deck.on'); on && on.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  };
+  spin();
+};
+$('#btn-start').onclick = () => {
+  const p1 = $('#p1').value.trim(), p2 = $('#p2').value.trim();
+  if (setup.where === 'online') { DB.last = { ...DB.last, p1, where: 'online', mode: setup.mode, len: setup.len }; save(); return Net.create(p1, setup.mode, setup.len, setup.deck); }
+  if (p1.toLowerCase() === p2.toLowerCase()) { openModal(`<h3>רגע, אותו שם פעמיים? 🤔</h3><p>תנו לכל שחקן שם אחר, כדי שנדע מי ענה מה.</p><button class="btn mt16" id="m-close">הבנתי</button>`); $('#m-close').onclick = closeModal; return; }
+  DB.last = { ...DB.last, p1, p2, where: 'local', mode: setup.mode, len: setup.len }; save();
+  startGame(p1, p2, setup.mode, setup.len, setup.deck);
+};
+
+/* ============ GAME ============ */
+let G = null;
+function chooseQuestions(deck, pk, n) {
+  const pr = DB.pairs[pk]; const seen = new Set(pr && pr.seen && pr.seen[deck.id] || []);
+  const fresh = shuffle(deck.questions.filter(q => !seen.has(q.id))), old = shuffle(deck.questions.filter(q => seen.has(q.id)));
+  let qs = fresh.concat(old).slice(0, Math.min(n, deck.questions.length));
+  // spread the question types nicely
+  return shuffle(qs);
+}
+const QBYID = {}; DECKS.forEach(d => d.questions.forEach(q => QBYID[q.id] = q));
+function startGame(p1, p2, mode, len, deckId, online) {
+  const deck = DECKS.find(d => d.id === deckId) || DECKS[0];
+  const pk = pairKey(p1, p2);
+  const qs = online ? online.qids.map(id => QBYID[id]).filter(Boolean) : chooseQuestions(deck, pk, len);
+  G = { p: [p1, p2], mode, deck, pk, qs, i: 0, res: [], streak: 0, bestStreak: 0, order: [0, 1], turn: 0, phase: 'self', cur: null,
+        online: online ? { me: online.me, round: online.round } : null, revealed: -1, ended: false };
+  Snd.sfx('pick');
+  beginQuestion();
+}
+function beginQuestion() {
+  G.order = G.i % 2 === 0 ? [0, 1] : [1, 0];
+  G.turn = 0; G.cur = { self: [null, null], guess: [null, null] }; G.phase = 'self';
+  if (G.online) { renderQuestion(); show('q'); Net.check(); return; }
+  showPass();
+}
+function showWait() {
+  const other = 1 - G.online.me;
+  $('#wait-emoji').textContent = pick(['⏳', '🤔', '👀', '🌊']);
+  $('#wait-title').textContent = `ממתינים ל${G.p[other]}`;
+  $('#wait-sub').textContent = pick(['ברגע שיענה/תענה – חושפים! ✨', 'אל תגלו מה עניתם 🤫', 'מעניין אם תהיה התאמה… 💞']);
+  show('wait');
+}
+function showPass() {
+  const who = G.order[G.turn];
+  const first = G.i === 0 && G.turn === 0;
+  $('#pass-emoji').textContent = first ? '🌊' : G.turn === 0 ? '👉' : '🙈';
+  $('#pass-sub').textContent = first ? 'מתחילים! הטלפון אצל' : G.turn === 0 ? 'השאלה הבאה מתחילה אצל' : 'אל תציצו! 🤫 תעבירו את הטלפון ל';
+  $('#pass-name').innerHTML = `<div class="avbig" style="background:${COLORS[who]}">${esc(initial(G.p[who]))}</div><div class="mt12">${esc(G.p[who])}</div>`;
+  $('#pass-note').textContent = `שאלה ${G.i + 1} מתוך ${G.qs.length}` + (G.mode === 'guess' ? ' · עונים ואז מנחשים' : '');
+  $('#btn-ready').innerHTML = `<span class="shine"></span>אני ${esc(G.p[who])}, יאללה 👀`;
+  if (!first) { Snd.sfx('pass'); vib(25); }
+  show('pass');
+}
+$('#btn-ready').onclick = () => { Snd.sfx('tap'); G.phase = 'self'; renderQuestion(); show('q'); };
+
+function renderDashes() {
+  const d = $('#dashes'); d.innerHTML = '';
+  G.qs.forEach((q, i) => { const r = G.res[i]; d.appendChild(el('i', i < G.i ? (r && r.match ? 'hit' : 'miss') : i === G.i ? 'cur' : '')); });
+  const pct = (G.i) / G.qs.length, R = 23, C = 2 * Math.PI * R;
+  $('#ring').innerHTML = `<svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="${R}" fill="none" stroke="#DCD3F5" stroke-width="6"/><circle cx="27" cy="27" r="${R}" fill="none" stroke="#1C1433" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" style="transition:stroke-dashoffset .5s"/></svg><span>${G.i + 1}</span>`;
+}
+function renderQuestion() {
+  const q = G.qs[G.i], who = G.online ? G.online.me : G.order[G.turn], other = 1 - who, guessing = G.phase === 'guess';
+  renderDashes();
+  const tag = $('#q-who');
+  tag.className = 'who-tag' + (guessing ? ' guess-tag' : '');
+  tag.innerHTML = guessing ? `🔮 ${esc(G.p[who])}, מה לדעתך ${esc(G.p[other])} ענה/תה?` : `<span class="dot" style="background:${COLORS[who]}"></span>התשובה של ${esc(G.p[who])}`;
+  const qt = $('#q-text'); qt.style.animation = 'none'; void qt.offsetWidth; qt.style.animation = '';
+  qt.textContent = q.q;
+  $('#q-type').textContent = q.t === 'rank' ? 'לחצו לפי הסדר: 1 = הכי, 4 = הכי פחות' : TYPE_LBL[q.t];
+  const box = $('#q-input'), bottom = $('#q-bottom'); box.innerHTML = ''; bottom.innerHTML = '';
+  const done = v => {
+    vib(15);
+    if (guessing) G.cur.guess[who] = v; else G.cur.self[who] = v;
+    if (G.mode === 'guess' && !guessing) { G.phase = 'guess'; Snd.sfx('pick'); return setTimeout(renderQuestion, 180); }
+    G.phase = 'self';
+    if (G.online) { Net.answer(G.i, { s: G.cur.self[who], g: G.mode === 'guess' ? G.cur.guess[who] : null }); return setTimeout(() => { if (G && G.revealed < G.i) showWait(); Net.check(); }, 200); }
+    if (G.turn === 0) { G.turn = 1; return setTimeout(showPass, 220); }
+    setTimeout(reveal, 220);
+  };
+  const waitLine = () => { const w = el('div', 'waitline'); w.innerHTML = `<span>${guessing ? 'הניחוש שלך' : 'הבחירה שלך'}</span><span>${G.online ? '<span class="onlinepill"><i></i>אונליין</span>' : G.turn === 0 ? `אחר כך ${esc(G.p[other])}…` : 'ואז חושפים! ✨'}</span>`; bottom.appendChild(w); };
+
+  if (q.t === 'ab' || q.t === 'mc') {
+    const wrap = el('div', 'opts ' + q.t);
+    q.o.forEach((o, i) => {
+      const b = el('button', 'opt', `<span class="num">${q.t === 'mc' ? 'אבגד'[i] : i === 0 ? '←' : '→'}</span><span>${esc(o)}</span>`);
+      b.onclick = () => { if (wrap.dataset.lock) return; wrap.dataset.lock = 1; b.classList.add('pick'); Snd.sfx('pick'); done(i); };
+      wrap.appendChild(b);
+    });
+    if (q.t === 'ab') wrap.querySelectorAll('.num').forEach((n, i) => n.textContent = i === 0 ? 'א' : 'ב');
+    box.appendChild(wrap); waitLine();
+  } else if (q.t === 'who') {
+    const wrap = el('div', 'opts who');
+    [0, 1].forEach(i => {
+      const b = el('button', 'opt', `<span class="av" style="background:${COLORS[i]}">${esc(initial(G.p[i]))}</span>${esc(G.p[i])}`);
+      b.onclick = () => { if (wrap.dataset.lock) return; wrap.dataset.lock = 1; b.classList.add('pick'); Snd.sfx('pick'); done(i); };
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap); waitLine();
+  } else if (q.t === 'scale') {
+    let v = 5;
+    const sb = el('div', 'scalebox');
+    sb.innerHTML = `<div class="bignum">5</div><input type="range" min="1" max="10" step="1" value="5"><div class="scalelbl"><span>1 · ${esc(q.min || 'הכי פחות')}</span><span>${esc(q.max || 'הכי')} · 10</span></div>`;
+    const r = sb.querySelector('input'), num = sb.querySelector('.bignum');
+    const conf = el('button', 'btn mt24', 'אישור 5');
+    const upd = () => { v = +r.value; num.textContent = v; conf.textContent = 'אישור ' + v; r.style.setProperty('--p', ((v - 1) / 9 * 100) + '%'); num.classList.add('bump'); setTimeout(() => num.classList.remove('bump'), 120); Snd.sfx('tick'); };
+    r.addEventListener('input', upd); r.style.setProperty('--p', '44.4%');
+    conf.onclick = () => { if (conf.dataset.lock) return; conf.dataset.lock = 1; Snd.sfx('pick'); done(v); };
+    box.appendChild(sb); bottom.appendChild(conf); waitLine();
+  } else if (q.t === 'rank') {
+    let order = [];
+    const wrap = el('div', 'opts');
+    const conf = el('button', 'btn mt16', 'אישור הדירוג'); conf.disabled = true;
+    const reset = el('button', 'btn ghost small mt8', 'איפוס ↺'); reset.style.margin = '10px auto 0';
+    const paint = () => {
+      [...wrap.children].forEach((b, i) => { const p = order.indexOf(i); b.classList.toggle('pick', p >= 0); b.querySelector('.num').textContent = p >= 0 ? p + 1 : ''; });
+      conf.disabled = order.length < q.o.length;
+      if (order.length === q.o.length - 1) { const last = q.o.findIndex((_, i) => !order.includes(i)); order.push(last); paint(); }
+    };
+    q.o.forEach((o, i) => {
+      const b = el('button', 'opt', `<span class="num"></span><span>${esc(o)}</span>`);
+      b.onclick = () => { const p = order.indexOf(i); if (p >= 0) order = order.slice(0, p); else order.push(i); Snd.sfx('tap'); paint(); };
+      wrap.appendChild(b);
+    });
+    reset.onclick = () => { order = []; Snd.sfx('tap'); paint(); };
+    conf.onclick = () => { if (conf.dataset.lock) return; conf.dataset.lock = 1; Snd.sfx('pick'); done(order.slice()); };
+    box.appendChild(wrap); box.appendChild(reset); bottom.appendChild(conf); waitLine();
+  }
+}
+
+/* similarity 0..1 */
+function sim(q, a, b) {
+  if (a == null || b == null) return 0;
+  if (q.t === 'scale') return Math.max(0, 1 - Math.abs(a - b) / 4);
+  if (q.t === 'rank') { let s = 0; for (let k = 0; k < q.o.length; k++) s += Math.abs(a.indexOf(k) - b.indexOf(k)); return 1 - s / 8; }
+  return a === b ? 1 : 0;
+}
+function fmt(q, v) {
+  if (v == null) return '—';
+  if (q.t === 'scale') return String(v);
+  if (q.t === 'who') return G.p[v];
+  if (q.t === 'rank') return v.map(i => q.o[i]).join(' › ');
+  return q.o[v];
+}
+function reveal() {
+  if (G.revealed === G.i) return; G.revealed = G.i;
+  const q = G.qs[G.i], c = G.cur;
+  let s, match, guessS = null;
+  if (G.mode === 'match') { s = sim(q, c.self[0], c.self[1]); }
+  else { guessS = [sim(q, c.guess[0], c.self[1]), sim(q, c.guess[1], c.self[0])]; s = (guessS[0] + guessS[1]) / 2; }
+  match = s >= .75;
+  G.res[G.i] = { q, self: c.self.slice(), guess: c.guess.slice(), s, match, guessS };
+  G.streak = match ? G.streak + 1 : 0; G.bestStreak = Math.max(G.bestStreak, G.streak);
+
+  const perfect = s === 1;
+  const V = $('#rv-verdict');
+  if (G.mode === 'match') {
+    const t = perfect ? pick(['על אותו גל! 🌊', 'בול אותו דבר!', 'טלפתיה!', 'מוח אחד!']) : match ? pick(['כמעט זהה!', 'ממש קרוב!', 'אותו כיוון!']) : pick(['גלים שונים', 'אופס, לא הפעם', 'כל אחד והגל שלו', 'הפכים נמשכים?']);
+    V.innerHTML = `<div class="vem">${perfect ? '💞' : match ? '✨' : '🙃'}</div><div class="vt">${t}</div>${G.streak >= 3 ? `<div class="vs">🔥 ${G.streak} התאמות ברצף!</div>` : ''}`;
+  } else {
+    const both = guessS[0] >= .75 && guessS[1] >= .75, none = guessS[0] < .75 && guessS[1] < .75;
+    V.innerHTML = `<div class="vem">${both ? '🔮' : none ? '🙈' : '🎯'}</div><div class="vt">${both ? 'שניכם קראתם מחשבות!' : none ? 'אף אחד לא ניחש…' : 'ניחוש אחד בול!'}</div>`;
+  }
+  $('#rv-q').textContent = q.q;
+  const A = $('#rv-ans'); A.innerHTML = '';
+  [0, 1].forEach(p => {
+    const card = el('div', 'acard');
+    let extra = '', mk = '';
+    if (G.mode === 'guess') {
+      const ok = guessS[p] >= .75;
+      extra = `<div class="ag">🔮 ניחש/ה על ${esc(G.p[1 - p])}: <b>${esc(fmt(q, c.guess[p]))}</b></div>`;
+      mk = ok ? '✅' : '❌';
+    }
+    card.innerHTML = `<div class="av" style="background:${COLORS[p]}">${esc(initial(G.p[p]))}</div><div><div class="an">${esc(G.p[p])}</div><div class="aa">${esc(fmt(q, c.self[p]))}</div>${extra}</div>${mk ? `<span class="mk">${mk}</span>` : ''}`;
+    A.appendChild(card);
+  });
+  const done = G.res.filter(Boolean);
+  const sb = $('#rv-score');
+  if (G.mode === 'match') sb.innerHTML = `<div>💞 ${done.filter(r => r.match).length} התאמות</div><div>📊 ${Math.round(done.reduce((a, r) => a + r.s, 0) / done.length * 100)}% עד עכשיו</div>`;
+  else { const sc = [0, 1].map(p => done.reduce((a, r) => a + (r.guessS[p] >= .75 ? 1 : 0), 0)); sb.innerHTML = `<div style="border-color:${COLORS[0]}">${esc(G.p[0])}: ${sc[0]}</div><div style="border-color:${COLORS[1]}">${esc(G.p[1])}: ${sc[1]}</div>`; }
+  $('#btn-next').innerHTML = `<span class="shine"></span>${G.i + 1 >= G.qs.length ? 'לתוצאות! 🏁' : 'לשאלה הבאה ←'}`;
+  show('reveal');
+  setTimeout(() => {
+    if (perfect) { Snd.sfx('match'); FX.burst(90, ['💞', '🌊', '✨']); vib([30, 50, 30]); }
+    else if (match) { Snd.sfx('close'); FX.burst(40); vib(30); }
+    else { Snd.sfx('miss'); vib(60); }
+  }, 250);
+}
+$('#btn-next').onclick = () => {
+  Snd.sfx('tap');
+  if (G.online) { $('#btn-next').disabled = true; setTimeout(() => $('#btn-next').disabled = false, 1500); return Net.advance(G.i + 1); }
+  G.i++; if (G.i >= G.qs.length) return endGame(); beginQuestion();
+};
+function gotoQuestion(i) {
+  if (!G || i <= G.i) return;
+  G.i = i; if (G.i >= G.qs.length) { if (!G.ended) endGame(); return; }
+  beginQuestion();
+}
+
+$('#btn-quit').onclick = () => { Snd.sfx('tap'); confirmQuit(); };
+function confirmQuit() {
+  openModal(`<h3>לצאת מהמשחק? 🚪</h3><p>ההתקדמות של הסיבוב הזה לא תישמר.</p><div class="btnrow mt16"><button class="btn ghost" id="m-stay">להמשיך לשחק</button><button class="btn" id="m-quit">יציאה</button></div>`);
+  $('#m-stay').onclick = closeModal;
+  $('#m-quit').onclick = () => { closeModal(); G = null; Net.leave(); goHome(); };
+}
+
+/* ============ END ============ */
+const TIERS = [
+  [95, 'נשמות תאומות 💞', 'אתם בעצם אדם אחד בשני גופים. מפחיד קצת.'],
+  [80, 'על אותו גל 🌊', 'גולשים יחד על כל גל. כמעט טלפתיה.'],
+  [65, 'כמעט טלפתיה 🔮', 'עוד כמה סיבובים ואתם מסיימים משפטים אחד לשני.'],
+  [50, 'משלימים זה את זה 🧩', 'מסכימים על העיקר ומתווכחים על השאר. בדיוק כמו שצריך.'],
+  [35, 'הפכים נמשכים 😅', 'לפחות אף פעם לא משעמם ביחד.'],
+  [0, 'מכוכבים שונים 🪐', 'אבל היי, ככה לומדים משהו חדש בכל סיבוב!']
+];
+const GUESS_TIERS = [
+  [90, 'קוראי מחשבות 🔮', 'אתם מכירים אחד את השני יותר טוב מעצמכם.'],
+  [70, 'מכירים מצוין 🧠', 'עוד קצת ואתם יכולים להזמין אחד בשביל השני במסעדה.'],
+  [50, 'מכירים יפה 👍', 'יש בסיס, יש עוד מה לגלות.'],
+  [0, 'יש עוד מה לגלות 🕵️', 'מזל שיש עוד סיבוב!']
+];
+function endGame() {
+  G.ended = true;
+  const res = G.res.filter(Boolean), n = res.length || 1;
+  const pct = Math.round(res.reduce((a, r) => a + r.s, 0) / n * 100);
+  const matches = res.filter(r => r.match).length;
+  const tiers = G.mode === 'guess' ? GUESS_TIERS : TIERS; const tier = tiers.find(t => pct >= t[0]);
+  // record
+  const pk = G.pk; const pr = DB.pairs[pk] || (DB.pairs[pk] = { names: G.p.slice(), games: 0, best: 0, sum: 0, seen: {}, decks: {} });
+  pr.names = G.p.slice(); pr.games++; pr.best = Math.max(pr.best, pct); pr.sum += pct; pr.last = Date.now();
+  pr.decks[G.deck.id] = (pr.decks[G.deck.id] || 0) + 1;
+  const seen = new Set(pr.seen[G.deck.id] || []); res.forEach(r => seen.add(r.q.id)); pr.seen[G.deck.id] = [...seen];
+  DB.games++;
+  const allDecks = new Set(); Object.values(DB.pairs).forEach(p => Object.keys(p.decks).forEach(d => allDecks.add(d)));
+  const scaleExact = res.filter(r => r.q.t === 'scale' && G.mode === 'match' && r.s === 1).length;
+  const deckDone = seen.size >= G.deck.questions.length;
+  const h = new Date().getHours();
+  const earned = [];
+  const give = id => { if (!DB.badges[id]) { DB.badges[id] = Date.now(); earned.push(id); } };
+  give('first');
+  if (G.mode === 'match') { if (pct === 100) give('p100'); if (pct >= 90) give('p90'); if (pct < 25) give('p0'); }
+  if (G.mode === 'guess' && pct >= 80) give('guesswin');
+  if (G.bestStreak >= 5) give('streak5'); if (G.bestStreak >= 10) give('streak10');
+  if (DB.games >= 10) give('g10'); if (DB.games >= 25) give('g25'); if (DB.games >= 50) give('g50');
+  if (allDecks.size >= 5) give('d5'); if (allDecks.size >= 10) give('d10'); if (allDecks.size >= DECKS.length) give('dall');
+  if (deckDone) give('decdone'); if (deckDone && G.deck.id === 'wyr') give('wyrdone');
+  if (n >= 20) give('long'); if (scaleExact >= 3) give('scale3'); if (h >= 0 && h < 5) give('night');
+  if (G.deck.audience === 'couples') give('couple'); if (Object.keys(DB.pairs).length >= 3) give('pairs3');
+  const prevRank = rankOf(pr.games - 1), newRank = rankOf(pr.games);
+  save();
+  G.pct = pct; G.tier = tier;
+
+  // UI
+  $('#end-title').textContent = tier[1]; $('#end-sub').textContent = tier[2];
+  const W = $('#end-winner'); W.innerHTML = '';
+  if (G.mode === 'guess') {
+    const sc = [0, 1].map(p => res.reduce((a, r) => a + r.guessS[p], 0) / n * 100 | 0);
+    W.innerHTML = `<div class="winner">${sc[0] === sc[1] ? `🤝 תיקו! שניכם ${sc[0]}%` : `🏆 ${esc(G.p[sc[0] > sc[1] ? 0 : 1])} מכיר/ה את ${esc(G.p[sc[0] > sc[1] ? 1 : 0])} יותר טוב (${Math.max(...sc)}% מול ${Math.min(...sc)}%)`}</div>`;
+  }
+  $('#end-stats').innerHTML = `<div class="stat"><b>${matches}/${n}</b><span>${G.mode === 'guess' ? 'שאלות מוצלחות' : 'התאמות'}</span></div><div class="stat"><b>🔥${G.bestStreak}</b><span>רצף הכי ארוך</span></div><div class="stat"><b>${newRank[2]}</b><span>${newRank[1]}</span></div>`;
+  const L = $('#end-list'); L.innerHTML = '';
+  res.forEach((r, i) => {
+    const it = el('div', 'sumitem');
+    let a = `${esc(G.p[0])}: <b>${esc(fmt(r.q, r.self[0]))}</b><br>${esc(G.p[1])}: <b>${esc(fmt(r.q, r.self[1]))}</b>`;
+    if (G.mode === 'guess') a += `<br>🔮 ניחושים: ${esc(fmt(r.q, r.guess[0]))} / ${esc(fmt(r.q, r.guess[1]))}`;
+    it.innerHTML = `<div class="sq"><span>${r.match ? '✅' : '❌'}</span><span>${esc(r.q.q)}</span></div><div class="sa">${a}</div>`;
+    L.appendChild(it);
+  });
+  show('end');
+  const elp = $('#end-pct'); let k = 0; const t0 = performance.now();
+  const step = now => { const p = Math.min(1, (now - t0) / 1400); k = Math.round(pct * (1 - Math.pow(1 - p, 3))); elp.textContent = k + '%'; if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+  setTimeout(() => { Snd.sfx('win'); FX.burst(pct >= 65 ? 220 : 110, ['💞', '🌊', '⭐', '🎉']); vib([40, 60, 40, 60, 80]); }, 1300);
+  setTimeout(() => {
+    if (newRank !== prevRank) toast(newRank[2], `דרגה חדשה: ${newRank[1]}!`);
+    earned.forEach(id => { const b = BADGES.find(x => x[0] === id); b && toast(b[1], b[2]); });
+  }, 2100);
+}
+$('#btn-again').onclick = () => { Snd.sfx('pick'); if (G.online) return Net.newRound(G.deck.id); startGame(G.p[0], G.p[1], G.mode, G.qs.length, G.deck.id); };
+$('#btn-other').onclick = () => {
+  Snd.sfx('tap');
+  if (!G || !G.online) return openSetup();
+  openModal(`<h3>איזו חפיסה עכשיו? 🃏</h3><div class="minigrid" id="m-decks"></div><button class="btn ghost mt12" id="m-close">ביטול</button>`);
+  $('#m-close').onclick = closeModal;
+  DECKS.forEach(d => { const b = el('button', 'deck', `<span class="em">${d.emoji}</span><span><b>${esc(d.name)}</b><small>${d.questions.length} שאלות</small></span>`); b.onclick = () => { closeModal(); Net.newRound(d.id); }; $('#m-decks').appendChild(b); });
+};
+
+/* ============ SHARE IMAGE ============ */
+function drawShare() {
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#F6F2FF'); g.addColorStop(1, '#FFE6F1'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const blob = (cx, cy, r, col) => { const rg = x.createRadialGradient(cx, cy, 0, cx, cy, r); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = rg; x.fillRect(0, 0, W, H); };
+  blob(900, 160, 420, 'rgba(164,139,255,.45)'); blob(120, 1200, 460, 'rgba(255,143,188,.4)');
+  // waves
+  const wave = (y, amp, col) => { x.beginPath(); x.moveTo(0, y); for (let i = 0; i <= W; i += 10) x.lineTo(i, y + Math.sin(i / 90) * amp); x.lineTo(W, H); x.lineTo(0, H); x.closePath(); x.fillStyle = col; x.fill(); };
+  const wg = x.createLinearGradient(0, 0, W, 0); wg.addColorStop(0, '#7C5CFF'); wg.addColorStop(1, '#FF3D8B');
+  wave(1150, 22, 'rgba(164,139,255,.5)'); wave(1185, 26, wg);
+  x.direction = 'rtl'; x.textAlign = 'center'; x.fillStyle = '#1C1433';
+  const F = (w, s) => `${w} ${s}px Rubik, system-ui, Arial, sans-serif`;
+  x.font = F(900, 64); x.fillText('🌊 על אותו גל', W / 2, 150);
+  x.font = F(600, 44); x.fillStyle = '#5F5680'; x.fillText(`${G.p[0]}  💞  ${G.p[1]}`, W / 2, 250);
+  const pg = x.createLinearGradient(300, 0, 780, 0); pg.addColorStop(0, '#7C5CFF'); pg.addColorStop(1, '#FF3D8B');
+  x.font = F(900, 300); x.fillStyle = pg; x.fillText(G.pct + '%', W / 2, 600);
+  x.fillStyle = '#1C1433'; x.font = F(900, 76); x.fillText(G.tier[1], W / 2, 740);
+  x.font = F(500, 38); x.fillStyle = '#5F5680';
+  const words = G.tier[2].split(' '); let line = '', y = 820; for (const w of words) { const t = line ? line + ' ' + w : w; if (x.measureText(t).width > 880) { x.fillText(line, W / 2, y); line = w; y += 52; } else line = t; } x.fillText(line, W / 2, y);
+  // pill
+  const pill = `${G.deck.emoji} ${G.deck.name} · ${G.mode === 'guess' ? 'מצב ניחוש' : 'מצב התאמה'}`;
+  x.font = F(700, 38); const pw = x.measureText(pill).width + 80;
+  x.fillStyle = '#fff'; x.strokeStyle = '#DCD3F5'; x.lineWidth = 4;
+  const rr = (X, Y, w, h, r) => { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); };
+  rr(W / 2 - pw / 2, 930, pw, 84, 42); x.fill(); x.stroke();
+  x.fillStyle = '#1C1433'; x.fillText(pill, W / 2, 985);
+  x.font = F(700, 36); x.fillStyle = '#fff'; x.fillText('וכמה אתם על אותו גל? 😉', W / 2, 1290);
+  return c;
+}
+$('#btn-share').onclick = async () => {
+  Snd.sfx('tap');
+  const c = drawShare(); const url = c.toDataURL('image/png');
+  const text = `קיבלנו ${G.pct}% ב"על אותו גל" 🌊 ${G.tier[1]}`;
+  openModal(`<h3>התמונה שלכם מוכנה 📸</h3><img class="shareprev" src="${url}" alt=""><div class="btnrow mt16"><button class="btn grad" id="m-share">שיתוף</button><button class="btn ghost" id="m-close">סגירה</button></div>`);
+  $('#m-close').onclick = closeModal;
+  $('#m-share').onclick = async () => {
+    try {
+      if (window.Android && Android.shareImage) { Android.shareImage(url.split(',')[1], text); return; }
+      const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+      const file = new File([blob], 'al-oto-gal.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return; }
+      const a = document.createElement('a'); a.href = url; a.download = 'al-oto-gal.png'; document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) {}
+  };
+};
+
+/* ============ HISTORY ============ */
+function renderHistory() {
+  const pairs = Object.values(DB.pairs).sort((a, b) => (b.last || 0) - (a.last || 0));
+  const allDecks = new Set(); pairs.forEach(p => Object.keys(p.decks).forEach(d => allDecks.add(d)));
+  const best = pairs.reduce((m, p) => Math.max(m, p.best), 0);
+  $('#h-stats').innerHTML = `<div class="stat"><b>${DB.games}</b><span>משחקים</span></div><div class="stat"><b>${best}%</b><span>שיא התאמה</span></div><div class="stat"><b>${allDecks.size}/${DECKS.length}</b><span>חפיסות שנוסו</span></div><div class="stat"><b>${pairs.length}</b><span>זוגות שחקנים</span></div>`;
+  const B = $('#h-badges'); B.innerHTML = '';
+  $('#h-bcount').textContent = `${Object.keys(DB.badges).length}/${BADGES.length}`;
+  BADGES.forEach(([id, e, n, d]) => B.appendChild(el('div', 'bdg' + (DB.badges[id] ? '' : ' locked'), `<span class="be">${DB.badges[id] ? e : '🔒'}</span><b>${esc(n)}</b><small>${esc(d)}</small>`)));
+  const P = $('#h-pairs'); P.innerHTML = '';
+  if (!pairs.length) P.innerHTML = '<div class="empty">עוד לא שיחקתם. יאללה, משחק ראשון! 🌊</div>';
+  pairs.forEach(p => {
+    const r = rankOf(p.games), nx = nextRank(p.games);
+    const prog = nx ? (p.games - r[0]) / (nx[0] - r[0]) * 100 : 100;
+    const doneDecks = DECKS.filter(d => (p.seen[d.id] || []).length >= d.questions.length).length;
+    P.appendChild(el('div', 'pair', `<div class="pn">${esc(p.names[0])} 💞 ${esc(p.names[1])}</div><div class="pr">${r[2]} ${r[1]}</div>
+      <div class="ps"><span>🎮 ${p.games} משחקים</span><span>🏆 שיא ${p.best}%</span><span>📊 ממוצע ${Math.round(p.sum / p.games)}%</span><span>✅ ${doneDecks} חפיסות הושלמו</span></div>
+      <div class="prog"><i style="width:${prog}%"></i></div><div class="muted" style="font-size:13px;margin-top:6px">${nx ? `עוד ${nx[0] - p.games} משחקים לדרגת ${nx[1]} ${nx[2]}` : 'הגעתם לדרגה הכי גבוהה! 👑'}</div>`));
+  });
+}
+
+/* ============ ONLINE ROOMS ============ */
+/* Two interchangeable connections with the same room shape R:
+   { status, mode, len, deckId, round, qids, i, p:{0:{name,on},1:{name,on}}, ans:{ r<round>_<i>: {0:{s,g},1:{s,g}} } }
+   - Fire: the Firebase database (the APK and normal browsers)
+   - Live: the claude.ai artifact's live room (Firebase is blocked inside an artifact) */
+const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
+
+const FireT = (() => {
+  const ROOT = 'rooms', PFX = 'gal';  // shared database with the zeh-o-zeh app; own prefix so codes never clash
+  const CFG = { apiKey: "AIzaSyAcZnezXR5OQ1bi1FFPKPU_jUqkV-B5i_Y", authDomain: "zeh-o-zeh.firebaseapp.com",
+    databaseURL: "https://zeh-o-zeh-default-rtdb.europe-west1.firebasedatabase.app", projectId: "zeh-o-zeh", appId: "1:563159959757:web:feeddf9876cb76a92f0184" };
+  let db = null, F = window.FBK, code = null, me = 0, unsub = null, ready = null, T;
+  const path = s => ROOT + '/' + PFX + code + (s ? '/' + s : '');
+  const init = () => ready || (ready = (async () => {
+    if (!F) throw new Error('no-sdk');
+    const app = F.initializeApp(CFG); db = F.getDatabase(app);
+    await Promise.race([F.signInAnonymously(F.getAuth(app)), new Promise((_, rj) => setTimeout(() => rj(new Error('timeout')), 12000))]);
+    F.onValue(F.ref(db, '.info/connected'), s => T.onConn(!!s.val()));
+    return db;
+  })().catch(e => { ready = null; throw e; }));
+  const listen = () => {
+    unsub && unsub();
+    unsub = F.onValue(F.ref(db, path()), snap => T.onRoom(snap.val()));
+    try { F.onDisconnect(F.ref(db, path('p/' + me + '/on'))).set(false); F.set(F.ref(db, path('p/' + me + '/on')), true); } catch (e) {}
+  };
+  return T = {
+    onRoom: () => {}, onConn: () => {},
+    async create(name, meta) {
+      await init(); let c, tries = 0;
+      do { c = String(1000 + Math.floor(Math.random() * 9000)); const ex = await F.get(F.ref(db, ROOT + '/' + PFX + c + '/t')); if (!ex.exists() || Date.now() - ex.val() > 6 * 3600e3) break; } while (++tries < 12);
+      code = c; me = 0;
+      await F.set(F.ref(db, path()), { t: Date.now(), status: 'lobby', round: 0, i: 0, ...meta, p: { 0: { name, on: true } } });
+      listen(); return { code, me };
+    },
+    async join(c, name) {
+      await init();
+      const v = (await F.get(F.ref(db, ROOT + '/' + PFX + c))).val();
+      if (!v) return { err: 'לא מצאנו חדר עם הקוד הזה 🤔' };
+      const same = i => v.p && v.p[i] && v.p[i].name.trim().toLowerCase() === name.trim().toLowerCase();
+      code = c;
+      if (same(0) || same(1)) me = same(0) ? 0 : 1;
+      else if (v.p && v.p[1]) { code = null; return { err: 'החדר כבר מלא 🙈' }; }
+      else { me = 1; await F.set(F.ref(db, path('p/1')), { name, on: true }); }
+      listen(); return { code, me };
+    },
+    update(patch) { return F.update(F.ref(db, path()), patch); },
+    answer(key, val) { return F.set(F.ref(db, path('ans/' + key + '/' + me)), val); },
+    leave(R) {
+      try { F.set(F.ref(db, path('p/' + me + '/on')), false); if (me === 0 && R && R.status === 'lobby') F.set(F.ref(db, path()), null); } catch (e) {}
+      unsub && unsub(); unsub = null; code = null;
+    }
+  };
+})();
+
+const LiveT = (() => {
+  // Each phone keeps the whole game it knows in its own presence; the room is the merge of both.
+  let room = null, sub = null, T, mine = null, last = { 0: null, 1: null }, conn = true;
+  const api = () => claude.use('room').then(r => { if (!r) throw new Error('no-room'); return r; });
+  const push = () => room && room.presence({ gal: mine }).catch(e => console.warn(e));
+  const peersOf = () => (room ? room.peers() : []).map(p => ({ me: p.sameTab, v: p.presence && p.presence.gal })).filter(x => x.v && x.v.name);
+  function merge() {
+    const ps = peersOf();
+    const host = ps.find(x => x.v.role === 'h'), guest = ps.find(x => x.v.role === 'g');
+    if (host) last[0] = host.v.name; if (guest) last[1] = guest.v.name;
+    // adopt the newest round anyone started
+    const top = ps.reduce((a, x) => (!a || (x.v.meta.round || 0) > (a.v.meta.round || 0) ? x : a), null);
+    if (top && !top.me && (top.v.meta.round || 0) > (mine.meta.round || 0)) { mine.meta = { ...top.v.meta }; mine.ans = {}; push(); }
+    const meta = mine.meta, same = ps.filter(x => (x.v.meta.round || 0) === (meta.round || 0));
+    const R = { ...meta, i: Math.max(meta.i || 0, ...same.map(x => x.v.meta.i || 0)), p: {}, ans: {} };
+    [0, 1].forEach(k => { if (last[k]) R.p[k] = { name: last[k], on: !!(k === 0 ? host : guest) }; });
+    same.forEach(x => { const k = x.v.role === 'h' ? 0 : 1; Object.entries(x.v.ans || {}).forEach(([key, val]) => { (R.ans[key] = R.ans[key] || {})[k] = val; }); });
+    T.onRoom(R);
+  }
+  async function enter(code) {
+    const r = await api(); room = await r.join('gal' + code);
+    room.onConnection(ok => { conn = ok; T.onConn(ok); });
+    return room;
+  }
+  const waitPeers = ms => new Promise(res => setTimeout(res, ms));
+  return T = {
+    onRoom: () => {}, onConn: () => {},
+    async create(name, meta) {
+      const code = String(1000 + Math.floor(Math.random() * 9000));
+      await enter(code);
+      mine = { role: 'h', name, meta: { status: 'lobby', round: 0, i: 0, ...meta }, ans: {} }; last = { 0: name, 1: null };
+      sub = room.onPeers(merge); await push(); merge();
+      return { code, me: 0 };
+    },
+    async join(code, name) {
+      await enter(code); await waitPeers(2500);
+      const ps = peersOf(), low = s => s.trim().toLowerCase();
+      const host = ps.find(x => x.v.role === 'h'), guest = ps.find(x => x.v.role === 'g');
+      if (!host && !guest) { await room.leave(); room = null; return { err: 'לא מצאנו חדר עם הקוד הזה 🤔 (החדר פתוח רק כשמי שפתח אותו נמצא בו)' }; }
+      let role;
+      if (host && low(host.v.name) === low(name)) role = 'h';
+      else if (guest && low(guest.v.name) === low(name)) role = 'g';
+      else if (!guest) role = 'g';
+      else if (!host) role = 'h';
+      else { await room.leave(); room = null; return { err: 'החדר כבר מלא 🙈' }; }
+      const src = host || guest;
+      mine = { role, name, meta: { ...src.v.meta }, ans: role === (src === host ? 'h' : 'g') ? { ...(src.v.ans || {}) } : {} };
+      last = { 0: host ? host.v.name : role === 'h' ? name : null, 1: guest ? guest.v.name : role === 'g' ? name : null };
+      sub = room.onPeers(merge); await push(); merge();
+      return { code, me: role === 'h' ? 0 : 1 };
+    },
+    async update(patch) {
+      if (patch.ans === null) { mine.ans = {}; delete patch.ans; }
+      mine.meta = { ...mine.meta, ...patch };
+      await push(); merge();
+    },
+    async answer(key, val) { mine.ans = { ...mine.ans, [key]: val }; await push(); merge(); },
+    leave() { sub && sub(); sub = null; room && room.leave().catch(() => {}); room = null; mine = null; }
+  };
+})();
+
+const Net = (() => {
+  const T = IN_ARTIFACT ? LiveT : FireT;
+  let code = null, me = 0, R = null, connOk = true;
+  const netErr = e => {
+    console.warn(e);
+    const msg = IN_ARTIFACT ? 'כדי לשחק אונליין כאן, שני השחקנים צריכים להיות מחוברים ל-Claude ולפתוח את אותו קישור. אפשר גם לשחק בינתיים על טלפון אחד.' : 'בדקו שיש אינטרנט ונסו שוב. אפשר גם לשחק בינתיים על טלפון אחד.';
+    openModal(`<h3>אין חיבור לחדר 📡</h3><p>${msg}</p><button class="btn mt16" id="m-close">הבנתי</button>`); $('#m-close').onclick = closeModal;
+  };
+  const busy = (btn, on, txt) => { if (!btn) return; btn.disabled = on; if (on) { btn.dataset.t = btn.innerHTML; btn.innerHTML = txt || 'רגע…'; } else if (btn.dataset.t) btn.innerHTML = btn.dataset.t; };
+  const keyOf = i => 'r' + (R ? R.round : 0) + '_' + i;
+  T.onConn = ok => { connOk = ok; bar(); };
+  T.onRoom = v => { R = v; onRoom(); };
+
+  function bar() {
+    const b = $('#netbar'); let msg = '';
+    const inGame = ['lobby', 'q', 'wait', 'reveal', 'end'].includes(cur) && code;
+    if (inGame && !connOk) msg = '📡 החיבור נפל… מנסים להתחבר מחדש';
+    else if (inGame && R && R.p && R.p[1 - me] && R.p[1 - me].on === false) msg = `😴 ${R.p[1 - me].name} התנתק/ה… מחכים שיחזור/תחזור`;
+    if (msg) b.textContent = msg; b.classList.toggle('on', !!msg);
+  }
+  function renderLobby() {
+    if (!R) return;
+    $('#lobby-code').innerHTML = code.split('').map(c => `<span>${c}</span>`).join('');
+    const P = $('#lobby-players'); P.innerHTML = '';
+    [0, 1].forEach(i => {
+      const p = R.p && R.p[i];
+      P.appendChild(el('div', 'pl' + (p ? '' : ' empty'), p ? `<span class="av" style="background:${COLORS[i]}">${esc(initial(p.name))}</span>${esc(p.name)}${i === me ? ' (את/ה)' : ''}<span class="sp"></span>${i === 0 ? '👑' : '✅'}`
+        : `<span class="av">?</span><span class="dots">מחכים לשחקן/ית השני/ה</span>`));
+    });
+    const d = DECKS.find(x => x.id === R.deckId);
+    const both = R.p && R.p[0] && R.p[1];
+    $('#lobby-info').innerHTML = `${d ? d.emoji + ' ' + esc(d.name) : ''} · ${R.mode === 'guess' ? '🔮 ניחוש' : '💞 התאמה'} · ${R.len} שאלות` + (me === 1 && R.p[0] ? `<br><span class="dots">מחכים ש${esc(R.p[0].name)} יתחיל/תתחיל</span>` : '');
+    const st = $('#btn-lobby-start'); st.hidden = me !== 0; st.disabled = !both;
+    $('#btn-wa').hidden = !!both;
+  }
+  function onRoom() {
+    bar();
+    if (!R) { if (code) { Net.leave(); goHome(); openModal(`<h3>החדר נסגר 🚪</h3><p>אפשר לפתוח חדר חדש בכל רגע.</p><button class="btn mt16" id="m-close">סגירה</button>`); $('#m-close').onclick = closeModal; } return; }
+    if (R.status === 'lobby') { if (cur !== 'lobby') show('lobby'); renderLobby(); if (R.p && R.p[1] && me === 0 && !Net._joinedSnd) { Net._joinedSnd = 1; Snd.sfx('match'); vib([30, 40, 30]); FX.burst(50); } return; }
+    if (R.status !== 'play' || !R.p || !R.p[0] || !R.p[1]) return;
+    if (!G || !G.online || G.online.round !== R.round) {
+      closeModal();
+      startGame(R.p[0].name, R.p[1].name, R.mode, R.len, R.deckId, { me, round: R.round, qids: R.qids || [] });
+      return;
+    }
+    check();
+  }
+  function check() {
+    if (!R || !G || !G.online || G.online.round !== R.round) return;
+    const roomI = R.i || 0;
+    if (roomI > G.i) { if (G.revealed < G.i && G.i < G.qs.length) { const a = R.ans && R.ans[keyOf(G.i)]; if (a && a[0] && a[1]) fill(a), reveal(); } return gotoQuestion(roomI); }
+    const a = R.ans && R.ans[keyOf(G.i)];
+    if (a && a[0] && a[1] && G.revealed < G.i) { if (cur === 'q') return; fill(a); reveal(); }
+  }
+  const fill = a => { [0, 1].forEach(p => { G.cur.self[p] = a[p].s ?? null; G.cur.guess[p] = a[p].g ?? null; }); };
+  const roundPatch = deckId => {
+    const deck = DECKS.find(d => d.id === deckId) || DECKS[0];
+    const qids = chooseQuestions(deck, pairKey(R.p[0].name, R.p[1].name), R.len).map(q => q.id);
+    return { status: 'play', deckId: deck.id, round: (R.round || 0) + 1, i: 0, qids, ans: null };
+  };
+  return {
+    check, _joinedSnd: 0,
+    debug: () => ({ R, code, me, cur, Gi: G && G.i, rev: G && G.revealed, round: G && G.online && G.online.round, live: IN_ARTIFACT }),
+    async create(name, mode, len, deckId) {
+      const btn = $('#btn-start'); busy(btn, true, 'פותחים חדר… 🌐');
+      try { const r = await T.create(name, { mode, len, deckId }); code = r.code; me = r.me; Net._joinedSnd = 0; G = null; DB.lastRoom = { code, me, t: Date.now() }; save(); Snd.sfx('pick'); if (R) onRoom(); }
+      catch (e) { netErr(e); } finally { busy(btn, false); }
+    },
+    async join(c, name) {
+      const btn = $('#btn-join-go'); busy(btn, true, 'מתחברים… 🔌'); $('#join-err').textContent = '';
+      try {
+        const r = await T.join(c, name);
+        if (r.err) { $('#join-err').textContent = r.err; return; }
+        code = r.code; me = r.me; G = null; Snd.sfx('match'); vib(40);
+        DB.last = { ...DB.last, p1: name }; DB.lastRoom = { code, me, t: Date.now() }; save(); if (R) onRoom();
+      } catch (e) { netErr(e); } finally { busy(btn, false); }
+    },
+    async start() { if (!R || me !== 0) return; try { await T.update(roundPatch(R.deckId)); } catch (e) { netErr(e); } },
+    async newRound(deckId) { if (!R) return; try { await T.update(roundPatch(deckId)); } catch (e) { netErr(e); } },
+    answer(i, val) { if (!code) return; Promise.resolve(T.answer(keyOf(i), val)).catch(netErr); },
+    advance(i) { if (!code || !R) return; if ((R.i || 0) < i) Promise.resolve(T.update({ i })).catch(netErr); },
+    leave() { if (!code) return; T.leave(R); code = null; R = null; $('#netbar').classList.remove('on'); },
+    share() {
+      const txt = IN_ARTIFACT
+        ? `בוא/י נבדוק כמה אנחנו על אותו גל 🌊💞\nקוד החדר: *${code}*\nפותחים את הקישור של המשחק ב-Claude ← הצטרפות לחדר 🔑`
+        : `בוא/י נבדוק כמה אנחנו על אותו גל 🌊💞\nקוד החדר: *${code}*\nפותחים את האפליקציה "על אותו גל" ← הצטרפות לחדר 🔑`;
+      const url = 'https://wa.me/?text=' + encodeURIComponent(txt);
+      if (window.Android) { location.href = url; return; }
+      const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+    },
+    get code() { return code; }
+  };
+})();
+$('#btn-wa').onclick = () => { Snd.sfx('tap'); Net.share(); };
+$('#btn-lobby-start').onclick = () => { Snd.sfx('pick'); Net.start(); };
+$('#btn-lobby-x').onclick = () => { Snd.sfx('tap'); confirmQuit(); };
+$('#btn-join').onclick = () => {
+  Snd.sfx('pick');
+  $('#join-name').value = DB.last.p1 || ''; $('#join-code').value = ''; $('#join-err').textContent = ''; joinCheck();
+  show('join'); setTimeout(() => $('#join-code').focus(), 400);
+};
+const joinCheck = () => { $('#btn-join-go').disabled = !(/^\d{4}$/.test($('#join-code').value) && $('#join-name').value.trim()); };
+$('#join-code').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); joinCheck(); if (e.target.value.length === 4) { Snd.sfx('pick'); if (!$('#join-name').value.trim()) $('#join-name').focus(); } });
+$('#join-name').addEventListener('input', joinCheck);
+$('#btn-join-go').onclick = () => Net.join($('#join-code').value, $('#join-name').value.trim());
+
+/* ============ boot ============ */
+renderHome();
+requestAnimationFrame(() => $('#s-home').classList.add('on'));
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !window.Android && !IN_ARTIFACT && location.hostname !== 'localhost') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
